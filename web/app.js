@@ -98,8 +98,19 @@ class RealBackend {
     this.adapterName = await this.t.connect();
     this.t.onStatus = null;
     this.t.onDisconnect = () => onDisconnected();
-    await this.e.connect(status);
+    for (;;) {
+      try { await this.e.connect(status); return; }
+      catch (err) {
+        if (this.cancelled) { const c = new Error('Cancelled'); c.name = 'NotFoundError'; throw c; }
+        if (err.code !== 'NOANSWER') throw err;
+        // the adapter may talk on a different channel: try the next one before giving up
+        if (this.t.nextChannel && await this.t.nextChannel()) { status('Trying another channel...'); continue; }
+        throw new Error(this.adapterName + ' connected but didn’t answer. Unplug it for 10 seconds, plug it back in, turn the key on, then try again.' +
+          (this.t.channelInfo ? ' (Channels tried: ' + this.t.channelInfo() + ')' : ''));
+      }
+    }
   }
+  cancel() { this.cancelled = true; if (this.t.cancel) this.t.cancel(); else this.disconnect(); }
   get vin() { return this.e.vin; }
   get protoDesc() { return this.e.protoDesc; }
   get chip() { return this.e.stn || this.e.id; }
@@ -300,10 +311,14 @@ function vehicleName() { return VEH ? vehTitle(VEH) : (B ? 'Vehicle' : 'No vehic
 async function connect(demo) {
   if (S.mode !== 'off') return;
   const b = demo ? new DemoBackend() : new RealBackend();
+  S.pending = b;
   S.mode = 'connecting'; S.status = demo ? 'Starting demo...' : NativeTransport.available() ? 'Looking for adapters...' : 'Choose your adapter...'; renderHome();
   try {
-    await b.connect((s) => { S.status = s; renderHome(); });
+    await b.connect((s) => { if (S.pending === b) { S.status = s; renderHome(); } });
+    if (S.pending !== b) { try { b.disconnect(); } catch (e) { /* ignore */ } return; }
   } catch (err) {
+    if (S.pending !== b) return;
+    S.pending = null;
     S.mode = 'off'; S.status = '';
     try { b.disconnect(); } catch (e) { /* ignore */ }
     renderHome();
@@ -311,6 +326,7 @@ async function connect(demo) {
     alertBox({ title: 'Couldn’t connect', msg: (err && err.message) || String(err), cancel: false });
     return;
   }
+  S.pending = null;
   B = b; S.status = 'Identifying your vehicle...';
   S.makeKey = makeFromVIN(B.vin) || store.get('make', null);
   resetData();
@@ -857,7 +873,8 @@ function renderHome() {
       '<button class="btn primary tap" data-act="connect">Connect Adapter</button><button class="btn tap" data-act="demo" style="height:44px">Try Demo</button>';
   } else if (S.mode === 'connecting') {
     c.innerHTML = (known ? '<div class="stage' + (heroPhoto() ? ' photo' : '') + '">' + heroArt('dim') + '</div>' : '') +
-      '<div class="carrow"><div class="spin"></div><div class="grow"><b>Connecting</b><span class="s">' + esc(S.status) + '</span></div></div>';
+      '<div class="carrow"><div class="spin"></div><div class="grow"><b>Connecting</b><span class="s">' + esc(S.status) + '</span></div></div>' +
+      '<button class="btn tap" data-act="cancelConnect" style="height:44px">Cancel</button>';
   } else {
     const photo = heroPhoto();
     c.innerHTML = '<button class="hero tap" data-act="vehicle" aria-label="Vehicle details">' +
@@ -1303,6 +1320,11 @@ const ACT = {
   toggleSwitch: (el) => el.classList.toggle('on'),
   connect: () => { closeSheet(); connect(false); },
   demo: () => { closeSheet(); connect(true); },
+  cancelConnect: () => {
+    const b = S.pending; S.pending = null;
+    if (b) { try { b.cancel ? b.cancel() : b.disconnect(); } catch (e) { /* ignore */ } }
+    S.mode = 'off'; S.status = ''; renderHome();
+  },
   disconnect,
   settings, closeSheet,
   check: runCheck,

@@ -12,9 +12,17 @@ const BLE_SERVICES = [
   '000018f0-0000-1000-8000-00805f9b34fb',
   'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
   '0000beef-0000-1000-8000-00805f9b34fb',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Bluetooth calls can hang forever (adapter busy, out of range); give each one a limit and a clear message.
+function withTimeout(p, ms, msg, abort) {
+  let t;
+  const lim = new Promise((_, rej) => { t = setTimeout(() => rej(new Error(msg)), ms); });
+  return Promise.race([p, lim].concat(abort ? [abort] : [])).finally(() => clearTimeout(t));
+}
 
 // Shared prompt-based serial logic: collect bytes until the ELM ">" prompt.
 class SerialBase {
@@ -43,36 +51,67 @@ class SerialBase {
 
 // Web Bluetooth (Bluefy / Chrome).
 class BleTransport extends SerialBase {
-  constructor() { super(); this.dev = null; this.rx = null; this.tx = null; }
-
-  async connect() {
-    if (!navigator.bluetooth) throw new Error('This browser has no Bluetooth. Open the page in Bluefy.');
-    const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES });
-    this.dev = dev;
-    dev.addEventListener('gattserverdisconnected', () => { if (this.onDisconnect) this.onDisconnect(); });
-    if (this.onStatus) this.onStatus('Connecting to ' + (dev.name || 'adapter') + '...');
-    const server = await dev.gatt.connect();
-    const services = await server.getPrimaryServices();
-    for (const svc of services) {
-      let chars;
-      try { chars = await svc.getCharacteristics(); } catch (e) { continue; }
-      let r = null, t = null;
-      for (const c of chars) {
-        const p = c.properties;
-        if (!r && (p.notify || p.indicate)) r = c;
-        if (!t && (p.write || p.writeWithoutResponse)) t = c;
-      }
-      if (r && t) { this.rx = r; this.tx = t; break; }
-    }
-    if (!this.rx) throw new Error('This adapter has no serial service I recognise.');
-    await this.rx.startNotifications();
-    this.rx.addEventListener('characteristicvaluechanged', (e) => {
+  constructor() {
+    super(); this.dev = null; this.rx = null; this.tx = null; this.cands = []; this.ci = -1;
+    this._rxHandler = (e) => {
       const dv = e.target.value; let s = '';
       for (let i = 0; i < dv.byteLength; i++) s += String.fromCharCode(dv.getUint8(i));
       this._onText(s);
-    });
+    };
+    this.abort = new Promise((_, rej) => { this._abortRej = rej; });
+    this.abort.catch(() => {});
+  }
+
+  cancel() {
+    const e = new Error('Cancelled'); e.name = 'NotFoundError';
+    this._abortRej(e);
+    this.disconnect();
+  }
+
+  async connect() {
+    if (!navigator.bluetooth) throw new Error('This browser has no Bluetooth. Open the page in Bluefy.');
+    const dev = await Promise.race([navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES }), this.abort]);
+    this.dev = dev;
+    const name = dev.name || 'the adapter';
+    dev.addEventListener('gattserverdisconnected', () => { if (this.onDisconnect) this.onDisconnect(); });
+    if (this.onStatus) this.onStatus('Connecting to ' + name + '...');
+    const busy = 'Couldn’t connect to ' + name + '. Another app may be using it: fully close Car Scanner (swipe it away), unplug the adapter for 10 seconds, plug it back in, then try again.';
+    const server = await withTimeout(dev.gatt.connect(), 15000, busy, this.abort);
+    if (this.onStatus) this.onStatus('Opening a channel to ' + name + '...');
+    const services = await withTimeout(server.getPrimaryServices(), 10000, busy, this.abort);
+    // Every notify + write pair is a possible serial channel; try the known OBD services first.
+    const rank = (u) => { const i = BLE_SERVICES.indexOf(String(u).toLowerCase()); return i < 0 ? 99 : i; };
+    services.sort((a, b) => rank(a.uuid) - rank(b.uuid));
+    this.cands = [];
+    for (const svc of services) {
+      let chars;
+      try { chars = await withTimeout(svc.getCharacteristics(), 5000, 'timeout', this.abort); } catch (e) { if (e.name === 'NotFoundError') throw e; continue; }
+      const rx = chars.filter((c) => c.properties.notify || c.properties.indicate);
+      const tx = chars.filter((c) => c.properties.write || c.properties.writeWithoutResponse);
+      for (const r of rx) for (const t of tx) this.cands.push({ svc: svc.uuid, rx: r, tx: t });
+    }
+    if (!this.cands.length) throw new Error(name + ' has no data channel this app recognises. Is it an OBD adapter?');
+    this.ci = -1;
+    if (!(await this.nextChannel())) throw new Error('Couldn’t open a data channel on ' + name + '. Unplug it for 10 seconds and try again.');
     return dev.name || 'OBD adapter';
   }
+
+  // Switch to the next candidate channel (used when the adapter doesn't answer on the current one).
+  async nextChannel() {
+    if (this.rx) { try { this.rx.removeEventListener('characteristicvaluechanged', this._rxHandler); await withTimeout(this.rx.stopNotifications(), 2000, 'timeout'); } catch (e) { /* ignore */ } }
+    while (++this.ci < this.cands.length) {
+      const c = this.cands[this.ci];
+      try {
+        this.rx = c.rx; this.tx = c.tx;
+        await withTimeout(c.rx.startNotifications(), 6000, 'timeout', this.abort);
+        c.rx.addEventListener('characteristicvaluechanged', this._rxHandler);
+        return true;
+      } catch (e) { if (e.name === 'NotFoundError') throw e; }
+    }
+    this.rx = null; this.tx = null;
+    return false;
+  }
+  channelInfo() { return this.cands.map((c) => String(c.svc || '?').slice(4, 8)).filter((v, i, a) => a.indexOf(v) === i).join(', '); }
 
   disconnect() { try { if (this.dev && this.dev.gatt.connected) this.dev.gatt.disconnect(); } catch (e) { /* ignore */ } }
 
@@ -267,7 +306,7 @@ class Elm {
     let id = await this.raw('ATZ', 3000);
     await sleep(400);
     if (!/ELM|STN|OBD|V\d/i.test(id)) id = await this.raw('ATI', 1500);
-    if (!/ELM|STN|OBD|V\d/i.test(id)) throw new Error('Adapter did not answer. Is it plugged in?');
+    if (!/ELM|STN|OBD|V\d/i.test(id)) { const e = new Error('Adapter did not answer. Is it plugged in?'); e.code = 'NOANSWER'; throw e; }
     this.id = (id.match(/(ELM327|STN\d+|OBD\w*)[^\r\n>]*/i) || [id.trim()])[0].trim();
     for (const c of ['ATE0', 'ATL0', 'ATS0', 'ATH0', 'ATAT1', 'ATSP0']) await this.raw(c, 1000);
     const sti = (await this.lines('STI', 1000)).find((s) => /STN/.test(s));
