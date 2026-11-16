@@ -10,6 +10,7 @@ const runs = [
   ['connection: timeouts, channel fallback, cancel, Bluefy detection', [R('conn.js')]],
   ['vehicle photos, fuel & MPG', [R('feat.js')]],
   ['demo mode, both themes', [R('demo.js')]],
+  ['tabs, swipe back, sheets, code lookup', [R('nav.js')]],
 ];
 let bad = 0;
 for (const [name, args] of runs) {

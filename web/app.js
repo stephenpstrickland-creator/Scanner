@@ -71,7 +71,8 @@ for (let c = 1; c <= 8; c++) CAUSES['P030' + c] = ['Spark plug or ignition coil 
 // ---------------------------------------------------------------- state
 const S = {
   mode: 'off', status: '', theme: store.get('theme', 'dark'), tempU: store.get('tempU', 'F'), speedU: store.get('speedU', 'mph'),
-  stack: ['home'], liveMode: 'gauges', misMode: 'cur',
+  liveMode: ['gauges', 'list', 'graph'].includes(store.get('seg.live', '')) ? store.get('seg.live', '') : 'gauges',
+  misMode: store.get('seg.mis', '') === 'avg' ? 'avg' : 'cur', mpgMode: ['trip', 'fills', 'spend'].includes(store.get('seg.mpg', '')) ? store.get('seg.mpg', '') : 'trip',
   graphKeys: (store.get('graph.keys', 'rpm,speed') || 'rpm').split(',').filter((k) => GRAPH_KEYS.includes(k)).slice(0, 3), gWin: +store.get('graph.win', '60') || 60,
   codes: null, codesLoading: false, ff: null, ready: null, readyLoading: false, mis: null, misLoading: false, tests: null, testsLoading: false,
   scan: { state: 'intro', results: [], i: 0, n: 0, name: '' }, makeKey: null, selMod: null,
@@ -257,15 +258,23 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', alerts: 'Alerts', replay: 'Replay', fuel: 'Fuel Trim', extra: 'Extra' };
+// Four tabs, each with its own stack of screens. S.stack is always the current tab's stack.
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', alerts: 'Alerts', replay: 'Replay', fuel: 'Fuel Trim', extra: 'Extra',
+  livetab: 'Live', diag: 'Diagnose', log: 'Log', recs: 'Recordings' };
+const TABS = { home: 'home', live: 'livetab', diag: 'diag', log: 'log' };
+S.stacks = { home: ['home'], live: ['livetab'], diag: ['diag'], log: ['log'] };
+S.tab = TABS[store.get('tab', 'home')] ? store.get('tab', 'home') : 'home';
+Object.defineProperty(S, 'stack', { get: () => S.stacks[S.tab], set: (v) => { S.stacks[S.tab] = v; }, enumerable: true });
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
+function setBack(n, prev) { const bk = view(n).querySelector('.back span'); if (bk) bk.textContent = TITLES[prev] || 'Back'; }
 function push(n) {
   const cur = top();
   if (cur === n) return;
+  if (S.stack.includes(n)) { while (top() !== n) pop(); return; }   // already further down this tab: go back to it
   view(cur).classList.remove('active'); view(cur).classList.add('behind');
   const v = view(n); v.style.zIndex = S.stack.length + 1; v.classList.remove('behind');
-  const bk = v.querySelector('.back span'); if (bk) bk.textContent = TITLES[cur] || 'Back';
+  setBack(n, cur);
   void v.offsetWidth; v.classList.add('active');
   S.stack.push(n); onShow(n);
 }
@@ -275,8 +284,39 @@ function pop() {
   const prev = top(); view(prev).classList.remove('behind'); view(prev).classList.add('active');
   onShow(prev);
 }
-function goHome() { while (S.stack.length > 1) pop(); }
+// Show the current tab's stack without animating (switching tabs, or on launch).
+function showStack() {
+  const st = S.stack, all = $$('.view');
+  all.forEach((v) => { v.classList.add('notrans'); v.classList.remove('active', 'behind'); v.style.zIndex = ''; v.style.transform = ''; v.style.filter = ''; });
+  st.forEach((n, i) => { const v = view(n); v.style.zIndex = i + 1; v.classList.add(i === st.length - 1 ? 'active' : 'behind'); if (i) setBack(n, st[i - 1]); });
+  void document.body.offsetWidth;
+  all.forEach((v) => v.classList.remove('notrans'));
+  renderTabbar();
+  onShow(top());
+}
+function selectTab(t) {
+  if (!TABS[t]) return;
+  if (t === S.tab) {   // tapping the open tab goes back to its first screen, or scrolls it to the top
+    if (S.stack.length > 1) { while (S.stack.length > 1) pop(); } else { const c = view(top()).querySelector('.content'); if (c) c.scrollTop = 0; }
+    return;
+  }
+  S.tab = t; store.set('tab', t); showStack();
+}
+function goHome() {
+  Object.keys(TABS).forEach((t) => { S.stacks[t] = [TABS[t]]; });
+  S.tab = 'home'; showStack();
+}
+function renderTabbar() {
+  $$('#tabbar [data-tab]').forEach((b) => { const on = b.dataset.tab === S.tab; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const n = S.codes ? S.codes.stored.length + S.codes.pending.length : 0, bd = $('#tb-badge');
+  bd.style.display = n ? 'flex' : 'none'; bd.textContent = n || '';
+  $('#tabbar [data-tab="diag"]').setAttribute('aria-label', 'Diagnose' + (n ? ', ' + n + ' trouble code' + (n > 1 ? 's' : '') : ''));
+}
 function onShow(n) {
+  if (n === 'livetab') renderLiveTab();
+  if (n === 'diag') renderDiag();
+  if (n === 'log') renderLog();
+  if (n === 'recs') renderRecs();
   if (n === 'home') renderHome();
   if (n === 'codes') { renderCodes(); if (!S.codes && !S.codesLoading) loadCodes(); }
   if (n === 'ready') { renderReady(); if (!S.ready && !S.readyLoading) loadReady(); }
@@ -305,8 +345,64 @@ function alertBox(o) {
   no.onclick = () => { close(); if (o.onCancel) o.onCancel(); };
   ok.onclick = () => { close(); if (o.onOk) o.onOk(); };   // synchronous: keeps the tap gesture for Bluetooth
 }
-function openSheet(title, html) { $('#sh-t').textContent = title; $('#sh-b').innerHTML = html; $('#sheetscrim').classList.add('on'); $('#sheet').classList.add('on'); }
-function closeSheet() { $('#sheetscrim').classList.remove('on'); $('#sheet').classList.remove('on'); }
+function openSheet(title, html) { $('#sh-t').textContent = title; $('#sh-b').innerHTML = html; $('#sheetscrim').classList.add('on'); $('#sheet').classList.add('on'); document.body.classList.add('sheeton'); }
+function closeSheet() { $('#sheetscrim').classList.remove('on'); $('#sheet').classList.remove('on'); document.body.classList.remove('sheeton'); }
+
+// ---- gestures: swipe from the left edge to go back, drag a sheet down to close it
+const SW = { kind: null, block: 0 };
+const swNow = () => (window.performance ? performance.now() : Date.now());
+function swTrack(p) { const t = swNow(); if (SW.lt !== undefined && t > SW.lt) SW.v = (p - SW.lp) / (t - SW.lt); SW.lp = p; SW.lt = t; }
+document.addEventListener('pointerdown', (e) => {
+  if (e.button) return;
+  const sheetOn = $('#sheet').classList.contains('on'), r = $('#app').getBoundingClientRect();
+  if (!sheetOn && !$('#alertscrim').classList.contains('on') && S.stack.length > 1 && e.clientX - r.left <= 20) {
+    Object.assign(SW, { kind: 'back', x0: e.clientX, y0: e.clientY, d: 0, v: 0, lt: undefined, moved: false, w: r.width || window.innerWidth || 390,
+      cur: view(top()), prev: view(S.stack[S.stack.length - 2]) });
+    swTrack(e.clientX); return;
+  }
+  if (sheetOn && e.target.closest('#sheet .grab, #sheet .sh') && !e.target.closest('button')) {
+    Object.assign(SW, { kind: 'sheet', y0: e.clientY, d: 0, v: 0, lt: undefined, moved: false, h: $('#sheet').offsetHeight || (window.innerHeight || 800) * 0.86 });
+    swTrack(e.clientY);
+  }
+});
+document.addEventListener('pointermove', (e) => {
+  if (!SW.kind) return;
+  if (SW.kind === 'back') {
+    const dx = Math.max(0, e.clientX - SW.x0);
+    if (!SW.moved) { if (Math.abs(e.clientY - SW.y0) > 12 && dx < 12) { SW.kind = null; return; } if (dx < 8) return; SW.moved = true; }
+    SW.d = dx; swTrack(e.clientX);
+    const f = Math.min(1, dx / SW.w);
+    SW.cur.style.transition = 'none'; SW.cur.style.transform = 'translateX(' + dx + 'px)';
+    SW.prev.style.transition = 'none'; SW.prev.style.transform = 'translateX(' + (-28 * (1 - f)) + '%)'; SW.prev.style.filter = 'brightness(' + (0.6 + 0.4 * f) + ')';
+  } else {
+    const dy = Math.max(0, e.clientY - SW.y0);
+    if (!SW.moved) { if (dy < 6) return; SW.moved = true; }
+    SW.d = dy; swTrack(e.clientY);
+    const sh = $('#sheet'); sh.style.transition = 'none'; sh.style.transform = 'translateY(' + dy + 'px)';
+    $('#sheetscrim').style.opacity = String(Math.max(0, 1 - dy / SW.h));
+  }
+});
+function swEnd() {
+  const k = SW.kind; SW.kind = null;
+  if (!k || !SW.moved) return;
+  SW.block = Date.now() + 350;   // the release mustn't also count as a tap
+  if (k === 'back') {
+    const go = SW.d > SW.w * 0.35 || SW.v > 0.5;
+    [SW.cur, SW.prev].forEach((v) => { v.style.transition = ''; v.style.transform = ''; v.style.filter = ''; });
+    if (go) pop();
+  } else {
+    const go = SW.d > SW.h * 0.25 || SW.v > 0.5, sh = $('#sheet');
+    sh.style.transition = ''; sh.style.transform = ''; $('#sheetscrim').style.opacity = '';
+    if (go) closeSheet();
+  }
+}
+document.addEventListener('pointerup', swEnd);
+document.addEventListener('pointercancel', () => {
+  if (SW.kind === 'back' && SW.moved) [SW.cur, SW.prev].forEach((v) => { v.style.transition = ''; v.style.transform = ''; v.style.filter = ''; });
+  if (SW.kind === 'sheet' && SW.moved) { const sh = $('#sheet'); sh.style.transition = ''; sh.style.transform = ''; $('#sheetscrim').style.opacity = ''; }
+  SW.kind = null;
+});
+document.addEventListener('click', (e) => { if (Date.now() < SW.block) { e.stopPropagation(); e.preventDefault(); } }, true);
 let hudT;
 function hud(txt, icon) {
   $('#hudtxt').textContent = txt; $('#hudic').innerHTML = '<use href="#' + (icon || 'i-check') + '"/>';
@@ -324,6 +420,7 @@ function segSet(seg, val) {
 }
 function onSeg(seg, val) {
   segSet(seg, val);
+  if (['live', 'mis', 'mpg'].includes(seg)) store.set('seg.' + seg, val);   // remembered for next launch
   if (seg === 'live') { S.liveMode = val; ['gauges', 'list', 'graph'].forEach((m) => $('#p-' + m).classList.toggle('on', m === val)); updateLive(); }
   if (seg === 'mis') { S.misMode = val; renderMis(); }
   if (seg === 'gwin') { S.gWin = +val; store.set('graph.win', val); GL.cur = null; drawGraph(true); }
@@ -445,6 +542,7 @@ function basePollKeys() {
   }
   if (t === 'fuel') return ['stft1', 'ltft1', 'stft2', 'ltft2'];
   if (t === 'home') return ['rpm', 'speed', 'cool', 'volt'];
+  if (t === 'livetab') return ['rpm', 'speed', 'cool', 'volt', 'stft1', 'ltft1'];
   if (t === 'extra') return 'extra';
   return ['volt'];
 }
@@ -955,6 +1053,9 @@ function renderTiles() {
   else $('#t-mis').textContent = !on ? '—' : 'Tap to read';
   const xa = S.extra.find((x) => x.state === 1);
   $('#t-extra').textContent = !on ? '—' : xa ? 'ATF ' + tempStr(xa.v) : 'Maker data';
+  renderTabbar();
+  const t = top();
+  if (t === 'livetab') renderLiveTab(); else if (t === 'diag') renderDiag(); else if (t === 'log') renderLog();
 }
 function updateHome() {
   const on = S.mode === 'live' || S.mode === 'demo';
@@ -1007,7 +1108,7 @@ function renderCodes() {
 }
 function openCode(code) {
   const ff = S.ff, cell = (v, l) => '<div><b class="num">' + v + '</b><span>' + l + '</span></div>';
-  let h = '<div style="font-size:19px;font-weight:600;line-height:24px">' + esc(dtcText(code, S.makeKey)) + '</div>';
+  let h = '<div style="font-size:19px;font-weight:600;line-height:24px">' + esc(dtcText(code, makeKeyNow())) + '</div>';
   if (ff && ff.code === code) {
     h += '<div class="cap in">Freeze frame · conditions when it set</div><div class="ff">' +
       cell(ff.rpm !== undefined ? Math.round(ff.rpm).toLocaleString('en-US') : '—', 'RPM') + cell(ff.speed !== undefined ? Math.round(conv('speed', ff.speed)) : '—', unit('speed').toUpperCase()) +
@@ -1517,9 +1618,8 @@ function recTick() {
 const recWhen = (r) => new Date(r.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 function renderRecList() {
   const el = $('#grecs');
-  if (!el) return;
-  el.innerHTML = RECS.length ? '<div class="cap">Saved recordings</div><div class="group">' + RECS.slice().reverse().map((r) => '<button class="row tap" data-act="openRec" data-id="' + r.id + '"><span class="grow">' + esc(r.name) +
-    '<span class="sub">' + esc(recWhen(r)) + ' · ' + mmss(r.secs * 1000) + ' · ' + r.keys.length + ' readings</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('') + '</div>' : '';
+  if (el) el.innerHTML = RECS.length ? '<div class="cap">Saved recordings</div><div class="group">' + recListHtml() + '</div>' : '';
+  if (top() === 'recs') renderRecs();
 }
 function recCsv(r) {
   const header = ['time_s'].concat(r.keys.map((k) => k + '_' + unit(k).replace('°', 'deg').replace('/', 'per')));
@@ -2006,6 +2106,122 @@ function saveAlert() {
   alSave(); closeSheet(); renderAlerts(); alBar(); hud('Alert saved', 'i-bell');
 }
 
+// ---------------------------------------------------------------- tab roots: Live, Diagnose, Log
+const isOn = () => S.mode === 'live' || S.mode === 'demo';
+function makeKeyNow() { return S.makeKey || (VEH && VEH.vin && makeFromVIN(VEH.vin)) || store.get('make', null); }
+function makeName() { const k = makeKeyNow(); return k && VEHICLE_DB[k] ? VEHICLE_DB[k].name.split(' / ')[0] : 'Maker'; }
+// Same limits Drive Health uses, so a number turns orange/red where a finding would show up.
+function readLevel(k, v) {
+  if (v === undefined || v === null || isNaN(v)) return '';
+  if (k === 'cool') return v >= 110 ? 'red' : v >= 104 ? 'orange' : '';
+  if (k === 'volt') { const run = D.rpm > 500; return run ? (v < 12.6 ? 'red' : v < 13.0 || v > 15.0 ? 'orange' : '') : v < 12.2 ? 'orange' : ''; }
+  if (k === 'trim') return Math.abs(v) >= 25 ? 'red' : Math.abs(v) >= 10 ? 'orange' : '';
+  return '';
+}
+const LT_TILES = [['rpm', 'Engine speed', 0, 6000], ['speed', 'Speed', 0, 160], ['cool', 'Coolant', 40, 120], ['volt', 'Battery', 10, 16]];
+const navRow = (o) => '<button class="row tap" ' + o.attr + '><svg class="ic li"><use href="#' + o.icon + '"/></svg><span class="grow">' + esc(o.label) + '</span>' +
+  '<span class="val' + (o.cls ? ' ' + o.cls : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + '>' + (o.val || '') + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
+function connectCard(msg) {
+  const conn = S.mode === 'connecting';
+  return '<div class="offcard">' + (conn ? '<div class="loading" style="padding:4px 0;justify-content:flex-start"><div class="spin"></div>' + esc(S.status || 'Connecting...') + '</div>'
+    : '<p>' + msg + '</p><button class="btn primary tap" data-act="connect">Connect Adapter</button><button class="btn tap" data-act="demo" style="height:44px">Try Demo</button>') + '</div>';
+}
+function renderLiveTab() {
+  const el = $('#livetabbody'); if (!el) return;
+  const on = isOn(), alOn = AL.rules.filter((r) => r.on).length;
+  let h = '<div class="homehead"><h1>Live</h1><button class="iconbtn tap" data-go="alerts" aria-label="Custom alerts"><svg class="ic"><use href="#i-bell"/></svg></button></div>';
+  if (!on) h += connectCard('Connect to see live readings from the truck.');
+  else {
+    h += '<div class="ntiles">' + LT_TILES.map((t) => '<button class="ntile tap" data-go="live" id="lt-' + t[0] + '"><span class="nl">' + t[1] + '</span><span class="nv"><span class="nvv">—</span><small>' + (t[0] === 'volt' ? 'V' : unit(t[0])) + '</small></span><span class="nb"><i></i></span></button>').join('') + '</div>';
+    const n = B ? PIDS.filter((p) => B.supported(p.k)).length : 0;
+    h += '<button class="linkrow tap" data-go="live"><span>All gauges &amp; graph</span><span>' + (n ? n + ' readings' : '') + '</span></button>';
+  }
+  const xa = S.extra.find((x) => x.state === 1);
+  h += '<div class="group">' +
+    navRow({ attr: 'data-go="fuel"', icon: 'i-wave', label: 'Fuel Trim', id: 'lt-trim', val: '' }) +
+    navRow({ attr: 'data-go="extra"', icon: 'i-thermo', label: makeName() + ' Data', val: on && xa ? 'ATF ' + tempStr(xa.v).replace(/[FC]$/, '') : '' }) +
+    navRow({ attr: 'data-go="recs"', icon: 'i-recs', label: 'Recordings', val: RECS.length ? String(RECS.length) : '' }) +
+    navRow({ attr: 'data-go="alerts"', icon: 'i-bell', label: 'Custom Alerts', val: alOn ? alOn + ' on' : '' }) + '</div>';
+  el.innerHTML = h;
+  updateLiveTab();
+}
+function updateLiveTab() {
+  if (!isOn()) return;
+  LT_TILES.forEach((t) => {
+    const e = $('#lt-' + t[0]); if (!e) return;
+    const v = D[t[0]], lv = readLevel(t[0], v);
+    e.className = 'ntile tap' + (lv ? ' ' + lv : '');
+    e.querySelector('.nvv').textContent = v === undefined ? '—' : t[0] === 'volt' ? v.toFixed(1) : fmt(t[0], v);
+    const f = v === undefined ? 0 : Math.max(0, Math.min(1, (v - t[2]) / (t[3] - t[2])));
+    e.querySelector('.nb i').style.width = (f * 100).toFixed(1) + '%';
+  });
+  const tr = $('#lt-trim');
+  if (tr) { const tt = D.stft1 !== undefined && D.ltft1 !== undefined ? D.stft1 + D.ltft1 : undefined, lv = readLevel('trim', tt); tr.textContent = tt === undefined ? '' : 'B1 ' + pct(tt); tr.className = 'val' + (lv ? ' ' + lv : ''); }
+}
+function diagStatus() {
+  const on = isOn(), c = S.codes, sc = S.scan, rd = S.ready;
+  const n = c ? c.stored.length + c.pending.length : null;
+  const codes = !on ? ['', ''] : S.codesLoading && !c ? ['Reading...', ''] : n === null ? ['Not read', ''] : n ? [String(n), 'red'] : ['None', ''];
+  const sys = !on ? ['', ''] : sc.state === 'scanning' ? ['Scanning...', 'blue'] : sc.state === 'done' ? (() => { const w = sc.results.filter((r) => r.dtcs.length).length; return w ? [w + ' with codes', 'red'] : ['No codes', '']; })() : ['Not scanned', ''];
+  const nr = rd ? rd.monitors.filter((m) => !m.ready).length : null;
+  const ready = !on ? ['', ''] : nr === null ? ['Not checked', ''] : nr ? [nr + ' not ready', 'orange'] : ['All ready', ''];
+  let mis = !on ? ['', ''] : ['Not read', ''];
+  if (on && S.mis && S.mis.length) { const w = S.mis.reduce((a, x) => (x.cur > a.cur ? x : a), S.mis[0]); mis = w.cur ? ['Cyl ' + w.cyl + ' · ' + w.cur, w.cur >= 3 ? 'orange' : ''] : ['None', '']; }
+  return { codes, sys, ready, mis };
+}
+function renderDiag() {
+  const el = $('#diagbody'); if (!el) return;
+  const st = diagStatus(), r = (go, icon, label, s) => navRow({ attr: 'data-go="' + go + '"', icon, label, val: esc(s[0]), cls: s[1] });
+  el.innerHTML = '<div class="cap">This truck</div><div class="group">' + r('codes', 'i-warn', 'Codes', st.codes) + r('systems', 'i-layers', 'All Systems', st.sys) +
+    r('ready', 'i-checkc', 'Readiness', st.ready) + r('misfire', 'i-bolt', 'Misfire', st.mis) + '</div>' +
+    (isOn() ? '' : connectCard('Code lookup above works without the truck. Connect to read this truck’s codes and tests.'));
+  renderDtcResults();
+}
+// Look up any code offline: generic text plus the maker's own (Toyota ABS codes and so on).
+function dtcSearch(q) {
+  q = (q || '').trim(); if (!q) return [];
+  const mk = makeKeyNow(), all = {};
+  Object.keys(DTC_GENERIC).forEach((c) => { all[c] = DTC_GENERIC[c]; });
+  Object.keys(VEHICLE_DB).forEach((k) => { const t = VEHICLE_DB[k].dtc_text; if (t && (!mk || k === mk)) Object.keys(t).forEach((c) => { all[c] = t[c]; }); });
+  if (mk && VEHICLE_DB[mk] && VEHICLE_DB[mk].dtc_text) Object.assign(all, VEHICLE_DB[mk].dtc_text);
+  const Q = q.toUpperCase().replace(/\s+/g, ''), words = q.toLowerCase();
+  let out = Object.keys(all).filter((c) => c.startsWith(Q)).sort();
+  if (words.length >= 2) Object.keys(all).sort().forEach((c) => { if (!out.includes(c) && all[c].toLowerCase().includes(words)) out.push(c); });
+  if (/^[PCBU][0-3][0-9A-F]{3}$/.test(Q) && !out.includes(Q)) out.unshift(Q);
+  return out.slice(0, 8).map((c) => ({ code: c, text: all[c] || dtcText(c, mk) }));
+}
+function renderDtcResults() {
+  const el = $('#dtcres'), q = $('#dtcq'); if (!el || !q) return;
+  const v = q.value.trim();
+  if (!v) { el.innerHTML = ''; return; }
+  const res = dtcSearch(v);
+  el.innerHTML = res.length ? '<div class="group">' + res.map((x) => '<button class="row tap" data-act="lookupCode" data-code="' + esc(x.code) + '"><span class="grow"><b style="font-weight:600">' + esc(x.code) + '</b><span class="sub">' + esc(x.text) + '</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('') + '</div>'
+    : '<p class="foot" style="margin:0">No match. Codes look like P0441 or C1249.</p>';
+}
+function renderLog() {
+  const el = $('#logbody'); if (!el) return;
+  const trips = F.trips.filter((t) => t.gal > 0 && t.miles > 0), mi = trips.reduce((a, t) => a + t.miles, 0), gal = trips.reduce((a, t) => a + t.gal, 0);
+  const last = F.trips.length ? tripMPG(F.trips[F.trips.length - 1]) : null, s = spendStats();
+  const mon = new Date().toLocaleString('en-US', { month: 'short' }).toUpperCase();
+  el.innerHTML = '<div class="homehead"><h1>Log</h1></div>' +
+    '<div class="sumcard"><div><b>' + (gal > 0 ? (mi / gal).toFixed(1) : '—') + '</b><span>Avg MPG</span></div><div><b>' + (s.cur ? '$' + Math.round(s.cur) : '—') + '</b><span>Gas · ' + mon + '</span></div><div><b>' + HL.drives.length + '</b><span>Drives</span></div></div>' +
+    '<div class="cap">Fuel</div><div class="group">' +
+    navRow({ attr: 'data-act="openMpg" data-mode="trip"', icon: 'i-pump', label: 'Trips & MPG', val: last ? 'Last ' + last.toFixed(1) : '' }) +
+    navRow({ attr: 'data-act="openMpg" data-mode="fills"', icon: 'i-plus', label: 'Fill-Ups', val: F.fills.length ? String(F.fills.length) : '' }) + '</div>' +
+    '<div class="cap">Truck history</div><div class="group">' +
+    navRow({ attr: 'data-go="health"', icon: 'i-pulse', label: 'Past Drives', val: HL.drives.length ? String(HL.drives.length) : '' }) +
+    navRow({ attr: 'data-go="recs"', icon: 'i-recs', label: 'Recordings', val: RECS.length ? String(RECS.length) : '' }) + '</div>';
+}
+function recListHtml() {
+  return RECS.slice().reverse().map((r) => '<button class="row tap" data-act="openRec" data-id="' + r.id + '"><span class="grow">' + esc(r.name) +
+    '<span class="sub">' + esc(recWhen(r)) + ' · ' + mmss(r.secs * 1000) + ' · ' + r.keys.length + ' readings</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('');
+}
+function renderRecs() {
+  const el = $('#recsbody'); if (!el) return;
+  el.innerHTML = RECS.length ? '<div class="group">' + recListHtml() + '</div><p class="foot">Tap one to replay it on the graph or share it as a spreadsheet.</p>'
+    : '<div class="empty"><svg class="ic" style="color:var(--sec)"><use href="#i-recs"/></svg><b>No recordings yet</b>Tap Record on Live Data, or turn on an alert. Alerts save the minute around them.</div>';
+}
+
 // ---------------------------------------------------------------- refresh
 function updateAll() {
   fuelTick();
@@ -2016,6 +2232,7 @@ function updateAll() {
   if (t === 'health' && Date.now() - HL.lastDraw > 2000) renderHealth();
   if (t === 'mpg') updateMpg();
   if (t === 'home') updateHome();
+  if (t === 'livetab') updateLiveTab();
   if (t === 'live') updateLive();
   if (t === 'fuel') drawFuel();
   if (S.rec) recTick();
@@ -2102,6 +2319,8 @@ const ACT = {
     renderReplay();
   },
   openRec: (el) => openRec(el.dataset.id),
+  lookupCode: (el) => { const q = $('#dtcq'); if (q) q.blur(); openCode(el.dataset.code); },
+  openMpg: (el) => { S.mpgMode = el.dataset.mode; store.set('seg.mpg', S.mpgMode); if (top() === 'mpg') renderMpg(); else push('mpg'); },
   shareRec: (el) => shareRec(el.dataset.id || (GR.rec && GR.rec.id)),
   deleteRec: () => alertBox({ title: 'Delete this recording?', ok: 'Delete', dest: true, onOk: () => { RECS = RECS.filter((r) => r !== GR.rec); recsSave(); GR.rec = null; pop(); renderRecList(); } }),
   openAlerts: () => { closeSheet(); if (top() !== 'alerts') push('alerts'); },
@@ -2125,8 +2344,10 @@ document.addEventListener('click', (e) => {
   if (AL.sound && !AL.audio) alAudio();   // iOS only allows sound after a tap
   const segBtn = e.target.closest('.seg button');
   if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
+  const tb = e.target.closest('[data-tab]');
+  if (tb) { selectTab(tb.dataset.tab); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (S.mode === 'live' || S.mode === 'demo' || ['mpg', 'health', 'alerts'].includes(g.dataset.go)) push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (g) { if (S.mode === 'live' || S.mode === 'demo' || ['mpg', 'health', 'alerts', 'recs', 'replay'].includes(g.dataset.go)) push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
   if (e.target.closest('[data-pop]')) { pop(); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
@@ -2134,12 +2355,14 @@ document.addEventListener('click', (e) => {
 
 // ---------------------------------------------------------------- start
 applyTheme();
-segSet('live', 'gauges');
-(function () { const lv = store.get('lastVin', ''); if (lv) VEH = loadVeh(lv); loadFuel(lv || 'none'); })();
+segSet('live', S.liveMode); ['gauges', 'list', 'graph'].forEach((m) => $('#p-' + m).classList.toggle('on', m === S.liveMode));
+(function () { const lv = store.get('lastVin', ''); if (lv) VEH = loadVeh(lv); loadFuel(lv || 'none'); hlLoad(lv); })();
 alLoad(); recsLoad();
 renderHome();
+showStack();   // opens the tab used last time
+document.addEventListener('input', (e) => { if (e.target.id === 'dtcq') renderDtcResults(); });
 if (!navigator.bluetooth && !NativeTransport.available()) {
   $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
 }
-window.__scanner = { S, D, H, HT, F, HL, AL, getRECS: () => RECS, connect, push, pop, ACT, getVEH: () => VEH };
+window.__scanner = { S, D, H, HT, F, HL, AL, getRECS: () => RECS, connect, push, pop, selectTab, ACT, getVEH: () => VEH };
 })();

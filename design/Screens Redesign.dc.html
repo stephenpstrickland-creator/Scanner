@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+body { margin: 0; background: #E9E8E4; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: #0062CC; } a:hover { color: #004a99; }
+</style>
+</helmet>
+<section data-screen-label="Tab bar" style="padding: 56px 64px 40px; display: flex; flex-direction: column; gap: 32px; border-bottom: 1px solid #d3d1cb;">
+  <div style="display: flex; flex-direction: column; gap: 6px; max-width: 920px;">
+    <div style="font-size: 13px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: #6b6a66;">Turn 5 · Bottom tab bar, no merged screens</div>
+    <div style="font-size: 28px; font-weight: 700; letter-spacing: -.5px; color: #1a1a1a; text-wrap: pretty;">Four tabs. Each one opens a short menu, and every screen you've already seen stays its own page one tap further in. The bar uses iOS 26's floating style (your phone is on 26.3).</div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 56px 48px; align-items: flex-start;">
+
+    <!-- 5a HOME TAB -->
+    <div id="5a" data-screen-label="Tab Home" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">5a</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Home tab</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">The 1c home, unchanged. The app-style buttons stay as shortcuts, and each still opens its own screen.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="padding: 2px 16px 0; display: grid; grid-auto-rows: max-content; gap: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 13px; font-weight: 600; color: #98989D; display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 4px; background: #30D158;"></span>V011 connected</span>
+              <span style="font-size: 30px; font-weight: 700; letter-spacing: -.7px;">2007 Tacoma</span>
+            </div>
+            <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path></svg>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF9F0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"></path></svg></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 24px; font-weight: 700; letter-spacing: -.5px;">Safe to drive</span><span style="font-size: 15px; color: #98989D;">A few things to check soon</span></div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <span style="font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">3 codes · EVAP leak</span>
+              <span style="font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">Lean at idle</span>
+              <span style="font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">2 not ready</span>
+            </div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div style="padding: 14px 14px 10px; display: flex; flex-direction: column; border-right: .5px solid rgba(84,84,88,.65); border-bottom: .5px solid rgba(84,84,88,.65);"><b style="font-size: 38px; font-weight: 600; letter-spacing: -1.2px; line-height: 42px; font-variant-numeric: tabular-nums;">815</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">RPM</span></div>
+            <div style="padding: 14px 14px 10px; display: flex; flex-direction: column; border-right: .5px solid rgba(84,84,88,.65); border-bottom: .5px solid rgba(84,84,88,.65);"><b style="font-size: 38px; font-weight: 600; letter-spacing: -1.2px; line-height: 42px; font-variant-numeric: tabular-nums;">1</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">MPH</span></div>
+            <div style="padding: 14px 14px 10px; display: flex; flex-direction: column; border-bottom: .5px solid rgba(84,84,88,.65);"><b style="font-size: 38px; font-weight: 600; letter-spacing: -1.2px; line-height: 42px; font-variant-numeric: tabular-nums;">191°</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">COOLANT</span></div>
+            <div style="padding: 10px 14px 14px; display: flex; flex-direction: column; border-right: .5px solid rgba(84,84,88,.65);"><b style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">14.1</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">VOLTS</span></div>
+            <div style="padding: 10px 14px 14px; display: flex; flex-direction: column; border-right: .5px solid rgba(84,84,88,.65);"><b style="font-size: 22px; font-weight: 600; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8%</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">TRIM B1</span></div>
+            <div style="padding: 10px 14px 14px; display: flex; flex-direction: column;"><b style="font-size: 22px; font-weight: 600; color: #636366;">—</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">TRIP MPG</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 8px; padding-top: 4px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="position: relative; width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg><span style="position: absolute; top: -5px; right: -5px; min-width: 22px; height: 22px; border-radius: 11px; background: #FF453A; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div><span style="font-size: 13px; font-weight: 500;">Codes</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l8.5 4.7L12 13 3.5 8.2z"></path><path d="M3.5 12.5L12 17.3l8.5-4.8"></path><path d="M3.5 16.5L12 21.3l8.5-4.8"></path></svg></div><span style="font-size: 13px; font-weight: 500;">Systems</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="position: relative; width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12.3l2.7 2.7L16 9.6"></path></svg><span style="position: absolute; top: -5px; right: -5px; min-width: 22px; height: 22px; border-radius: 11px; background: #FF9F0A; color: #000; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;">2</span></div><span style="font-size: 13px; font-weight: 500;">Readiness</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path></svg></div><span style="font-size: 13px; font-weight: 500;">Misfire</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg></div><span style="font-size: 13px; font-weight: 500;">Live Data</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h3.5l3-7 4.5 14 3-7h5"></path></svg></div><span style="font-size: 13px; font-weight: 500;">Fuel Trim</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 20.5V5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 5v15.5"></path><path d="M3.5 20.5h12"></path><path d="M7 8h5"></path><path d="M14 9.5h1.5l2 2v5.5a1.5 1.5 0 0 0 3 0V8.5l-3-3"></path></svg></div><span style="font-size: 13px; font-weight: 500;">MPG</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><div style="width: 60px; height: 60px; border-radius: 18px; background: #1C1C1E; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M10 14.2V5a2 2 0 1 1 4 0v9.2a4 4 0 1 1-4 0z"></path><path d="M12 9.5v7"></path></svg></div><span style="font-size: 13px; font-weight: 500;">Toyota Data</span></div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: rgba(44,44,48,.78); border: .5px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; box-sizing: border-box;">
+          <div style="border-radius: 28px; background: rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 11px; font-weight: 600;">Home</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 11px; font-weight: 600;">Live</span></div>
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 11px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: 4px; left: 52%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 11px; font-weight: 600;">Log</span></div>
+        </div>
+        <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+      </div>
+    </div>
+
+    <!-- 5b LIVE TAB -->
+    <div id="5b" data-screen-label="Tab Live" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">5b</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Live tab</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Opens on the gauges, with drive mode at the top. Fuel Trim, Toyota Data and Recordings are rows underneath, and each still opens its own screen.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="padding: 2px 16px 0; display: grid; grid-auto-rows: max-content; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Live</div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <svg viewBox="0 0 24 24" style="width: 23px; height: 23px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"></path><path d="M10 21a2.2 2.2 0 0 0 4 0"></path></svg>
+              <div style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 16px; background: rgba(118,118,128,.24); font-size: 14px; font-weight: 600;"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF453A;"></span>Record</div>
+            </div>
+          </div>
+          <div style="background: #0B6FE0; border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+            <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="2"></circle><path d="M4 11h6"></path><path d="M14 11h6"></path><path d="M12 14v6.5"></path></svg>
+            <div style="flex: 1; display: flex; flex-direction: column;"><span style="font-size: 17px; font-weight: 600;">Drive mode</span><span style="font-size: 14px; color: #D6E6FF;">Or turn your phone sideways</span></div>
+            <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Engine speed</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">815</b><span style="font-size: 15px; color: #98989D;">rpm</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 14%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Speed</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">1</b><span style="font-size: 15px; color: #98989D;">mph</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 2%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Coolant</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">191</b><span style="font-size: 15px; color: #98989D;">°F</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 62%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Battery</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">14.1</b><span style="font-size: 15px; color: #98989D;">V</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 70%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;"><span style="font-size: 15px; color: #409CFF;">All gauges &amp; graph</span><span style="font-size: 15px; color: #98989D;">24 readings</span></div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h3.5l3-7 4.5 14 3-7h5"></path></svg><span style="flex: 1; font-size: 17px;">Fuel Trim</span><span style="font-size: 16px; color: #FF9F0A; font-weight: 600; font-variant-numeric: tabular-nums;">B1 +5.8%</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M10 14.2V5a2 2 0 1 1 4 0v9.2a4 4 0 1 1-4 0z"></path><path d="M12 9.5v7"></path></svg><span style="flex: 1; font-size: 17px;">Toyota Data</span><span style="font-size: 16px; color: #98989D; font-variant-numeric: tabular-nums;">ATF 168°</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg><span style="flex: 1; font-size: 17px;">Recordings</span><span style="font-size: 16px; color: #98989D;">3</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"></path><path d="M10 21a2.2 2.2 0 0 0 4 0"></path></svg><span style="flex: 1; font-size: 17px;">Custom Alerts</span><span style="font-size: 16px; color: #98989D;">2 on</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: rgba(44,44,48,.78); border: .5px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; box-sizing: border-box;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 11px; font-weight: 600;">Home</span></div>
+          <div style="border-radius: 28px; background: rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 11px; font-weight: 600;">Live</span></div>
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 11px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: 4px; left: 52%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 11px; font-weight: 600;">Log</span></div>
+        </div>
+        <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+      </div>
+    </div>
+
+    <!-- 5c DIAGNOSE TAB -->
+    <div id="5c" data-screen-label="Tab Diagnose" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">5c</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Diagnose tab</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">A short menu in three groups, with each row showing its current status. Code lookup at the top works even when you're not connected. Every row opens the screen you've already seen.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="padding: 2px 16px 0; display: grid; grid-auto-rows: max-content; gap: 10px;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Diagnose</div>
+          <div style="height: 38px; border-radius: 11px; background: rgba(118,118,128,.24); display: flex; align-items: center; gap: 8px; padding: 0 10px; color: #98989D; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #98989D; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>Look up any code</div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 6px 16px 0;">This truck</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg><span style="flex: 1; font-size: 17px;">Codes</span><span style="font-size: 16px; color: #FF6961; font-weight: 600;">3</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l8.5 4.7L12 13 3.5 8.2z"></path><path d="M3.5 12.5L12 17.3l8.5-4.8"></path><path d="M3.5 16.5L12 21.3l8.5-4.8"></path></svg><span style="flex: 1; font-size: 17px;">All Systems</span><span style="font-size: 16px; color: #98989D;">Not scanned</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12.3l2.7 2.7L16 9.6"></path></svg><span style="flex: 1; font-size: 17px;">Readiness</span><span style="font-size: 16px; color: #FF9F0A; font-weight: 600;">2 not ready</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path></svg><span style="flex: 1; font-size: 17px;">Misfire</span><span style="font-size: 16px; color: #98989D;">None</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="flex: 1; font-size: 17px;">Repair Check</span><span style="font-size: 16px; color: #409CFF;">Watching</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 6px 16px 0;">Tools</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"></path><path d="M10 21a2.2 2.2 0 0 0 4 0"></path></svg><span style="flex: 1; font-size: 17px;">Known Issues</span><span style="font-size: 16px; color: #FF9F0A; font-weight: 600;">1 recall</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path></svg><span style="flex: 1; font-size: 17px;">Battery Test</span><span style="font-size: 16px; color: #98989D;">Good · today</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M3 15l2-6h14l2 6"></path><rect x="3" y="15" width="18" height="4" rx="1.5"></rect></svg><span style="flex: 1; font-size: 17px;">Used-Car Check</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 3.5h9l3.5 3.5v13.5H6z"></path><path d="M9 11h6"></path><path d="M9 15h6"></path></svg><span style="flex: 1; font-size: 17px;">Mechanic Report</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: rgba(44,44,48,.78); border: .5px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; box-sizing: border-box;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 11px; font-weight: 600;">Home</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 11px; font-weight: 600;">Live</span></div>
+          <div style="position: relative; border-radius: 28px; background: rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 11px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: 4px; left: 52%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 11px; font-weight: 600;">Log</span></div>
+        </div>
+        <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+      </div>
+    </div>
+
+    <!-- 5d LOG TAB -->
+    <div id="5d" data-screen-label="Tab Log" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">5d</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Log tab</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Everything that builds up over time, in one place: trips, fill-ups, past drives, code history and battery tests. One summary card at the top, then a row for each.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="padding: 2px 16px 0; display: grid; grid-auto-rows: max-content; gap: 12px;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Log</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+            <div style="display: flex; flex-direction: column;"><b style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums;">17.2</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">AVG MPG</span></div>
+            <div style="display: flex; flex-direction: column;"><b style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums;">$142</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">GAS · NOV</span></div>
+            <div style="display: flex; flex-direction: column;"><b style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums;">6</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">DRIVES</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 6px 16px 0;">Fuel</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 20.5V5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 5v15.5"></path><path d="M3.5 20.5h12"></path><path d="M7 8h5"></path><path d="M14 9.5h1.5l2 2v5.5a1.5 1.5 0 0 0 3 0V8.5l-3-3"></path></svg><span style="flex: 1; font-size: 17px;">Trips &amp; MPG</span><span style="font-size: 16px; color: #98989D;">Last 18.4</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 4v16"></path><path d="M4 12h16"></path></svg><span style="flex: 1; font-size: 17px;">Fill-Ups</span><span style="font-size: 16px; color: #98989D;">12</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 6px 16px 0;">Truck history</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"></path></svg><span style="flex: 1; font-size: 17px;">Past Drives</span><span style="font-size: 16px; color: #98989D;">6</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg><span style="flex: 1; font-size: 17px;">Code History</span><span style="font-size: 16px; color: #FF6961; font-weight: 600;">1 keeps returning</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path></svg><span style="flex: 1; font-size: 17px;">Battery Tests</span><span style="font-size: 16px; color: #98989D;">Steady</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg><span style="flex: 1; font-size: 17px;">Recordings</span><span style="font-size: 16px; color: #98989D;">3</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: rgba(44,44,48,.78); border: .5px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; box-sizing: border-box;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 11px; font-weight: 600;">Home</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 11px; font-weight: 600;">Live</span></div>
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 11px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: 4px; left: 52%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+          <div style="border-radius: 28px; background: rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 11px; font-weight: 600;">Log</span></div>
+        </div>
+        <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+      </div>
+    </div>
+
+    <!-- 5e BAR STYLES -->
+    <div id="5e" data-screen-label="Bar styles" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">5e</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Bar style options</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Floating (iOS 26, what's shown above) versus the classic full-width bar. Both use the same four tabs and badge.</div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 13px; font-weight: 600; color: #6b6a66;">FLOATING · iOS 26</span>
+          <div style="position: relative; width: 390px; height: 130px; border-radius: 0 0 40px 40px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616;">
+            <div style="position: absolute; top: 0; left: 16px; right: 16px; height: 50px; border-radius: 12px; background: #1C1C1E;"></div>
+            <div style="position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: rgba(44,44,48,.78); border: .5px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; box-sizing: border-box; color: #fff;">
+              <div style="border-radius: 28px; background: rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 11px; font-weight: 600;">Home</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 11px; font-weight: 600;">Live</span></div>
+              <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 11px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: 4px; left: 52%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 11px; font-weight: 600;">Log</span></div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 13px; font-weight: 600; color: #6b6a66;">CLASSIC · full width</span>
+          <div style="position: relative; width: 390px; height: 130px; border-radius: 0 0 40px 40px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616;">
+            <div style="position: absolute; top: 0; left: 16px; right: 16px; height: 50px; border-radius: 12px; background: #1C1C1E;"></div>
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; background: rgba(22,22,24,.94); border-top: .5px solid rgba(84,84,88,.65); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 7px 8px 0; box-sizing: border-box; color: #8E8E93; align-items: start;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: #409CFF;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span style="font-size: 10px; font-weight: 600;">Home</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #8E8E93; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="font-size: 10px; font-weight: 600;">Live</span></div>
+              <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #8E8E93; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><span style="font-size: 10px; font-weight: 600;">Diagnose</span><span style="position: absolute; top: -3px; left: 54%; min-width: 18px; height: 18px; border-radius: 9px; background: #FF453A; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #8E8E93; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="font-size: 10px; font-weight: 600;">Log</span></div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section data-screen-label="Pro features" style="padding: 56px 64px 40px; display: flex; flex-direction: column; gap: 32px; border-bottom: 1px solid #d3d1cb;">
+  <div style="display: flex; flex-direction: column; gap: 6px; max-width: 920px;">
+    <div style="font-size: 13px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: #6b6a66;">Turn 4 · Pro-scanner features, read-only</div>
+    <div style="font-size: 28px; font-weight: 700; letter-spacing: -.5px; color: #1a1a1a; text-wrap: pretty;">Known issues and recalls, a used-car check, and a battery and cranking test. They'd live in a new "Tools" row below the Home launcher. Recall and complaint text is placeholder until it's wired to NHTSA.</div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 56px 48px; align-items: flex-start;">
+
+    <!-- 4a KNOWN ISSUES -->
+    <div id="4a" data-screen-label="Known issues" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">4a</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Recalls &amp; known issues</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Uses NHTSA's free recall and owner-complaint lookups for your exact year, make and model. Complaints that match your current codes are pulled to the top, so you can see whether "everyone with this truck gets this."</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span></span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Known Issues</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF9F0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"></path><path d="M10 21a2.2 2.2 0 0 0 4 0"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">1 recall to check</span><span style="font-size: 15px; color: #98989D;">2007 Tacoma · from NHTSA</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Matches your codes</div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">P0455 · P0441</span><span style="font-size: 13px; color: #98989D;">Owner complaints</span></div>
+            <b style="font-size: 17px; font-weight: 600;">EVAP leak codes are common on this truck</b>
+            <span style="font-size: 15px; line-height: 21px; color: #AEAEB2; text-wrap: pretty;">Owners most often report the charcoal canister or the vent valve. A cracked gas cap seal comes next.</span>
+            <span style="font-size: 15px; color: #409CFF; margin-top: 2px;">See 38 reports</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Recalls</div>
+          <div style="background: #1C1C1E; border-radius: 16px; overflow: hidden;">
+            <div style="padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">Check with dealer</span><span style="font-size: 13px; color: #98989D; font-family: ui-monospace, Menlo, monospace;">NHTSA 00V-000</span></div>
+              <b style="font-size: 17px; font-weight: 600;">Example recall title goes here</b>
+              <span style="font-size: 15px; line-height: 21px; color: #AEAEB2;">A one-line plain summary of the risk and the free fix.</span>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; font-size: 15px;"><span style="color: #98989D;">Dealer can confirm by VIN</span><span style="color: #409CFF;">Mark as done</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Top complaints</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Frame / rust</span><span style="font-size: 16px; color: #98989D; font-variant-numeric: tabular-nums;">412</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Engine &amp; emissions</span><span style="font-size: 16px; color: #98989D; font-variant-numeric: tabular-nums;">96</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Brakes &amp; ABS</span><span style="font-size: 16px; color: #98989D; font-variant-numeric: tabular-nums;">54</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4b USED-CAR CHECK -->
+    <div id="4b" data-screen-label="Used-car check" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">4b</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Used-car check</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">For checking a car you might buy. It reads the standard OBD counters for distance, warm-ups and engine time since codes were cleared, adds readiness and pending codes, and gives one verdict. The example shows a seller who cleared codes just before you arrived.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Share</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Used-Car Check</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF453A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Codes were just cleared</span><span style="font-size: 15px; color: #98989D; text-wrap: pretty;">Problems may be hidden. Ask why.</span></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+              <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 22px; font-weight: 600; color: #FF6961; font-variant-numeric: tabular-nums;">12 mi</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">SINCE CLEAR</span></div>
+              <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 22px; font-weight: 600; color: #FF6961; font-variant-numeric: tabular-nums;">2</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">WARM-UPS</span></div>
+              <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 22px; font-weight: 600; color: #FF6961; font-variant-numeric: tabular-nums;">0:41</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">ENGINE HRS</span></div>
+            </div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">What we checked</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Check engine light</span><span style="font-size: 16px; color: #98989D;">Off</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Stored codes</span><span style="font-size: 16px; color: #98989D;">None</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Pending codes</span><span style="font-size: 14px; color: #FF9F0A;">P0420 · catalyst efficiency</span></div><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">1</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Readiness</span><span style="font-size: 14px; color: #FF6961;">Catalyst, EVAP, O2, O2 heater not ready</span></div><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">4 of 8</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Other modules</span><span style="font-size: 16px; color: #98989D;">No codes</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+          </div>
+          <div style="background: #0F2236; border-radius: 12px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 20px; color: #D1D1D6;">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.8v.2"></path></svg>
+            <span style="text-wrap: pretty;">A pending P0420 right after a clear often means the catalytic converter is failing. That's an expensive repair. Ask for a re-check after 100+ miles.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4c BATTERY TEST -->
+    <div id="4c" data-screen-label="Battery test" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">4c</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Battery &amp; cranking test</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">It reads battery voltage with the key on, asks you to start the engine, then records how far the voltage drops while cranking and where charging settles. No extra hardware, since the adapter already reads voltage. This is the result screen.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Test Again</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Battery Test</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Battery looks good</span><span style="font-size: 15px; color: #98989D;">Charging normal · tested just now</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 18px; padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #98989D;"><span>Voltage during start</span><span>6 sec</span></div>
+            <svg viewBox="0 0 340 150" style="width: 100%; height: 150px; display: block;">
+              <rect x="0" y="88" width="340" height="62" style="fill: #FF453A; opacity: .08;"></rect>
+              <line x1="0" x2="340" y1="88" y2="88" style="stroke: rgba(255,69,58,.5); stroke-width: 1; stroke-dasharray: 4 4;"></line>
+              <text x="334" y="102" style="font-size: 11px; fill: #FF6961; text-anchor: end;">9.6 V min</text>
+              <polyline points="0,46 60,46 80,47 90,80 96,74 104,77 112,72 122,70 140,62 160,40 180,24 200,22 240,22 280,23 340,22" style="fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linejoin: round;"></polyline>
+              <circle cx="90" cy="80" r="4" style="fill: #30D158; stroke: #1C1C1E; stroke-width: 2;"></circle>
+              <text x="4" y="40" style="font-size: 11px; fill: #98989D;">Key on</text>
+              <text x="98" y="96" style="font-size: 11px; fill: #98989D;">Cranking</text>
+              <text x="230" y="16" style="font-size: 11px; fill: #98989D;">Running</text>
+            </svg>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Key on, engine off</span><span style="font-size: 14px; color: #98989D;">12.4 V or more is healthy</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">12.6 V</b><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Lowest while cranking</span><span style="font-size: 14px; color: #98989D;">Below 9.6 V means a weak battery</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">10.6 V</b><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Charging</span><span style="font-size: 14px; color: #98989D;">13.8 to 14.8 V is normal</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">14.1 V</b><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Crank time</span><span style="font-size: 14px; color: #98989D;">Started in under 2 seconds</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">0.9 s</b><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 12px; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Past tests</span><span style="font-size: 15px; color: #98989D;">Trend: steady</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section data-screen-label="New features" style="padding: 56px 64px 40px; display: flex; flex-direction: column; gap: 32px; border-bottom: 1px solid #d3d1cb;">
+  <div style="display: flex; flex-direction: column; gap: 6px; max-width: 920px;">
+    <div style="font-size: 13px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: #6b6a66;">Turn 3 · New features</div>
+    <div style="font-size: 28px; font-weight: 700; letter-spacing: -.5px; color: #1a1a1a; text-wrap: pretty;">Connection checklist, repair check, code history, mechanic report, and Lock Screen / CarPlay gauges. All in the same style as the redesigned screens.</div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 56px 48px; align-items: flex-start;">
+
+    <!-- 3a CONNECTING -->
+    <div id="3a" data-screen-label="Connecting" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3a</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Connecting</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">The spinner and status line become a checklist, so you can see exactly where it's up to. The steps match what the app already does: find the adapter, find a working channel, talk to the truck, read the VIN.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="flex: 1; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; font-weight: 600; color: #98989D;">Last connected · 2007 Tacoma</span><span style="font-size: 30px; font-weight: 700; letter-spacing: -.7px;">Connecting</span></div>
+          <div style="background: #1C1C1E; border-radius: 20px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Adapter found</span><span style="font-size: 14px; color: #98989D;">V011</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Adapter is answering</span><span style="font-size: 14px; color: #98989D;">ELM327 v1.5 · channel FFF0</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; border: 3px solid rgba(118,118,128,.35); border-top-color: #409CFF; box-sizing: border-box; flex-shrink: 0;"></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">Talking to the truck</span><span style="font-size: 14px; color: #98989D;">Key on. Engine can be off.</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; border: 2px solid rgba(118,118,128,.45); box-sizing: border-box; flex-shrink: 0;"></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; color: #8E8E93;">Reading the VIN</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; border: 2px solid rgba(118,118,128,.45); box-sizing: border-box; flex-shrink: 0;"></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; color: #8E8E93;">Checking for codes</span></div>
+            </div>
+          </div>
+          <div style="flex: 1;"></div>
+          <div style="height: 50px; border-radius: 14px; background: #2C2C2E; display: flex; align-items: center; justify-content: center; color: #409CFF; font-size: 17px; font-weight: 600;">Cancel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3b CONNECT FAILED -->
+    <div id="3b" data-screen-label="Connect failed" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3b</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Connection problem</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">The step that failed turns red and the fix appears right under it, instead of a popup with a generic error. The example is the "adapter busy" case the app already detects.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="flex: 1; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; font-weight: 600; color: #98989D;">Last connected · 2007 Tacoma</span><span style="font-size: 30px; font-weight: 700; letter-spacing: -.7px;">Couldn't connect</span></div>
+          <div style="background: #1C1C1E; border-radius: 20px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Adapter found</span><span style="font-size: 14px; color: #98989D;">V011</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: #FF453A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 3.2; stroke-linecap: round;"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">Adapter is busy</span><span style="font-size: 14px; color: #FF6961;">It didn't answer within 10 seconds</span></div>
+                <div style="background: #2C2C2E; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 20px; color: #D1D1D6;">
+                  <span style="font-weight: 600; color: #fff;">Try this</span>
+                  <span>1. Close other car apps (like Car Scanner). They can hold onto the adapter.</span>
+                  <span>2. Unplug the adapter for 5 seconds, then plug it back in.</span>
+                </div>
+              </div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 58px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;">
+              <span style="width: 28px; height: 28px; border-radius: 14px; border: 2px solid rgba(118,118,128,.45); box-sizing: border-box; flex-shrink: 0;"></span>
+              <span style="font-size: 17px; color: #8E8E93;">Talking to the truck</span>
+            </div>
+          </div>
+          <div style="flex: 1;"></div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="height: 50px; border-radius: 14px; background: #0B6FE0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600;">Try Again</div>
+            <div style="height: 44px; border-radius: 14px; background: #2C2C2E; display: flex; align-items: center; justify-content: center; color: #409CFF; font-size: 17px; font-weight: 600;">Try Demo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3c REPAIR CHECK -->
+    <div id="3c" data-screen-label="Repair check" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3c</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Did the fix work?</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Starts automatically when you clear codes. It watches each drive and walks you toward the test that proves the repair. It ends with either "Fixed" or "It came back." A matching card sits on Home until then.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span></span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Repair Check</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 14px; background: #0A84FF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Watching the EVAP fix</span><span style="font-size: 15px; color: #98989D;">No codes back after 3 drives</span></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;"><span style="height: 6px; border-radius: 3px; background: #30D158;"></span><span style="height: 6px; border-radius: 3px; background: #30D158;"></span><span style="height: 6px; border-radius: 3px; background: #0A84FF;"></span><span style="height: 6px; border-radius: 3px; background: rgba(118,118,128,.3);"></span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px;">
+              <span style="width: 26px; height: 26px; border-radius: 13px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Codes cleared</span><span style="font-size: 14px; color: #98989D;">Nov 12 · 273,402 mi · new gas cap</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 56px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px;">
+              <span style="width: 26px; height: 26px; border-radius: 13px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">P0455 hasn't come back</span><span style="font-size: 14px; color: #98989D;">3 drives · 41 miles</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 56px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px;">
+              <span style="width: 26px; height: 26px; border-radius: 13px; border: 3px solid rgba(118,118,128,.35); border-top-color: #409CFF; box-sizing: border-box; flex-shrink: 0;"></span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">EVAP leak test</span><span style="font-size: 14px; color: #98989D;">Hasn't run yet</span></div>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 56px;"></div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 16px;">
+              <span style="width: 26px; height: 26px; border-radius: 13px; border: 2px solid rgba(118,118,128,.45); box-sizing: border-box; flex-shrink: 0;"></span>
+              <span style="font-size: 17px; color: #8E8E93;">Confirmed fixed</span>
+            </div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">To get the test to run</div>
+          <div style="background: #1C1C1E; border-radius: 16px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span><span style="font-size: 16px;">Keep the tank between ¼ and ¾</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 52px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span><span style="font-size: 16px;">Let it sit overnight (8+ hours)</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 52px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span><span style="font-size: 16px;">Cold start, then a normal drive</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 12px; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Also waiting: Catalyst</span><span style="font-size: 15px; color: #98989D;">Highway drive</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3d CODE HISTORY -->
+    <div id="3d" data-screen-label="Code history" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3d</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Code history</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Every code ever seen, logged by date and mileage. Codes that keep coming back are flagged, new ones are marked, and fixes that held turn green. You open it from the Codes screen.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Codes</div>
+          <span></span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Code History</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: rgba(118,118,128,.24); border-radius: 9px; padding: 2px; height: 34px;">
+            <span style="background: #636366; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">All</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Active</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Fixed</span>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><b style="font-size: 17px; font-weight: 600;">P0455</b><span style="flex: 1; font-size: 15px; color: #98989D;">EVAP large leak</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Keeps coming back</span></div>
+            <div style="display: flex; align-items: center; gap: 0;">
+              <span style="width: 10px; height: 10px; border-radius: 5px; background: #FF453A; flex-shrink: 0;"></span><span style="flex: 1; height: 2px; background: rgba(118,118,128,.35);"></span>
+              <span style="width: 10px; height: 10px; border-radius: 5px; background: #FF453A; flex-shrink: 0;"></span><span style="flex: 2; height: 2px; background: rgba(118,118,128,.35);"></span>
+              <span style="width: 10px; height: 10px; border-radius: 5px; background: #FF453A; flex-shrink: 0;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #98989D; font-variant-numeric: tabular-nums;"><span>Sep '25 · 268k</span><span>Feb '26 · 270k</span><span>Nov 12 · 273k</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><b style="font-size: 17px; font-weight: 600;">P0441</b><span style="flex: 1; font-size: 15px; color: #98989D;">EVAP purge flow</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Seen twice</span></div>
+            <div style="display: flex; align-items: center;"><span style="flex: 1; height: 2px; background: transparent;"></span><span style="width: 10px; height: 10px; border-radius: 5px; background: #FF453A; flex-shrink: 0;"></span><span style="flex: 2; height: 2px; background: rgba(118,118,128,.35);"></span><span style="width: 10px; height: 10px; border-radius: 5px; background: #FF453A; flex-shrink: 0;"></span></div>
+            <div style="display: flex; justify-content: flex-end; gap: 0; font-size: 13px; color: #98989D;"><span style="flex: 1;"></span><span style="flex: 2;">Feb '26 · 270k</span><span>Nov 12 · 273k</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><b style="font-size: 17px; font-weight: 600;">P0504</b><span style="flex: 1; font-size: 15px; color: #98989D;">Brake switch</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">New</span></div>
+            <span style="font-size: 13px; color: #98989D;">First seen Nov 15 · 273,388 mi</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Fixed</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;"><b style="font-weight: 600;">P0171</b> System too lean</span><span style="font-size: 14px; color: #98989D;">Fixed Mar '26 · held for 2,900 mi</span></div><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;"><b style="font-weight: 600;">C1249</b> Brake light switch (ABS)</span><span style="font-size: 14px; color: #98989D;">Cleared Jan '26 · didn't return</span></div><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3e MECHANIC REPORT -->
+    <div id="3e" data-screen-label="Mechanic report" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3e</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Report for a mechanic</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">One tap from Home or Codes. A clean one-page summary (codes, freeze frame, readiness, failed tests, Drive Health notes) that you can share as a PDF, image or text message.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="position: absolute; top: 58px; left: 14px; right: 14px; height: 40px; border-radius: 12px 12px 0 0; background: #141415;"></div>
+        <div style="position: absolute; top: 68px; left: 0; right: 0; bottom: 0; background: #1C1C1E; border-radius: 14px 14px 0 0; display: flex; flex-direction: column; gap: 12px; padding: 0 16px 28px;">
+          <div style="width: 36px; height: 5px; border-radius: 3px; background: rgba(118,118,128,.4); margin: 6px auto 0;"></div>
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 36px;"><span style="color: #409CFF; font-size: 17px;">Cancel</span><span style="font-size: 17px; font-weight: 600;">Vehicle Report</span><span></span></div>
+          <div style="flex: 1; background: #FAFAF8; border-radius: 10px; color: #1a1a1a; padding: 18px 18px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.4);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 700; letter-spacing: -.3px;">2007 Toyota Tacoma</span><span style="font-size: 11px; color: #55544f;">PreRunner · 4.0L V6 · 273,410 mi</span><span style="font-size: 11px; color: #55544f; font-family: ui-monospace, Menlo, monospace;">VIN 5TETU62N•••••1234</span></div>
+              <span style="font-size: 11px; color: #55544f; text-align: right;">Nov 16, 2026<br>9:41 AM</span>
+            </div>
+            <div style="height: 1px; background: #e2e0da;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: .6px; color: #6b6a66;">TROUBLE CODES · CHECK ENGINE ON</span>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 12px;">
+              <div style="display: flex; gap: 8px;"><b style="width: 46px;">P0455</b><span style="flex: 1;">EVAP system large leak</span><span style="color: #C4281C; font-weight: 600;">Stored</span></div>
+              <div style="display: flex; gap: 8px;"><b style="width: 46px;">P0441</b><span style="flex: 1;">EVAP purge flow incorrect</span><span style="color: #C4281C; font-weight: 600;">Stored</span></div>
+              <div style="display: flex; gap: 8px;"><b style="width: 46px;">P0504</b><span style="flex: 1;">Brake switch A/B correlation</span><span style="color: #B35A00; font-weight: 600;">Pending</span></div>
+            </div>
+            <div style="height: 1px; background: #e2e0da;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: .6px; color: #6b6a66;">FREEZE FRAME · P0455</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 8px; font-size: 12px; font-variant-numeric: tabular-nums;"><span>1,920 rpm</span><span>38 mph</span><span>192°F</span><span>Load 24%</span><span>STFT +3.1%</span><span>LTFT +6.3%</span></div>
+            <div style="height: 1px; background: #e2e0da;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: .6px; color: #6b6a66;">READINESS · 6 OF 8</span>
+            <div style="font-size: 12px; line-height: 17px;">Not ready: EVAP system, Catalyst</div>
+            <div style="height: 1px; background: #e2e0da;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: .6px; color: #6b6a66;">FAILED TESTS</span>
+            <div style="display: flex; gap: 8px; font-size: 12px;"><span style="flex: 1;">EVAP leak test</span><span style="font-variant-numeric: tabular-nums;">0.042 (max 0.040)</span><span style="color: #C4281C; font-weight: 600;">Fail</span></div>
+            <div style="height: 1px; background: #e2e0da;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: .6px; color: #6b6a66;">DRIVE NOTES</span>
+            <div style="font-size: 12px; line-height: 17px;">Lean at idle on bank 1 (≈ +12%), normal at cruise.</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+            <div style="height: 50px; border-radius: 14px; background: #0B6FE0; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;">PDF</div>
+            <div style="height: 50px; border-radius: 14px; background: #2C2C2E; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #409CFF;">Image</div>
+            <div style="height: 50px; border-radius: 14px; background: #2C2C2E; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #409CFF;">Text</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3f LOCK SCREEN -->
+    <div id="3f" data-screen-label="Lock Screen" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3f</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Lock Screen + Dynamic Island</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Same data as your current Live Activity (4 readings plus an alert), laid out like drive mode: one big lead number and three smaller ones. The alert becomes a colored pill with a one-line Drive Health summary.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff; background: repeating-linear-gradient(160deg, #1d2230 0 14px, #1a1e2a 14px 28px);">
+        <div style="position: absolute; top: 11px; left: 50%; transform: translateX(-50%); height: 37px; border-radius: 19px; background: #000; display: flex; align-items: center; justify-content: space-between; gap: 90px; padding: 0 14px;">
+          <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;">42</span>
+          <span style="font-size: 15px; font-weight: 700; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8</span>
+        </div>
+        <div style="position: absolute; top: 74px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center;">
+          <span style="font-size: 19px; font-weight: 600; color: rgba(255,255,255,.85);">Monday, November 16</span>
+          <span style="font-size: 92px; font-weight: 600; letter-spacing: -2px; line-height: 100px;">9:41</span>
+        </div>
+        <div style="position: absolute; top: 310px; left: 0; right: 0; text-align: center; font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: rgba(255,255,255,.35);">wallpaper</div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 110px; background: rgba(0,0,0,.82); border-radius: 24px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 13px; font-weight: 600; color: #98989D; flex: 1;">2007 Tacoma · Trip 18.4 mpg</span>
+            <span style="display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 12px; background: #3A2A12; color: #FF9F0A; font-size: 12px; font-weight: 700;"><span style="width: 6px; height: 6px; border-radius: 3px; background: #FF9F0A;"></span>Lean at idle</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; align-items: end; gap: 8px;">
+            <div style="display: flex; flex-direction: column;"><span style="font-size: 11px; font-weight: 700; color: #98989D;">MPH</span><b style="font-size: 48px; font-weight: 700; letter-spacing: -1.5px; line-height: 50px; font-variant-numeric: tabular-nums;">42</b></div>
+            <div style="display: flex; flex-direction: column;"><span style="font-size: 11px; font-weight: 700; color: #98989D;">RPM</span><b style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums;">1,850</b></div>
+            <div style="display: flex; flex-direction: column;"><span style="font-size: 11px; font-weight: 700; color: #98989D;">COOLANT</span><b style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums;">192°</b></div>
+            <div style="display: flex; flex-direction: column;"><span style="font-size: 11px; font-weight: 700; color: #98989D;">TRIM</span><b style="font-size: 22px; font-weight: 700; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8</b></div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 34px; display: flex; justify-content: space-between; padding: 0 46px;">
+          <span style="width: 50px; height: 50px; border-radius: 25px; background: rgba(255,255,255,.14);"></span>
+          <span style="width: 50px; height: 50px; border-radius: 25px; background: rgba(255,255,255,.14);"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3g CARPLAY -->
+    <div id="3g" data-screen-label="CarPlay" style="display: flex; flex-direction: column; gap: 14px; width: 800px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">3g</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">CarPlay Dashboard</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; max-width: 620px; text-wrap: pretty;">The small widget keeps today's 2×2 grid of numbers, but the alert gets a full-width colored strip so it can't be missed at a glance. When nothing's wrong, the strip disappears and the numbers get more room.</div>
+      <div style="display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="width: 800px; height: 400px; border-radius: 24px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; color: #fff;">
+          <div style="width: 76px; background: #111; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 18px 0;">
+            <span style="font-size: 14px; font-weight: 600;">9:41</span>
+            <span style="width: 46px; height: 46px; border-radius: 12px; background: #2C2C2E;"></span>
+            <span style="width: 46px; height: 46px; border-radius: 12px; background: #2C2C2E;"></span>
+            <span style="width: 46px; height: 46px; border-radius: 12px; background: #2C2C2E;"></span>
+          </div>
+          <div style="flex: 1; padding: 12px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px;">
+            <div style="border-radius: 16px; background: repeating-linear-gradient(135deg, #1f2a22 0 10px, #1b251e 10px 20px); display: flex; align-items: center; justify-content: center; font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6f8a74;">Maps</div>
+            <div style="display: grid; grid-template-rows: 1.25fr 1fr; gap: 12px;">
+              <div style="border-radius: 16px; background: #1C1C1E; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="background: #FF9F0A; color: #000; font-size: 14px; font-weight: 700; padding: 7px 12px; display: flex; align-items: center; gap: 6px;"><svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: #000; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg>Lean at idle · B1 +12%</div>
+                <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 8px 12px; gap: 4px 10px; align-content: center;">
+                  <div style="display: flex; flex-direction: column;"><span style="font-size: 10px; font-weight: 700; color: #98989D;">MPH</span><b style="font-size: 28px; font-weight: 700; line-height: 30px; font-variant-numeric: tabular-nums;">42</b></div>
+                  <div style="display: flex; flex-direction: column;"><span style="font-size: 10px; font-weight: 700; color: #98989D;">COOLANT</span><b style="font-size: 28px; font-weight: 700; line-height: 30px; font-variant-numeric: tabular-nums;">192°</b></div>
+                  <div style="display: flex; flex-direction: column;"><span style="font-size: 10px; font-weight: 700; color: #98989D;">RPM</span><b style="font-size: 28px; font-weight: 700; line-height: 30px; font-variant-numeric: tabular-nums;">1,850</b></div>
+                  <div style="display: flex; flex-direction: column;"><span style="font-size: 10px; font-weight: 700; color: #98989D;">VOLTS</span><b style="font-size: 28px; font-weight: 700; line-height: 30px; font-variant-numeric: tabular-nums;">14.1</b></div>
+                </div>
+              </div>
+              <div style="border-radius: 16px; background: #1C1C1E; display: flex; align-items: center; gap: 12px; padding: 0 14px;">
+                <span style="width: 52px; height: 52px; border-radius: 10px; background: repeating-linear-gradient(135deg, #2C2C2E 0 6px, #252527 6px 12px); flex-shrink: 0;"></span>
+                <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; font-weight: 600;">Now Playing</span><span style="font-size: 12px; color: #98989D;">audio widget</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section data-screen-label="Screens" style="padding: 56px 64px 80px; display: flex; flex-direction: column; gap: 32px;">
+  <div style="display: flex; flex-direction: column; gap: 6px; max-width: 920px;">
+    <div style="font-size: 13px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: #6b6a66;">Scanner · Screens in the 1c style</div>
+    <div style="font-size: 28px; font-weight: 700; letter-spacing: -.5px; color: #1a1a1a; text-wrap: pretty;">Every screen opens with a plain-English verdict card, then the details. Icons are one color, color only means status, and the footnotes are gone. Values shown are demo examples.</div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 56px 48px; align-items: flex-start;">
+
+    <!-- 2a CODES -->
+    <div id="2a" data-screen-label="Codes" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2a</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Codes</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Codes are grouped into likely problems, each with what to check first. Refresh lives only in the nav bar, and Clear is a quiet button at the bottom.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Refresh</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Codes</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF453A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l9 15.5H3z"></path><path d="M12 10v4"></path><path d="M12 16.8v.2"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Check engine light on</span><span style="font-size: 15px; color: #98989D;">3 codes · likely 2 problems</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Likely problem 1</div>
+          <div style="background: #1C1C1E; border-radius: 16px; overflow: hidden;">
+            <div style="padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 20px; font-weight: 700; letter-spacing: -.3px;">EVAP leak</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">2 codes</span></div>
+              <span style="font-size: 15px; line-height: 21px; color: #AEAEB2; text-wrap: pretty;">Start with the gas cap seal, then the purge valve (VSV) and its hoses.</span>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">P0455</span><span style="font-size: 14px; color: #98989D;">EVAP system large leak</span></div>
+              <span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Stored</span>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">P0441</span><span style="font-size: 14px; color: #98989D;">EVAP purge flow incorrect</span></div>
+              <span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Stored</span>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; font-size: 15px;"><span style="color: #FF6961; font-weight: 600;">Leak test failed</span><span style="color: #409CFF;">See test results</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Likely problem 2</div>
+          <div style="background: #1C1C1E; border-radius: 16px; overflow: hidden;">
+            <div style="padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 20px; font-weight: 700; letter-spacing: -.3px;">Brake light switch</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">1 code</span></div>
+              <span style="font-size: 15px; line-height: 21px; color: #AEAEB2; text-wrap: pretty;">Usually a worn switch above the brake pedal. A cheap part and an easy fix.</span>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 12px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px; font-weight: 600;">P0504</span><span style="font-size: 14px; color: #98989D;">Brake switch A/B correlation</span></div>
+              <span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">Pending</span>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+          </div>
+          <div style="height: 46px; border-radius: 14px; background: #1C1C1E; display: flex; align-items: center; justify-content: center; color: #FF6961; font-size: 17px; font-weight: 600; margin-top: 8px;">Clear Engine Codes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2b CODE DETAIL -->
+    <div id="2b" data-screen-label="Code detail" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2b</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Code detail sheet</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Opens with a plain-English name, then the freeze frame, an ordered list of what to check, and the related test result.</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600;">9:41</div>
+        <div style="position: absolute; top: 58px; left: 14px; right: 14px; height: 40px; border-radius: 12px 12px 0 0; background: #141415;"></div>
+        <div style="position: absolute; top: 68px; left: 0; right: 0; bottom: 0; background: #1C1C1E; border-radius: 14px 14px 0 0; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; padding: 0 16px 24px; overflow: hidden;">
+          <div style="width: 36px; height: 5px; border-radius: 3px; background: rgba(118,118,128,.4); margin: 6px auto 0;"></div>
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 36px;"><span></span><span style="font-size: 17px; font-weight: 600;">P0455</span><span style="justify-self: end; color: #409CFF; font-size: 17px; font-weight: 600;">Done</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 26px; font-weight: 700; letter-spacing: -.5px; line-height: 30px; text-wrap: pretty;">Large leak in the fuel vapor system</span>
+            <div style="display: flex; gap: 6px;"><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Stored</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #98989D; background: #2C2C2E;">Not urgent · safe to drive</span></div>
+          </div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #AEAEB2; text-transform: uppercase; margin-top: 4px;">When it set</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">1,920</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">RPM</span></div>
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">38</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">MPH</span></div>
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">192°</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">COOLANT</span></div>
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">24%</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">LOAD</span></div>
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">+3.1%</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">SHORT TRIM</span></div>
+            <div style="background: #2C2C2E; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column;"><b style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;">+6.3%</b><span style="font-size: 11px; font-weight: 700; color: #AEAEB2;">LONG TRIM</span></div>
+          </div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #AEAEB2; text-transform: uppercase; margin-top: 4px;">Check in this order</div>
+          <div style="background: #2C2C2E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span><span style="font-size: 16px;">Gas cap: tight, seal not cracked</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 52px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span><span style="font-size: 16px;">Filler neck and vapor hoses</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 52px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span><span style="font-size: 16px;">Purge valve (VSV)</span></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 52px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;"><span style="width: 24px; height: 24px; border-radius: 12px; background: rgba(118,118,128,.3); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">4</span><span style="font-size: 16px;">Charcoal canister</span></div>
+          </div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #AEAEB2; text-transform: uppercase; margin-top: 4px;">Related test</div>
+          <div style="background: #2C2C2E; border-radius: 12px; display: flex; align-items: center; gap: 12px; padding: 11px 16px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 16px; font-weight: 600;">EVAP leak test</span><span style="font-size: 14px; color: #AEAEB2;">Pass: up to 0.040 in</span></div>
+            <span style="font-size: 16px; font-weight: 600; color: #FF6961; font-variant-numeric: tabular-nums;">0.042</span>
+            <span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">Fail</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2c READINESS -->
+    <div id="2c" data-screen-label="Readiness" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2c</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Readiness</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Gives a clear answer on passing inspection. Not-ready monitors come first, with their failed test right in the row, so you don't have to dig.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Refresh</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Readiness</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF9F0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></div>
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Not inspection-ready</span><span style="font-size: 15px; color: #98989D; text-wrap: pretty;">Most states allow only 1 not-ready monitor</span></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px;">
+              <span style="height: 8px; border-radius: 4px; background: #FF9F0A;"></span><span style="height: 8px; border-radius: 4px; background: #FF9F0A;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span><span style="height: 8px; border-radius: 4px; background: #30D158;"></span>
+            </div>
+            <span style="font-size: 14px; color: #98989D; margin-top: -6px;">6 of 8 ready</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Not ready</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px;">EVAP system</span><span style="font-size: 14px; color: #FF6961; font-weight: 600;">Leak test failed · 0.042 / limit 0.040</span></div>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px;">Catalyst</span><span style="font-size: 14px; color: #98989D;">Hasn't run yet · needs a highway drive</span></div>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Ready</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Misfire</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Fuel system</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Components</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">O2 sensor</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">O2 heater</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">EGR / VVT</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 12px; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">All test results</span><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF6961; background: #3C2222;">2 failed</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2d LIVE DATA -->
+    <div id="2d" data-screen-label="Live Data" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2d</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Live Data</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Bigger number tiles in place of the small rings. A thin bar shows where each reading sits in its normal range, and it turns orange or red when the value is out. Drive mode is one tap away.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <svg viewBox="0 0 24 24" style="width: 23px; height: 23px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"></path><path d="M10 21a2.2 2.2 0 0 0 4 0"></path></svg>
+            <div style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 16px; background: rgba(118,118,128,.24); font-size: 14px; font-weight: 600;"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF453A;"></span>Record</div>
+          </div>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Live Data</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: rgba(118,118,128,.24); border-radius: 9px; padding: 2px; height: 34px;">
+            <span style="background: #636366; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">Gauges</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">All Data</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Graph</span>
+          </div>
+          <div style="background: #0B6FE0; border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+            <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="2"></circle><path d="M4 11h6"></path><path d="M14 11h6"></path><path d="M12 14v6.5"></path></svg>
+            <div style="flex: 1; display: flex; flex-direction: column;"><span style="font-size: 17px; font-weight: 600;">Drive mode</span><span style="font-size: 14px; color: #D6E6FF;">Huge numbers for the dash mount</span></div>
+            <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Engine speed</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">815</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">rpm</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 14%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Speed</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">1</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">mph</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 2%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Coolant</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">191</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">°F</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 62%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Battery</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">14.1</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">V</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 70%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Fuel trim B1</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">%</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 64%; height: 4px; border-radius: 2px; background: #FF9F0A;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Engine load</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">22</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">%</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 22%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Intake air</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">74</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">°F</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 30%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #98989D;">Timing</span><div style="display: flex; align-items: baseline; gap: 4px;"><b style="font-size: 34px; font-weight: 600; letter-spacing: -1px; font-variant-numeric: tabular-nums;">10</b><span style="font-size: 15px; color: #98989D; font-weight: 500;">°</span></div><div style="height: 4px; border-radius: 2px; background: rgba(118,118,128,.3); margin-top: 6px;"><div style="width: 40%; height: 4px; border-radius: 2px; background: #fff;"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2e DRIVE MODE (landscape) -->
+    <div id="2e" data-screen-label="Drive mode" style="display: flex; flex-direction: column; gap: 14px; width: 844px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2e</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Drive mode (landscape)</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; max-width: 620px; text-wrap: pretty;">New. For a phone in a dash mount: three huge numbers you can read at arm's length, a strip of secondary readings, and a single line of Drive Health status. Tap any number to swap which reading it shows.</div>
+      <div style="width: 844px; height: 390px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff; padding: 20px 56px 22px; box-sizing: border-box;">
+        <div style="display: flex; align-items: center; justify-content: space-between; height: 40px;">
+          <span style="color: #409CFF; font-size: 17px; font-weight: 600;">Done</span>
+          <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 16px; background: #3A2A12; color: #FF9F0A; font-size: 15px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 4px; background: #FF9F0A;"></span>2 things to check</div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #98989D;"><span style="width: 8px; height: 8px; border-radius: 4px; background: #30D158;"></span>V011</div>
+        </div>
+        <div style="flex: 1; display: grid; grid-template-columns: 1.3fr 1fr 1fr; align-items: center;">
+          <div style="display: flex; flex-direction: column;"><b style="font-size: 132px; font-weight: 600; letter-spacing: -6px; line-height: 132px; font-variant-numeric: tabular-nums;">42</b><span style="font-size: 18px; font-weight: 700; color: #98989D; letter-spacing: .5px;">MPH</span></div>
+          <div style="display: flex; flex-direction: column; border-left: .5px solid rgba(84,84,88,.65); padding-left: 28px;"><b style="font-size: 72px; font-weight: 600; letter-spacing: -3px; line-height: 80px; font-variant-numeric: tabular-nums;">1,850</b><span style="font-size: 16px; font-weight: 700; color: #98989D; letter-spacing: .5px;">RPM</span></div>
+          <div style="display: flex; flex-direction: column; border-left: .5px solid rgba(84,84,88,.65); padding-left: 28px;"><b style="font-size: 72px; font-weight: 600; letter-spacing: -3px; line-height: 80px; font-variant-numeric: tabular-nums;">192°</b><span style="font-size: 16px; font-weight: 700; color: #98989D; letter-spacing: .5px;">COOLANT</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;">
+          <div style="background: #1C1C1E; border-radius: 14px; padding: 10px 14px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #98989D;">MPG</span><b style="font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums;">18.4</b></div>
+          <div style="background: #1C1C1E; border-radius: 14px; padding: 10px 14px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #98989D;">VOLTS</span><b style="font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums;">14.1</b></div>
+          <div style="background: #1C1C1E; border-radius: 14px; padding: 10px 14px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #98989D;">TRIM B1</span><b style="font-size: 24px; font-weight: 600; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8%</b></div>
+          <div style="background: #1C1C1E; border-radius: 14px; padding: 10px 14px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #98989D;">ATF</span><b style="font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums;">168°</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2f FUEL TRIM -->
+    <div id="2f" data-screen-label="Fuel Trim" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2f</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Fuel Trim</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Leads with the bank totals in big type, colored by status. The chart shows one kind of trim at a time (total, short or long), so it's two lines instead of four.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span></span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Fuel Trim</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF9F0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h3.5l3-7 4.5 14 3-7h5"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">Slightly lean</span><span style="font-size: 15px; color: #98989D; text-wrap: pretty;">Bank 1 is adding fuel. Within ±10% is normal.</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #98989D;">BANK 1 TOTAL</span><b style="font-size: 38px; font-weight: 600; letter-spacing: -1.2px; color: #FF9F0A; font-variant-numeric: tabular-nums;">+5.8%</b><span style="font-size: 13px; color: #98989D; font-variant-numeric: tabular-nums;">Short +1.2 · Long +4.6</span></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #98989D;">BANK 2 TOTAL</span><b style="font-size: 38px; font-weight: 600; letter-spacing: -1.2px; font-variant-numeric: tabular-nums;">+2.1%</b><span style="font-size: 13px; color: #98989D; font-variant-numeric: tabular-nums;">Short −0.4 · Long +2.5</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: rgba(118,118,128,.24); border-radius: 9px; padding: 2px; height: 30px;">
+              <span style="background: #636366; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">Total</span>
+              <span style="display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500;">Short</span>
+              <span style="display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500;">Long</span>
+            </div>
+            <div style="display: flex; gap: 14px; font-size: 13px; color: #98989D;"><span style="display: flex; align-items: center; gap: 6px;"><i style="width: 10px; height: 10px; border-radius: 5px; background: #0A84FF;"></i>Bank 1</span><span style="display: flex; align-items: center; gap: 6px;"><i style="width: 10px; height: 10px; border-radius: 5px; background: #98989D;"></i>Bank 2</span><span style="margin-left: auto;">Last 5 min</span></div>
+            <svg viewBox="0 0 340 150" style="width: 100%; height: 150px; display: block;">
+              <rect x="0" y="37" width="340" height="76" style="fill: #30D158; opacity: .09;"></rect>
+              <line x1="0" x2="340" y1="75" y2="75" style="stroke: rgba(84,84,88,.65); stroke-width: 1;"></line>
+              <text x="334" y="33" style="font-size: 11px; fill: #98989D; text-anchor: end;">+10%</text>
+              <text x="334" y="127" style="font-size: 11px; fill: #98989D; text-anchor: end;">−10%</text>
+              <polyline points="0,70 20,68 40,71 60,66 80,64 100,62 120,58 140,60 160,55 180,57 200,53 220,55 240,51 260,54 280,52 300,53 320,50 340,52" style="fill: none; stroke: #98989D; stroke-width: 2; stroke-linejoin: round;"></polyline>
+              <polyline points="0,66 20,63 40,64 60,60 80,61 100,57 120,56 140,58 160,57 180,55 200,58 220,56 240,59 260,57 280,58 300,56 320,59 340,57" style="fill: none; stroke: #0A84FF; stroke-width: 2.4; stroke-linejoin: round;"></polyline>
+            </svg>
+          </div>
+          <div style="background: #0F2236; border-radius: 12px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 20px; color: #D1D1D6;">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.8v.2"></path></svg>
+            <span style="text-wrap: pretty;">Lean at idle that improves at cruise usually means a small vacuum leak. Check the intake hoses and the PCV valve.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2g MISFIRE -->
+    <div id="2g" data-screen-label="Misfire" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2g</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Misfire</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">The bar chart becomes a map of the V6 laid out by bank, so "swap the coil with a neighbor" is something you can see. Any cylinder with 3 or more counts turns orange.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Refresh</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Misfire</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #30D158; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">No misfires</span><span style="font-size: 15px; color: #98989D; text-wrap: pretty;">A few counts per drive are normal</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: rgba(118,118,128,.24); border-radius: 9px; padding: 2px; height: 34px;">
+            <span style="background: #636366; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">This drive</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Recent average</span>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #98989D;"><span>BANK 1 · passenger side</span></div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">0</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 1</span></div>
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">1</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 3</span></div>
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">0</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 5</span></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: #636366;"><span style="flex: 1; height: .5px; background: rgba(84,84,88,.65);"></span>FRONT OF ENGINE ←<span style="flex: 1; height: .5px; background: rgba(84,84,88,.65);"></span></div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">2</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 2</span></div>
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">0</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 4</span></div>
+              <div style="background: #2C2C2E; border-radius: 16px; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><b style="font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums;">0</b><span style="font-size: 12px; font-weight: 700; color: #98989D;">CYL 6</span></div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #98989D;"><span>BANK 2 · driver side</span></div>
+          </div>
+          <div style="background: #0F2236; border-radius: 12px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 20px; color: #D1D1D6;">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #409CFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.8v.2"></path></svg>
+            <span style="text-wrap: pretty;">If one cylinder turns orange, swap its coil with the one next to it on the same bank. If the misfire moves, replace the coil.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2h ALL SYSTEMS -->
+    <div id="2h" data-screen-label="All Systems" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2h</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">All Systems (after a scan)</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Modules with codes sort to the top, the icons are one color, and the verdict card shows when the last scan ran.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Rescan</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">All Systems</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF453A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3.5l8.5 4.7L12 13 3.5 8.2z"></path><path d="M3.5 12.5L12 17.3l8.5-4.8"></path><path d="M3.5 16.5L12 21.3l8.5-4.8"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">1 module has codes</span><span style="font-size: 15px; color: #98989D;">7 responded · Toyota · 5 min ago</span></div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Has codes</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px;">
+              <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><rect x="4" y="7" width="16" height="11" rx="2"></rect><path d="M8 7V4.5h8V7"></path><path d="M9 12.5h6"></path></svg>
+              <span style="flex: 1; font-size: 17px;">Engine</span><span style="font-size: 16px; color: #FF6961; font-weight: 600;">3 codes</span>
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">No codes</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"></path></svg><span style="flex: 1; font-size: 17px;">Transmission</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 4v2M12 18v2M4 12h2M18 12h2"></path></svg><span style="flex: 1; font-size: 17px;">ABS / VSC</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><circle cx="12" cy="6" r="2.5"></circle><path d="M7 21v-6l-2-4h14l-2 4v6"></path></svg><span style="flex: 1; font-size: 17px;">Airbag</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M3 15l2-6h14l2 6"></path><rect x="3" y="15" width="18" height="4" rx="1.5"></rect></svg><span style="flex: 1; font-size: 17px;">Body</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M3 15l2-6h14l2 6"></path><rect x="3" y="15" width="18" height="4" rx="1.5"></rect></svg><span style="flex: 1; font-size: 17px;">Immobilizer</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 50px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 17a8 8 0 1 1 16 0"></path><path d="M12 17l4-5"></path></svg><span style="flex: 1; font-size: 17px;">Gauge cluster</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #30D158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2i DRIVE HEALTH -->
+    <div id="2i" data-screen-label="Drive Health" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2i</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Drive Health</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">Findings come first. Passed checks shrink to a compact grid, and past drives and custom alerts share one list. "Finish" moves to the nav bar.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">Finish drive</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Drive Health</div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: #FF9F0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 22px; font-weight: 700; letter-spacing: -.4px;">2 things worth a look</span><span style="font-size: 15px; color: #98989D;">This drive · 14 min · 6 checks OK</span></div>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">Check</span><b style="font-size: 17px; font-weight: 600;">Running lean at idle (bank 1)</b></div>
+            <span style="font-size: 15px; line-height: 21px; color: #AEAEB2; text-wrap: pretty;">Trim sits around +12% at idle and drops at cruise. That pattern usually points to a vacuum leak.</span>
+            <span style="font-size: 15px; color: #409CFF; margin-top: 2px;">Open Fuel Trim</span>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; color: #FF9F0A; background: #3A2A12;">Check</span><b style="font-size: 17px; font-weight: 600;">New pending code P0504</b></div>
+            <span style="font-size: 15px; line-height: 21px; color: #AEAEB2; text-wrap: pretty;">Showed up during this drive. Usually the brake light switch.</span>
+            <span style="font-size: 15px; color: #409CFF; margin-top: 2px;">Open Codes</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Checks</div>
+          <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px;">
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Warm-up</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Charging</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Knock</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Misfires</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Idle</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 15px;"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #30D158; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Rear O2</span>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Past drives</span><span style="font-size: 16px; color: #98989D;">6</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px;"><span style="flex: 1; font-size: 17px;">Custom alerts</span><span style="font-size: 16px; color: #98989D;">2 on</span><svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: none; stroke: #636366; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6l6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2j FUEL & MPG -->
+    <div id="2j" data-screen-label="Fuel and MPG" style="display: flex; flex-direction: column; gap: 14px; width: 390px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 6px;">2j</span><span style="font-size: 17px; font-weight: 600; color: #1a1a1a;">Fuel &amp; MPG (parked)</span></div>
+      <div style="font-size: 14px; line-height: 20px; color: #55544f; text-wrap: pretty;">When you're not driving, the screen shows your last trip and real averages instead of six tiles of "—". Add Fill-Up is always the main button.</div>
+      <div style="width: 390px; height: 844px; border-radius: 48px; background: #000; overflow: hidden; box-shadow: 0 0 0 10px #161616, 0 30px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; color: #fff;">
+        <div style="height: 54px; display: flex; align-items: center; padding: 0 34px; font-size: 16px; font-weight: 600; flex-shrink: 0;">9:41</div>
+        <div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 6px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; color: #409CFF; font-size: 17px;"><svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: none; stroke: #409CFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"></path></svg>Home</div>
+          <span style="color: #409CFF; font-size: 17px;">$3.19/gal</span>
+        </div>
+        <div style="flex: 1; padding: 0 16px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; overflow: hidden;">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -.8px;">Fuel &amp; MPG</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: rgba(118,118,128,.24); border-radius: 9px; padding: 2px; height: 34px;">
+            <span style="background: #636366; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">Trips</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Fill-Ups</span>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;">Spending</span>
+          </div>
+          <div style="background: #1C1C1E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #98989D;">LAST TRIP · NOV 15, 5:42 PM</span>
+            <div style="display: flex; align-items: baseline; gap: 6px;"><b style="font-size: 56px; font-weight: 600; letter-spacing: -2px; line-height: 62px; font-variant-numeric: tabular-nums;">18.4</b><span style="font-size: 20px; font-weight: 500; color: #98989D;">mpg</span></div>
+            <span style="font-size: 15px; color: #98989D; font-variant-numeric: tabular-nums;">12.3 mi · 0.67 gal · $2.14 · 4 min idle</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #98989D;">FILL-UP AVERAGE</span><b style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums;">17.2 <span style="font-size: 15px; color: #98989D; font-weight: 500;">mpg</span></b></div>
+            <div style="background: #1C1C1E; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #98989D;">THIS MONTH</span><b style="font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums;">$142</b></div>
+          </div>
+          <div style="height: 50px; border-radius: 14px; background: #0B6FE0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 600;">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 20.5V5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 5v15.5"></path><path d="M3.5 20.5h12"></path><path d="M7 8h5"></path><path d="M14 9.5h1.5l2 2v5.5a1.5 1.5 0 0 0 3 0V8.5l-3-3"></path></svg>Add Fill-Up
+          </div>
+          <div style="font-size: 13px; font-weight: 500; letter-spacing: .2px; color: #98989D; text-transform: uppercase; padding: 4px 16px 0;">Recent trips</div>
+          <div style="background: #1C1C1E; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Nov 15 · 5:42 PM</span><span style="font-size: 14px; color: #98989D; font-variant-numeric: tabular-nums;">12.3 mi · $2.14</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">18.4</b></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Nov 15 · 8:10 AM</span><span style="font-size: 14px; color: #98989D; font-variant-numeric: tabular-nums;">11.9 mi · $2.31</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">16.4</b></div>
+            <div style="height: .5px; background: rgba(84,84,88,.65); margin-left: 16px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px;"><div style="flex: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 17px;">Nov 14 · 6:03 PM</span><span style="font-size: 14px; color: #98989D; font-variant-numeric: tabular-nums;">27.5 mi · $4.62</span></div><b style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;">19.0</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>

@@ -27,6 +27,10 @@ web/            the app (single-page, vanilla JS, no framework, no bundler)
   db.js         VEHICLE_DB (per-make modules, warnings, enhanced PIDs, DTC text) + DTC_GENERIC
   app.js        UI, screens, polling, vehicle card, fuel/MPG, CarPlay gauges feed, Drive Health glue, custom alerts,
                 charts (up to 3 readings, own scales, drag cursor) and recordings (search for the "// -----" markers).
+                Navigation: a floating tab bar (Home · Live · Diagnose · Log). Each tab has its own stack in
+                `S.stacks[tab]`; `S.stack` is a getter for the current tab, so `push`/`pop`/`top()` work as before.
+                `showStack()` redraws a tab without animation. Swipe from the left edge pops; sheets drag down to close.
+                The last tab and segment choices are saved (`scanner.tab`, `scanner.seg.*`).
                 `pushH` keeps HT = [time, value] for the last 10 min: graphs and alert recordings read it.
                 Recordings and alert rules live in localStorage (`scanner.recs`, `scanner.alerts.*`), metric values.
   build.py      concatenates everything into ../index.html
@@ -63,8 +67,9 @@ ios/            native wrapper, built by XcodeGen on GitHub Actions (no local Ma
 - `tests/conn.js`: hanging adapter, silent first channel, Cancel, all-silent, and **Bluefy detection**
 - `tests/feat.js`: vehicle lookup/photos (mocked fetch), fuel & MPG, fill-ups
 - `tests/demo.js`: demo mode in both themes, checks for page errors
+- `tests/nav.js`: tab bar, per-tab stacks, badge, offline code lookup, swipe back, sheet drag, remembered tab
 
-Add a test with every fix. `window.__scanner` exposes `S, D, H, HT, F, HL, AL, getRECS, ACT, connect, getVEH` for tests.
+Add a test with every fix. `window.__scanner` exposes `S, D, H, HT, F, HL, AL, getRECS, ACT, connect, push, pop, selectTab, getVEH` for tests.
 
 ## Things that bit us (don't undo these)
 1. **Bluefy has its own `window.webkit.messageHandlers.ble`.** The iPhone app's bridge is named `scannerApp`, and
