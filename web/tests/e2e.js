@@ -43,6 +43,12 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) pass++; else { fail++; con
   // readiness
   click('[data-go="ready"]'); await until(() => /not ready/.test(txt('#readybody')), 10000, 'ready');
   ok(/EVAP system/.test(txt('#readybody')) && /7\/8/.test(txt('#readybody')), 'readiness ' + txt('.ringcard b'));
+  // monitor tests (mode 06), opened from readiness
+  click('#readybody [data-go="tests"]'); await until(() => /failed/.test(txt('#testsbody')), 15000, 'monitor tests');
+  ok(/2 failed/.test(txt('#testsbody .ringcard')) && /Purge flow/.test(txt('#testsbody')) && /Not run/.test(txt('#testsbody')), 'tests summary');
+  ok(d.querySelector('#testsbody .cap').textContent === 'EVAP system' && /gas cap/.test(txt('#testsbody .tip')), 'failed group first + tip');
+  click('#v-tests [data-pop]'); await sleep(200);
+  ok(/2 failed/.test(txt('#readybody [data-go="tests"]')), 'readiness row chip');
   click('#v-ready [data-pop]'); await sleep(100);
   // misfire
   click('[data-go="misfire"]'); await until(() => d.querySelectorAll('#misbody .bar').length === 6, 10000, 'misfire');

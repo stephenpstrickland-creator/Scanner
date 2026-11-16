@@ -60,7 +60,7 @@ for (let c = 1; c <= 8; c++) CAUSES['P030' + c] = ['Spark plug or ignition coil 
 const S = {
   mode: 'off', status: '', theme: store.get('theme', 'dark'), tempU: store.get('tempU', 'F'), speedU: store.get('speedU', 'mph'),
   stack: ['home'], liveMode: 'gauges', graphKey: 'rpm', misMode: 'cur',
-  codes: null, codesLoading: false, ff: null, ready: null, readyLoading: false, mis: null, misLoading: false,
+  codes: null, codesLoading: false, ff: null, ready: null, readyLoading: false, mis: null, misLoading: false, tests: null, testsLoading: false,
   scan: { state: 'intro', results: [], i: 0, n: 0, name: '' }, makeKey: null, selMod: null,
   extra: [], busy: 0, inRead: false, rec: false, recRows: [], recStart: 0, lastRec: 0,
 };
@@ -132,6 +132,7 @@ class RealBackend {
   async clearCodes() { await this._func(); return (await this.e.lines('04', 6000)).some((s) => s.startsWith('44')); }
   async readiness() { await this._func(); return this.e.readiness(); }
   async misfire() { await this._func(); return this.e.misfire(); }
+  async monitorTests() { await this._func(); return this.e.monitorTests(); }
   async scan(mods, step) {
     await this._func();
     this.e.enhBegin();
@@ -196,6 +197,13 @@ class DemoBackend {
     return { mil: this.codesList.length > 0, count: this.codesList.length, diesel: false, monitors: ['Misfire', 'Fuel system', 'Components', 'Catalyst', 'EVAP system', 'O2 sensor', 'O2 heater', 'EGR / VVT'].map((n) => ({ name: n, ready: n !== 'EVAP system' })) };
   }
   async misfire() { await sleep(700); return this.misCur.map((c, i) => ({ cyl: i + 1, cur: c, avg: this.misAvg[i] })); }
+  async monitorTests() {
+    await sleep(900);
+    const T = [[0x01, 0x05, 0x10, 70, 0, 150], [0x01, 0x06, 0x10, 82, 0, 150], [0x02, 0x08, 0x0A, 6557, 4918, 0xFFFF],
+      [0x21, 0x91, 0x20, 52, 0, 128], [0x22, 0x91, 0x20, 61, 0, 128], [0x35, 0x91, 0x1D, 6, 0, 40],
+      [0x3A, 0xC9, 0xFE, 1840, 0, 1200], [0x3B, 0xC9, 0xFE, 0, 0, 0], [0x3D, 0x91, 0xFE, 40, 200, 0x7FFF], [0x41, 0x91, 0x0E, 1800, 1000, 4000]];
+    return T.flatMap(([mid, tid, uas, v, lo, hi]) => mode06Parse([0x46, mid, tid, uas, v >> 8, v & 255, lo >> 8, lo & 255, hi >> 8, hi & 255], mid));
+  }
   async scan(mods, step) {
     const out = [];
     for (let i = 0; i < mods.length; i++) {
@@ -229,7 +237,7 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', fuel: 'Fuel Trim', extra: 'Extra' };
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', fuel: 'Fuel Trim', extra: 'Extra' };
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
 function push(n) {
@@ -255,6 +263,7 @@ function onShow(n) {
   if (n === 'systems') renderSystems();
   if (n === 'module') renderModule();
   if (n === 'misfire') { renderMis(); if (!S.mis && !S.misLoading) loadMis(); }
+  if (n === 'tests') { renderTests(); if (!S.tests && !S.testsLoading) loadTests(); }
   if (n === 'live') { buildLive(); updateLive(); }
   if (n === 'extra') initExtra();
   if (n === 'fuel') drawFuel();
@@ -349,7 +358,7 @@ async function connect(demo) {
   loadCodes();
 }
 function resetData() {
-  S.codes = null; S.ff = null; S.ready = null; S.mis = null; S.scan = { state: 'intro', results: [], i: 0, n: 0, name: '' }; S.selMod = null; S.extra = [];
+  S.codes = null; S.ff = null; S.ready = null; S.mis = null; S.tests = null; S.scan = { state: 'intro', results: [], i: 0, n: 0, name: '' }; S.selMod = null; S.extra = [];
   Object.keys(D).forEach((k) => { delete D[k]; });
   if (S.mode === 'live') Object.keys(H).forEach((k) => { delete H[k]; });
 }
@@ -993,7 +1002,60 @@ function renderReady() {
     '<p><b>' + (notReady.length ? notReady.length + ' not ready' : 'All ready') + '</b>' + (notReady.length ? 'Many states allow one incomplete monitor on 2001+ vehicles. Monitors complete after normal driving.' : 'Ready for an emissions inspection.') + '</p></div>' +
     '<div class="group">' + mons.map((m) => '<div class="row"><span class="grow">' + m.name + '</span>' +
       (m.ready ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg><span class="val" style="width:84px">Ready</span>'
-        : '<svg class="ic" style="color:var(--orangeT)"><use href="#i-clock"/></svg><span class="val" style="width:84px;color:var(--orangeT);font-weight:600">Not ready</span>') + '</div>').join('') + '</div>';
+        : '<svg class="ic" style="color:var(--orangeT)"><use href="#i-clock"/></svg><span class="val" style="width:84px;color:var(--orangeT);font-weight:600">Not ready</span>') + '</div>').join('') + '</div>' +
+    (B && B.isCAN ? '<div class="group"><button class="row tap" data-go="tests"><span class="grow">Monitor test results<span class="sub">The pass/fail numbers behind each monitor</span></span>' +
+      (S.tests ? testsChip() : '') + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>' : '');
+}
+
+// ---------------------------------------------------------------- monitor tests (mode 06)
+async function loadTests() {
+  if (!B || S.testsLoading) return;
+  S.testsLoading = true; renderTests();
+  try { S.tests = await job(() => B.monitorTests()); } catch (e) { S.tests = null; }
+  S.testsLoading = false; renderTests();
+}
+function testsChip() {
+  const bad = S.tests.filter((t) => !t.notRun && !t.pass).length;
+  return '<span class="chip ' + (bad ? 'red">' + bad + ' failed' : 'green">All passed') + '</span>';
+}
+function testVal(t, x) {
+  if (t.unit === '°C') return tempStr(x);
+  return x.toLocaleString('en-US', { minimumFractionDigits: t.dec, maximumFractionDigits: t.dec }) + (t.unit ? ' ' + t.unit : '');
+}
+function testLimits(t) {
+  if (t.noMin && t.noMax) return 'No limits set';
+  if (t.noMin) return 'Pass: up to ' + testVal(t, t.max);
+  if (t.noMax) return 'Pass: at least ' + testVal(t, t.min);
+  return 'Pass: ' + testVal(t, t.min) + ' to ' + testVal(t, t.max);
+}
+const TEST_TIPS = {
+  'EVAP system': 'A failed leak test means the system can’t hold vacuum: check the gas cap seal first, then the filler neck, hoses and charcoal canister. A failed purge flow test points to the purge valve (VSV) or its hoses. These go with codes like P0441, P0455 and P0456.',
+  'Catalytic converter': 'A failing catalyst test usually sets P0420 / P0430. Fix any misfires or O2 sensor problems first, since they can make a good converter look bad.',
+  'Oxygen sensors': 'Slow switch times or a narrow voltage range mean a lazy O2 sensor. It often fails here before it sets a code.',
+  'Oxygen sensor heaters': 'A failed heater test usually means the sensor’s heater is open, or there’s a fuse or wiring problem. It usually means replacing the sensor.',
+};
+function renderTests() {
+  const el = $('#testsbody');
+  if (S.testsLoading && !S.tests) { el.innerHTML = '<div class="loading"><div class="spin"></div>Reading test results...</div>'; return; }
+  if (!S.tests) { el.innerHTML = B ? '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-info"/></svg><b>No test results</b>' + (B.isCAN ? 'This engine computer didn’t report any monitor tests. Try again with the key on.' : 'Test results need a CAN vehicle (most 2008 and newer).') + '</div>' : ''; return; }
+  const all = S.tests, bad = all.filter((t) => !t.notRun && !t.pass), run = all.filter((t) => !t.notRun);
+  const groups = [];
+  all.forEach((t) => { let g = groups.find((x) => x.name === t.group); if (!g) groups.push(g = { name: t.group, tests: [] }); g.tests.push(t); });
+  const hasBad = (g) => g.tests.some((t) => !t.notRun && !t.pass);
+  groups.sort((a, b) => hasBad(b) - hasBad(a));
+  let h = '<div class="ringcard"><span class="sq" style="background:' + (bad.length ? 'var(--red)' : 'var(--green)') + ';width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0"><svg class="ic" style="width:30px;height:30px"><use href="#' + (bad.length ? 'i-warn' : 'i-check') + '"/></svg></span>' +
+    '<p><b>' + (bad.length ? bad.length + ' failed' : 'All tests passed') + '</b>' + run.length + ' of ' + all.length + ' tests have run' +
+    (all.length > run.length ? '. The rest run during normal driving.' : '.') + '</p></div>';
+  groups.forEach((g) => {
+    h += '<div class="cap">' + esc(g.name) + '</div><div class="group">' + g.tests.map((t) => {
+      const chip = t.notRun ? '<span class="chip gray">Not run</span>' : t.pass ? '<span class="chip green">Pass</span>' : '<span class="chip red">Fail</span>';
+      return '<div class="row"><span class="grow"><b style="font-weight:600">' + esc(t.name) + '</b><span class="sub">' + esc(t.test) + ' · ' + esc(testLimits(t)) + '</span></span>' +
+        '<span class="val num"' + (!t.notRun && !t.pass ? ' style="color:var(--redT);font-weight:600"' : '') + '>' + (t.notRun ? '—' : esc(testVal(t, t.value))) + '</span>' + chip + '</div>';
+    }).join('') + '</div>';
+    if (hasBad(g) && TEST_TIPS[g.name]) h += '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>' + TEST_TIPS[g.name] + '</span></div>';
+  });
+  h += '<p class="foot">Results from the engine computer’s last run of each test (Mode 06). Clearing codes erases them until the tests run again. Test numbers 80 and up are defined by the manufacturer. Misfire counts are on the Misfire screen.</p>';
+  el.innerHTML = h;
 }
 
 // ---------------------------------------------------------------- all systems
@@ -1439,6 +1501,7 @@ const ACT = {
   loadCodes: () => loadCodes(),
   loadReady: () => loadReady(),
   loadMis: () => loadMis(),
+  loadTests: () => loadTests(),
   openCode: (el) => openCode(el.dataset.code),
   clearEngine: () => {
     if (!B) return needConnection();

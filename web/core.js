@@ -219,6 +219,66 @@ const PID_DEC = {
 };
 const PID_LEN = { 0x0C: 2, 0x10: 2, 0x1F: 2, 0x42: 2 };
 
+// ---------------------------------------------------------------- mode 06 (SAE J1979 test results)
+// Unit and scaling IDs: [unit, scale, offset]. 0x80+ are signed.
+const UAS = {
+  0x01: ['', 1], 0x02: ['', 0.1], 0x03: ['', 0.01], 0x04: ['', 0.001], 0x05: ['', 0.0000305], 0x06: ['', 0.000305],
+  0x07: ['rpm', 0.25], 0x08: ['km/h', 0.01], 0x09: ['km/h', 1], 0x0A: ['mV', 0.122], 0x0B: ['V', 0.001], 0x0C: ['V', 0.01],
+  0x0D: ['mA', 0.00390625], 0x0E: ['A', 0.001], 0x0F: ['A', 0.01], 0x10: ['ms', 1], 0x11: ['ms', 100], 0x12: ['s', 1],
+  0x13: ['mΩ', 1], 0x14: ['Ω', 1], 0x15: ['kΩ', 1], 0x16: ['°C', 0.1, -40], 0x17: ['kPa', 0.01], 0x18: ['kPa', 0.0117],
+  0x19: ['kPa', 0.079], 0x1A: ['kPa', 1], 0x1B: ['kPa', 10], 0x1C: ['°', 0.01], 0x1D: ['°', 0.5], 0x1E: ['λ', 0.0000305],
+  0x1F: ['A/F', 0.05], 0x20: ['', 0.0039062], 0x21: ['mHz', 1], 0x22: ['Hz', 1], 0x23: ['kHz', 1], 0x24: ['counts', 1],
+  0x25: ['km', 1], 0x26: ['mV/ms', 0.1], 0x27: ['g/s', 0.01], 0x28: ['g/s', 1], 0x29: ['Pa/s', 0.25], 0x2A: ['kg/h', 0.001],
+  0x2B: ['switches', 1], 0x2C: ['g/cyl', 0.01], 0x2D: ['mg/stroke', 0.01], 0x2F: ['%', 0.01], 0x30: ['%', 0.001526],
+  0x31: ['L', 0.001], 0x34: ['min', 1], 0x35: ['ms', 10], 0x36: ['g', 0.01], 0x37: ['g', 0.1], 0x38: ['g', 1],
+  0x39: ['%', 0.01, -327.68], 0x3A: ['g', 0.001], 0x3B: ['g', 0.0001], 0x3C: ['µs', 0.1], 0x3D: ['mA', 0.01], 0x3F: ['L', 0.01],
+  0x40: ['ppm', 1], 0x41: ['µA', 0.01],
+  0x81: ['', 1], 0x82: ['', 0.1], 0x83: ['', 0.01], 0x84: ['', 0.001], 0x85: ['', 0.0000305], 0x86: ['', 0.000305],
+  0x87: ['ppm', 1], 0x8A: ['mV', 0.122], 0x8B: ['V', 0.001], 0x8C: ['V', 0.01], 0x8D: ['mA', 0.00390625], 0x8E: ['A', 0.001],
+  0x90: ['ms', 1], 0x96: ['°C', 0.1], 0x9C: ['°', 0.01], 0x9D: ['°', 0.5], 0xA8: ['g/s', 1], 0xA9: ['Pa/s', 0.25],
+  0xAD: ['mg/stroke', 0.01], 0xAE: ['mg/stroke', 0.1], 0xAF: ['%', 0.01], 0xB0: ['%', 0.003052], 0xB1: ['mV/s', 2],
+  0xFC: ['kPa', 0.01], 0xFD: ['kPa', 0.001], 0xFE: ['Pa', 0.25],
+};
+const O2_TID = { 1: 'Rich-to-lean threshold', 2: 'Lean-to-rich threshold', 3: 'Low voltage for switch time', 4: 'High voltage for switch time',
+  5: 'Rich-to-lean switch time', 6: 'Lean-to-rich switch time', 7: 'Lowest sensor voltage', 8: 'Highest sensor voltage',
+  9: 'Time between switches', 10: 'Sensor period' };
+function mode06Name(mid) {
+  const bs = (n) => 'bank ' + ((n >> 2) + 1) + ' sensor ' + ((n & 3) + 1);
+  const r = (lo, hi) => mid >= lo && mid <= hi;
+  if (r(0x01, 0x10)) return ['Oxygen sensors', 'O2 sensor ' + bs(mid - 0x01)];
+  if (r(0x21, 0x24)) return ['Catalytic converter', 'Catalyst bank ' + (mid - 0x20)];
+  if (r(0x31, 0x34)) return ['EGR / VVT', 'EGR bank ' + (mid - 0x30)];
+  if (r(0x35, 0x38)) return ['EGR / VVT', 'Variable valve timing bank ' + (mid - 0x34)];
+  if (r(0x39, 0x3D)) return ['EVAP system', ['Leak test (cap off, 0.150")', 'Leak test (0.090")', 'Leak test (0.040")', 'Small leak test (0.020")', 'Purge flow'][mid - 0x39]];
+  if (r(0x41, 0x50)) return ['Oxygen sensor heaters', 'O2 heater ' + bs(mid - 0x41)];
+  if (r(0x61, 0x64)) return ['Catalytic converter', 'Catalyst heater bank ' + (mid - 0x60)];
+  if (r(0x71, 0x74)) return ['Secondary air', 'Secondary air ' + (mid - 0x70)];
+  if (r(0x81, 0x84)) return ['Fuel system', 'Fuel system bank ' + (mid - 0x80)];
+  if (r(0x85, 0x86)) return ['Fuel system', 'Boost pressure bank ' + (mid - 0x84)];
+  if (r(0x90, 0x91)) return ['Exhaust aftertreatment', 'NOx trap bank ' + (mid - 0x8F)];
+  if (r(0x98, 0x99)) return ['Exhaust aftertreatment', 'NOx catalyst bank ' + (mid - 0x97)];
+  if (r(0xB0, 0xB1)) return ['Exhaust aftertreatment', 'Particulate filter bank ' + (mid - 0xAF)];
+  return ['Other', 'Monitor ' + h2(mid)];
+}
+// One 46-reply -> test records (9 bytes each: MID TID UAS value min max).
+function mode06Parse(m, mid) {
+  const out = [];
+  if (m[0] !== 0x46) return out;
+  for (let i = 1; i + 9 <= m.length; i += 9) {
+    if (m[i] !== mid) continue;
+    const tid = m[i + 1], uas = m[i + 2];
+    const word = (j) => { const v = m[j] * 256 + m[j + 1]; return uas >= 0x80 && v > 32767 ? v - 65536 : v; };
+    const raw = word(i + 3), lo = word(i + 5), hi = word(i + 7);
+    const u = UAS[uas] || ['', 1], sc = (x) => x * u[1] + (u[2] || 0);
+    const [group, name] = mode06Name(mid);
+    out.push({ mid, tid, uas, group, name, test: mid <= 0x10 && O2_TID[tid] ? O2_TID[tid] : 'Test ' + h2(tid),
+      unit: u[0], dec: Math.min(3, Math.max(0, Math.ceil(-Math.log10(u[1]) - 1e-9))),
+      value: sc(raw), min: sc(lo), max: sc(hi),
+      noMin: uas >= 0x80 ? lo === -32768 : lo === 0, noMax: uas >= 0x80 ? hi === 32767 : hi === 0xFFFF, notRun: raw === 0 && lo === 0 && hi === 0, pass: raw >= lo && raw <= hi });
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- ELM layer
 class Elm {
   constructor(transport) {
@@ -388,6 +448,30 @@ class Elm {
       }
       if (cur === null && avg === null) { if (out.length) break; continue; }
       out.push({ cyl: mid - 0xA1, cur: cur || 0, avg: avg || 0 });
+    }
+    return out.length ? out : null;
+  }
+
+  // ---- every on-board monitor test result (mode 06, CAN only). Misfire MIDs have their own screen.
+  async monitorTests() {
+    if (!this.isCAN()) return null;
+    const mids = [];
+    for (let base = 0; base <= 0xE0; base += 0x20) {
+      const L = await this.lines('06' + h2(base), 2000);
+      const sups = toMessages(L).filter((x) => x[0] === 0x46 && x[1] === base && x.length >= 6);
+      if (!sups.length) break;
+      for (const s of sups) for (let i = 0; i < 32; i++) {
+        const mid = base + 1 + i;
+        if ((s[2 + (i >> 3)] >> (7 - (i & 7))) & 1 && !mids.includes(mid)) mids.push(mid);
+      }
+      if (!mids.includes(base + 0x20)) break;
+    }
+    const out = [];
+    for (const mid of mids) {
+      if (mid % 0x20 === 0 || (mid >= 0xA1 && mid <= 0xAD)) continue;
+      const L = await this.lines('06' + h2(mid), 2000);
+      if (hasError(L)) continue;
+      for (const m of toMessages(L)) out.push(...mode06Parse(m, mid));
     }
     return out.length ? out : null;
   }
@@ -635,5 +719,5 @@ class AllSystems {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { Elm, AllSystems, BleTransport, NativeTransport, SerialBase, toMessages, decodeDTC, makeFromVIN, modelYear, modulesFor, dtcText, PID_DEC };
+  module.exports = { Elm, AllSystems, BleTransport, NativeTransport, SerialBase, toMessages, decodeDTC, mode06Parse, makeFromVIN, modelYear, modulesFor, dtcText, PID_DEC };
 }

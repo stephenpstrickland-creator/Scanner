@@ -1,7 +1,7 @@
 # DIY OBD-II Scanner: guide for Claude Code
 
 A phone-based car scanner in the spirit of the Topdon AD500: engine codes, freeze frame, readiness, live data,
-Mode 06 misfire counts, fuel trims, **all-systems scan (ABS / airbag / body modules)** with manufacturer data
+Mode 06 misfire counts and full monitor test results (pass/fail vs limits), fuel trims, **all-systems scan (ABS / airbag / body modules)** with manufacturer data
 (Toyota first), a vehicle card (NHTSA VIN decode + photo), a fuel & MPG tracker, and CarPlay / Lock Screen
 live gauges. Apple-style UI (SF fonts, grouped lists, sheets, dark/light).
 

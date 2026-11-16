@@ -1,7 +1,7 @@
 // Node test of core.js against sim_car.py
 const { spawn } = require('child_process');
 const fs = require('fs');
-eval(fs.readFileSync(__dirname + '/db.js', 'utf8') + '\n' + fs.readFileSync(__dirname + '/core.js', 'utf8').replace(/if \(typeof module[\s\S]*$/, '') + '\nglobalThis.C={Elm,AllSystems,makeFromVIN,modelYear,modulesFor,dtcText,DB:VEHICLE_DB};');
+eval(fs.readFileSync(__dirname + '/db.js', 'utf8') + '\n' + fs.readFileSync(__dirname + '/core.js', 'utf8').replace(/if \(typeof module[\s\S]*$/, '') + '\nglobalThis.C={Elm,AllSystems,mode06Parse,makeFromVIN,modelYear,modulesFor,dtcText,DB:VEHICLE_DB};');
 class SimTransport {
   constructor(car, ver) { this.p = spawn(process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3'), ['-I', __dirname + '/sim_car.py', car, '--elm', ver]); this.buf = ''; this.w = null;
     this.p.stdout.on('data', (d) => { this.buf += d.toString('latin1'); const i = this.buf.indexOf('>'); if (this.w && i >= 0) { const w = this.w; this.w = null; const o = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1); w(o); } }); }
@@ -23,6 +23,15 @@ const ok = (c, m) => { if (c) pass++; else { fail++; console.log('  FAIL:', m); 
   const rd = await e.readiness(); ok(rd.mil && rd.count === 3 && rd.monitors.length === 8 && rd.monitors.filter((m) => !m.ready).map((m) => m.name).join() === 'EVAP system', 'readiness ' + JSON.stringify(rd));
   const ff = await e.freezeFrame(); ok(ff && ff.code === 'P0441' && ff.rpm === 1840 && ff.speed === 38 && Math.abs(ff.ltft1 - 4.69) < 0.01, 'ff ' + JSON.stringify(ff));
   const mis = await e.misfire(); ok(mis && mis.length === 6 && mis[2].cur === 5 && mis[2].avg === 6 && mis[4].cur === 1, 'misfire ' + JSON.stringify(mis));
+  const mt = await e.monitorTests(), byMid = (m) => mt.filter((t) => t.mid === m);
+  ok(mt && mt.length === 19 && !mt.some((t) => t.mid >= 0xA1 && t.mid <= 0xAD), 'mode06 count ' + (mt && mt.length));
+  ok(byMid(0x01)[0].test === 'Rich-to-lean switch time' && byMid(0x01)[0].value === 70 && byMid(0x01)[0].unit === 'ms' && byMid(0x01)[0].pass, 'mode06 o2');
+  ok(byMid(0x02)[1].noMax && Math.abs(byMid(0x02)[1].min - 600) < 0.1 && byMid(0x02)[1].pass, 'mode06 open max');
+  ok(byMid(0x3A)[0].group === 'EVAP system' && byMid(0x3A)[0].value === 460 && byMid(0x3A)[0].unit === 'Pa' && !byMid(0x3A)[0].pass, 'mode06 evap fail');
+  ok(byMid(0x3B)[0].notRun && !byMid(0x3D)[0].pass && byMid(0x3D)[0].name === 'Purge flow', 'mode06 not run / purge');
+  ok(mt.filter((t) => !t.notRun && !t.pass).length === 2, 'mode06 two failures');
+  const neg = C.mode06Parse([0x46, 0x3D, 0x91, 0xFE, 0xFF, 0x38, 0x80, 0x00, 0x00, 0x00], 0x3D)[0];
+  ok(neg.value === -50 && neg.noMin && neg.pass, 'mode06 signed ' + JSON.stringify(neg));
   ok(C.dtcText('C1249', 'toyota').startsWith('Open in stop light'), 'dtc text');
   const mods = C.modulesFor('toyota'); const found = [];
   e.enhBegin();

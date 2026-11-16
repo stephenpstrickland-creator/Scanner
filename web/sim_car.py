@@ -44,6 +44,40 @@ def misrec(mid, cur, avg):
     return bytes(r)
 
 
+def sup6(base, mids):
+    m = 0
+    for p in mids:
+        m |= 1 << (31 - (p - base - 1))
+    return "46%02X%08X" % (base, m)
+
+
+def m06(mid, tests):
+    """tests: [(tid, uas, value, min, max)] -> one mode 06 reply."""
+    r = [0x46]
+    for tid, uas, v, lo, hi in tests:
+        r += [mid, tid, uas]
+        for x in (v, lo, hi):
+            x &= 0xFFFF
+            r += [x >> 8, x & 0xFF]
+    return bytes(r)
+
+
+# 2007 Tacoma monitor results: EVAP gross leak and purge flow fail (P0455 / P0441), 0.040" test not run yet
+TACOMA_M06 = {
+    0x01: [(0x05, 0x10, 70, 0, 150), (0x06, 0x10, 82, 0, 150)],
+    0x02: [(0x07, 0x0A, 820, 0, 2458), (0x08, 0x0A, 6557, 4918, 0xFFFF)],
+    0x05: [(0x05, 0x10, 74, 0, 150), (0x06, 0x10, 88, 0, 150)],
+    0x06: [(0x07, 0x0A, 860, 0, 2458), (0x08, 0x0A, 6640, 4918, 0xFFFF)],
+    0x21: [(0x91, 0x20, 52, 0, 128)], 0x22: [(0x91, 0x20, 61, 0, 128)],
+    0x35: [(0x91, 0x1D, 6, 0, 40)], 0x36: [(0x91, 0x1D, 8, 0, 40)],
+    0x3A: [(0xC9, 0xFE, 1840, 0, 1200)],
+    0x3B: [(0xC9, 0xFE, 0, 0, 0)],
+    0x3D: [(0x91, 0xFE, 40, 200, 0x7FFF)],
+    0x41: [(0x91, 0x0E, 1800, 1000, 4000)], 0x42: [(0x91, 0x0E, 650, 300, 2500)],
+    0x45: [(0x91, 0x0E, 1760, 1000, 4000)], 0x46: [(0x91, 0x0E, 640, 300, 2500)],
+}
+
+
 def tacoma2007():
     vin = b"5TETU62N37Z412345"
     st = {"abs": [dtc("C0200") + [0xE0], dtc("C1249") + [0xE0]],
@@ -61,6 +95,8 @@ def tacoma2007():
                "0108": "41087F", "0109": "410984", "010B": "410B21", "010D": "410D00", "010E": "410E54", "010F": "410F3A",
                "0110": "41100162", "0111": "411125", "0114": "41145A", "011F": "411F0384", "012F": "412F9E", "0133": "413365",
                "0142": "41423708", "06A0": "46A0FE000000",
+               "0600": sup6(0x00, [1, 2, 5, 6, 0x20]), "0620": sup6(0x20, [0x21, 0x22, 0x35, 0x36, 0x3A, 0x3B, 0x3D, 0x40]),
+               "0640": sup6(0x40, [0x41, 0x42, 0x45, 0x46, 0x60]), "0660": sup6(0x60, [0x80]), "0680": sup6(0x80, [0xA0]),
                "020200": "42020004" + "41", "020C00": "420C001CC0", "020D00": "420D0026", "020500": "42050082",
                "020400": "4204004F", "020600": "42060083", "020700": "42070086",
                "3E": "7E", "3E00": "7F3E12", "1902FF": "7F1911", "1800FF00": "7F1811", "13": "7F1311",
@@ -69,6 +105,9 @@ def tacoma2007():
             return [bytes.fromhex(tbl[h])]
         if h == "0902":
             return [bytes([0x49, 0x02, 0x01]) + vin]
+        if h.startswith("06") and len(h) == 4 and int(h[2:], 16) in TACOMA_M06:
+            mid = int(h[2:], 16)
+            return [m06(mid, TACOMA_M06[mid])]
         if h.startswith("06A") and len(h) == 4 and h != "06A0":
             mid = int(h[2:], 16)
             if 0xA2 <= mid <= 0xA7:
