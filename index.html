@@ -1,0 +1,1795 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Scanner</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+html[data-theme="dark"] {
+  --bg: #000000; --card: #1C1C1E; --elev: #1C1C1E; --cell: #2C2C2E; --fill: #2C2C2E; --fill2: rgba(118,118,128,.24);
+  --label: #FFFFFF; --sec: #98989D; --sep: rgba(84,84,88,.65); --bar: rgba(22,22,24,.8);
+  --segSel: #636366; --alert: rgba(44,44,46,.9);
+  --blue: #0A84FF; --blueT: #409CFF; --blueFill: #0B6FE0;
+  --green: #30D158; --greenT: #30D158; --red: #FF453A; --redT: #FF6961; --orange: #FF9F0A; --orangeT: #FF9F0A;
+  --yellow: #FFD60A; --teal: #40C8E0; --indigo: #5E5CE6; --pink: #FF375F;
+  --redChip: #3C2222; --greenChip: #15301D; --orangeChip: #3A2A12; --blueChip: #0F2236; --grayChip: #2C2C2E; --tipT: #D1D1D6;
+}
+html[data-theme="light"] {
+  --bg: #F2F2F7; --card: #FFFFFF; --elev: #F2F2F7; --cell: #FFFFFF; --fill: #E5E5EA; --fill2: rgba(118,118,128,.12);
+  --label: #000000; --sec: #636366; --sep: rgba(60,60,67,.22); --bar: rgba(249,249,249,.85);
+  --segSel: #FFFFFF; --alert: rgba(242,242,247,.92);
+  --blue: #007AFF; --blueT: #0062CC; --blueFill: #0062CC;
+  --green: #34C759; --greenT: #248A3D; --red: #FF3B30; --redT: #D70015; --orange: #FF9500; --orangeT: #C93400;
+  --yellow: #FFCC00; --teal: #30B0C7; --indigo: #5856D6; --pink: #FF2D55;
+  --redChip: #FDE3E4; --greenChip: #DDF3E3; --orangeChip: #FDEBD7; --blueChip: #E3EEFB; --grayChip: #E5E5EA; --tipT: #3A3A3C;
+}
+body { background: var(--bg); color: var(--label); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; font-size: 17px; -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none; }
+button, input { font-family: inherit; }
+button { color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.tap { transition: transform .12s, opacity .12s; cursor: pointer; }
+.tap:active { transform: scale(.97); opacity: .7; }
+#app { position: fixed; inset: 0; max-width: 680px; margin: 0 auto; overflow: hidden; background: var(--bg); }
+
+/* navigation stack */
+.view { position: absolute; inset: 0; background: var(--bg); overflow: hidden; transform: translateX(100%); transition: transform .48s cubic-bezier(.32,.72,0,1), filter .48s; }
+.view.active { transform: none; }
+.view.behind { transform: translateX(-28%); filter: brightness(.6); }
+.nav { position: absolute; top: 0; left: 0; right: 0; z-index: 5; height: calc(44px + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) 12px 0 4px;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: .5px solid var(--sep); }
+.nav h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
+.back { justify-self: start; display: flex; align-items: center; height: 44px; padding: 0 10px 0 0; background: none; border: 0; color: var(--blueT); font-size: 17px; cursor: pointer; }
+.back .ic { width: 26px; height: 26px; stroke-width: 2.6; }
+.navR { justify-self: end; display: flex; align-items: center; gap: 4px; }
+.textbtn { background: none; border: 0; color: var(--blueT); font-size: 17px; height: 44px; padding: 0 0 0 10px; cursor: pointer; }
+.content { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding: calc(56px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; }
+.content::-webkit-scrollbar { display: none; }
+
+/* components */
+.group { background: var(--card); border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 16px; width: 100%; background: none; border: 0; text-align: left; font-size: 17px; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: .5px; background: var(--sep); }
+.row.ic-row + .row.ic-row::before { left: 58px; }
+.row .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.row .sub { font-size: 14px; color: var(--sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .val { font-size: 16px; color: var(--sec); text-align: right; }
+.row .chev { width: 15px; height: 15px; color: var(--sec); stroke-width: 2.8; }
+.sq { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.sq .ic { width: 19px; height: 19px; stroke-width: 2.3; }
+.sq.sm { width: 30px; height: 30px; border-radius: 7px; }
+.sq.sm .ic { width: 17px; height: 17px; }
+.chip { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 11px; white-space: nowrap; }
+.chip.red { color: var(--redT); background: var(--redChip); }
+.chip.green { color: var(--greenT); background: var(--greenChip); }
+.chip.orange { color: var(--orangeT); background: var(--orangeChip); }
+.chip.gray { color: var(--sec); background: var(--grayChip); }
+.btn { height: 50px; border-radius: 14px; border: 0; background: var(--fill); color: var(--blueT); font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; width: 100%; }
+.btn.primary { background: var(--blueFill); color: #FFFFFF; }
+.btn.danger { color: var(--redT); }
+.btn:disabled { opacity: .45; }
+.btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; flex-shrink: 0; }
+.tip { background: var(--blueChip); border-radius: 12px; padding: 11px 14px; display: flex; gap: 10px; align-items: center; font-size: 15px; line-height: 20px; color: var(--tipT); flex-shrink: 0; }
+.tip .ic { color: var(--blueT); }
+.cap { font-size: 13px; font-weight: 500; letter-spacing: .2px; color: var(--sec); text-transform: uppercase; padding: 0 16px; margin-bottom: -6px; }
+.cap.in { padding: 0; margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+.seg { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); background: var(--fill2); border-radius: 9px; padding: 2px; height: 34px; flex-shrink: 0; }
+.seg .ind { position: absolute; top: 2px; bottom: 2px; left: 2px; border-radius: 7px; background: var(--segSel); box-shadow: 0 3px 8px rgba(0,0,0,.12), 0 1px 1px rgba(0,0,0,.08); transition: transform .32s cubic-bezier(.32,.72,0,1); }
+.seg button { position: relative; z-index: 1; background: none; border: 0; font-size: 14px; font-weight: 500; cursor: pointer; }
+.seg button.on { font-weight: 600; }
+.chips { display: flex; gap: 6px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.pill { height: 32px; padding: 0 14px; border-radius: 16px; border: 0; background: var(--fill2); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.pill.on { background: var(--label); color: var(--bg); }
+.dot { width: 8px; height: 8px; border-radius: 4px; background: var(--green); display: inline-block; flex-shrink: 0; }
+.spin { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--fill2); border-top-color: var(--sec); animation: rot .8s linear infinite; flex-shrink: 0; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 26px 0; text-align: center; color: var(--sec); font-size: 15px; }
+.empty b { color: var(--label); font-size: 19px; font-weight: 600; }
+.empty .ic { width: 44px; height: 44px; }
+.loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px 0; color: var(--sec); font-size: 15px; }
+
+/* home */
+#v-home .content { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+.homehead { display: flex; justify-content: space-between; align-items: center; }
+.homehead h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -.8px; }
+.iconbtn { width: 44px; height: 44px; border: 0; background: none; color: var(--blueT); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-right: -10px; }
+.iconbtn .ic { width: 24px; height: 24px; }
+.carcard { background: var(--card); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.carrow { display: flex; align-items: center; gap: 12px; }
+.carrow .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.carrow b { font-size: 19px; font-weight: 600; letter-spacing: -.3px; }
+.carrow span.s { font-size: 14px; color: var(--sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vpill { display: flex; align-items: center; gap: 6px; background: var(--fill2); border-radius: 15px; height: 30px; padding: 0 11px; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.mini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mini div { background: var(--fill2); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; }
+.mini b { font-size: 22px; font-weight: 600; letter-spacing: -.5px; }
+.mini span { font-size: 12px; color: var(--sec); font-weight: 600; }
+.demo { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--orangeChip); color: var(--orangeT); letter-spacing: .4px; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0; }
+@media (min-width: 560px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tile { position: relative; background: var(--card); border: 0; border-radius: 18px; padding: 14px; height: 112px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; cursor: pointer; }
+.tile .sq { margin-bottom: auto; }
+.tile .tl { font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
+.tile .tv { font-size: 14px; color: var(--sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.tile .tv.red { color: var(--redT); font-weight: 600; }
+.badge { position: absolute; top: 12px; right: 12px; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: var(--red); color: #fff; font-size: 14px; font-weight: 700; display: none; align-items: center; justify-content: center; }
+.foot { font-size: 13px; color: var(--sec); text-align: center; margin: 4px 0 0; line-height: 18px; }
+
+/* live */
+.pane { display: none; flex-direction: column; gap: 12px; }
+.pane.on { display: flex; }
+.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 560px) { .gauges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.gauge { background: var(--card); border-radius: 18px; display: flex; flex-direction: column; align-items: center; padding: 12px 0 10px; position: relative; }
+.gauge svg { width: 112px; height: 112px; }
+.gauge .gv { position: absolute; top: 12px; left: 0; right: 0; height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 4px; }
+.gauge .gv b { font-size: 26px; font-weight: 600; letter-spacing: -.6px; line-height: 28px; }
+.gauge .gv span { font-size: 11px; color: var(--sec); font-weight: 700; letter-spacing: .3px; }
+.gauge .gl { font-size: 14px; color: var(--sec); margin-top: -10px; }
+.spark { width: 64px; height: 24px; flex-shrink: 0; }
+.list .row { min-height: 50px; }
+.list .v { min-width: 84px; text-align: right; font-weight: 600; }
+.list .v small { font-size: 13px; color: var(--sec); font-weight: 500; margin-left: 3px; }
+.chart { position: relative; width: 100%; background: var(--card); border-radius: 18px; overflow: hidden; flex-shrink: 0; }
+.chart svg { display: block; width: 100%; }
+.chart .now { position: absolute; top: 10px; left: 16px; }
+.chart .now b { font-size: 30px; font-weight: 600; letter-spacing: -.8px; }
+.chart .now span { font-size: 15px; color: var(--sec); margin-left: 4px; }
+.rec { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: var(--fill2); font-size: 14px; font-weight: 600; cursor: pointer; }
+.rec i { width: 9px; height: 9px; border-radius: 5px; background: var(--red); display: inline-block; }
+.rec.on { background: var(--redChip); color: var(--redT); }
+.rec.on i { animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+/* readiness / systems / misfire / fuel / extra */
+.ringcard { background: var(--card); border-radius: 18px; display: flex; align-items: center; gap: 18px; padding: 16px; flex-shrink: 0; }
+.ringcard .big { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+.ringcard .big b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; letter-spacing: -.6px; }
+.ringcard p { margin: 0; font-size: 15px; color: var(--sec); line-height: 21px; }
+.ringcard p b { color: var(--label); font-size: 19px; font-weight: 600; display: block; margin-bottom: 2px; }
+.center { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 10px 0; }
+.found { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; min-height: 26px; }
+.found .chip { animation: pop .35s cubic-bezier(.32,.72,0,1.4); }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+.bars { background: var(--card); border-radius: 18px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; padding: 14px 16px 12px; height: 250px; flex-shrink: 0; }
+.bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; min-height: 0; }
+.bar .track { width: 100%; max-width: 38px; flex: 1; border-radius: 9px; background: var(--fill2); display: flex; align-items: flex-end; overflow: hidden; }
+.bar .fillb { width: 100%; border-radius: 9px; background: var(--blue); transition: height .5s cubic-bezier(.32,.72,0,1); }
+.bar b { font-size: 17px; font-weight: 600; }
+.bar span { font-size: 12px; color: var(--sec); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0; }
+.stat { background: var(--card); border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-size: 30px; font-weight: 600; letter-spacing: -.8px; }
+.legend { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--sec); flex-shrink: 0; }
+.legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+.bigcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0; }
+.bigcard { background: var(--card); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+.bigcard .bv { display: flex; align-items: baseline; gap: 3px; }
+.bigcard .bv b { font-size: 46px; font-weight: 600; letter-spacing: -1.6px; line-height: 54px; }
+.bigcard .bv span { font-size: 20px; font-weight: 500; color: var(--sec); }
+.bigcard svg { width: 100%; height: 28px; }
+
+/* overlays */
+.scrim { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.42); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.alert { position: absolute; top: 50%; left: 50%; width: 280px; transform: translate(-50%, -50%) scale(1.12); opacity: 0; transition: transform .3s cubic-bezier(.32,.72,0,1), opacity .2s;
+  background: var(--alert); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%); border-radius: 14px; overflow: hidden; text-align: center; }
+.scrim.on .alert { transform: translate(-50%, -50%); opacity: 1; }
+.alert .ab { padding: 19px 16px 16px; display: flex; flex-direction: column; gap: 5px; }
+.alert h3 { margin: 0; font-size: 17px; font-weight: 600; }
+.alert p { margin: 0; font-size: 13px; line-height: 18px; }
+.alert .acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: .5px solid var(--sep); }
+.alert .acts.one { grid-template-columns: 1fr; }
+.alert .acts button { height: 46px; border: 0; background: none; font-size: 17px; color: var(--blueT); cursor: pointer; }
+.alert .acts button + button { border-left: .5px solid var(--sep); }
+.alert .acts button.bold { font-weight: 600; }
+.alert .acts button.dest { color: var(--redT); font-weight: 600; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; max-width: 680px; margin: 0 auto; height: 86%; z-index: 51; background: var(--elev); border-radius: 14px 14px 0 0;
+  transform: translateY(105%); transition: transform .45s cubic-bezier(.32,.72,0,1); display: flex; flex-direction: column; box-shadow: 0 -8px 30px rgba(0,0,0,.25); }
+html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
+.sheet.on { transform: none; }
+.sheet .grab { width: 36px; height: 5px; border-radius: 3px; background: var(--fill2); margin: 6px auto 0; flex-shrink: 0; }
+.sheet .sh { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 16px; height: 46px; flex-shrink: 0; }
+.sheet .sh h3 { margin: 0; font-size: 17px; font-weight: 600; }
+.sheet .sb { flex: 1; overflow-y: auto; padding: 4px 16px calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
+.sheet .sb::-webkit-scrollbar { display: none; }
+.sheet .group, .sheet .ff div, .sheet .causes { background: var(--cell); }
+.ff { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ff div { border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column; }
+.ff b { font-size: 19px; font-weight: 600; }
+.ff span { font-size: 11px; color: var(--sec); font-weight: 700; letter-spacing: .3px; }
+.causes { margin: 0; padding: 0; list-style: none; border-radius: 12px; }
+.causes li { padding: 12px 16px; font-size: 16px; position: relative; }
+.causes li + li::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: .5px; background: var(--sep); }
+.sheet input[type=text] { flex: 1; min-width: 0; text-align: right; border: 0; background: none; color: var(--sec); font-size: 16px; outline: none; -webkit-user-select: text; user-select: text; }
+.hud { position: fixed; top: 50%; left: 50%; width: 150px; min-height: 130px; transform: translate(-50%, -50%) scale(.85); opacity: 0; z-index: 60; pointer-events: none;
+  background: var(--alert); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  transition: transform .3s cubic-bezier(.32,.72,0,1.3), opacity .25s; font-size: 15px; font-weight: 600; text-align: center; padding: 16px 12px; }
+.hud.on { transform: translate(-50%, -50%); opacity: 1; }
+.hud .ic { width: 44px; height: 44px; stroke-width: 2.4; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5l9 15.5H3z"/><path d="M12 10v4"/><path d="M12 16.8v.2"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/></symbol>
+  <symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.7 2.7L16 9.6"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l8.5 4.7L12 13 3.5 8.2z"/><path d="M3.5 12.5L12 17.3l8.5-4.8"/><path d="M3.5 16.5L12 21.3l8.5-4.8"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/></symbol>
+  <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 12h3.5l3-7 4.5 14 3-7h5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 14.2V5a2 2 0 1 1 4 0v9.2a4 4 0 1 1-4 0z"/><path d="M12 9.5v7"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4.5V11h-6.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.8v.2"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 15l2-6h14l2 6"/><rect x="3" y="15" width="18" height="4" rx="1.5"/><path d="M7 19v1.5"/><path d="M17 19v1.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-engine" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 7V4.5h8V7"/><path d="M9 12.5h6"/></symbol>
+  <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></symbol>
+  <symbol id="i-seat" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.5"/><path d="M7 21v-6l-2-4h14l-2 4v6"/></symbol>
+  <symbol id="i-gears" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M16.3 16.3l2.1 2.1"/><path d="M5.6 18.4l2.1-2.1"/><path d="M16.3 7.7l2.1-2.1"/></symbol>
+  <symbol id="i-steer" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2"/><path d="M4 11h6"/><path d="M14 11h6"/><path d="M12 14v6.5"/></symbol>
+  <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></symbol>
+</svg>
+
+<div id="app">
+
+  <!-- HOME -->
+  <section class="view active" id="v-home" aria-label="Home">
+    <div class="content">
+      <div class="homehead"><h1>Scanner</h1><button class="iconbtn tap" data-act="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button></div>
+      <div class="carcard" id="carcard"></div>
+      <div class="tiles">
+        <button class="tile tap" data-go="codes"><span class="sq" style="background:#FF3B30"><svg class="ic"><use href="#i-warn"/></svg></span><span class="badge" id="h-badge"></span><span class="tl">Codes</span><span class="tv" id="t-codes">—</span></button>
+        <button class="tile tap" data-go="live"><span class="sq" style="background:#0A84FF"><svg class="ic"><use href="#i-gauge"/></svg></span><span class="tl">Live Data</span><span class="tv num" id="t-live">—</span></button>
+        <button class="tile tap" data-go="ready"><span class="sq" style="background:#30C452"><svg class="ic"><use href="#i-checkc"/></svg></span><span class="tl">Readiness</span><span class="tv" id="t-ready">—</span></button>
+        <button class="tile tap" data-go="systems"><span class="sq" style="background:#5E5CE6"><svg class="ic"><use href="#i-layers"/></svg></span><span class="tl">All Systems</span><span class="tv" id="t-sys">—</span></button>
+        <button class="tile tap" data-go="misfire"><span class="sq" style="background:#FF9500"><svg class="ic"><use href="#i-bolt"/></svg></span><span class="tl">Misfire</span><span class="tv num" id="t-mis">—</span></button>
+        <button class="tile tap" data-go="fuel"><span class="sq" style="background:#32ADE6"><svg class="ic"><use href="#i-wave"/></svg></span><span class="tl">Fuel Trim</span><span class="tv num" id="t-fuel">—</span></button>
+        <button class="tile tap" data-act="clearEngine" data-need="1"><span class="sq" style="background:#8E8E93"><svg class="ic"><use href="#i-trash"/></svg></span><span class="tl">Clear</span><span class="tv">Erase engine codes</span></button>
+        <button class="tile tap" data-go="extra"><span class="sq" style="background:#FF2D55"><svg class="ic"><use href="#i-thermo"/></svg></span><span class="tl">Extra Data</span><span class="tv num" id="t-extra">—</span></button>
+      </div>
+      <p class="foot">Read-only diagnostics plus code clearing. No resets, coding or actuator tests.</p>
+    </div>
+  </section>
+
+  <!-- LIVE -->
+  <section class="view" id="v-live" aria-label="Live data">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Live Data</h2>
+      <div class="navR"><button class="rec tap num" data-act="rec" id="recbtn"><i></i><span id="rectxt">Record</span></button></div></div>
+    <div class="content">
+      <div class="seg" data-seg="live"><span class="ind"></span><button class="on" data-val="gauges">Gauges</button><button data-val="list">All Data</button><button data-val="graph">Graph</button></div>
+      <div class="pane on" id="p-gauges"><div class="gauges" id="gauges"></div></div>
+      <div class="pane" id="p-list"><div class="group list" id="pidlist"></div></div>
+      <div class="pane" id="p-graph"><div class="chips" id="gchips"></div>
+        <div class="chart"><svg id="gsvg" viewBox="0 0 360 240" preserveAspectRatio="none"></svg><div class="now num"><b id="gnow">—</b><span id="gunit"></span></div></div>
+        <p class="foot">Shows the most recent readings. Fewer readings on screen = faster updates.</p></div>
+    </div>
+  </section>
+
+  <!-- CODES -->
+  <section class="view" id="v-codes" aria-label="Trouble codes">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Trouble Codes</h2>
+      <div class="navR"><button class="textbtn" data-act="loadCodes">Refresh</button></div></div>
+    <div class="content" id="codesbody"></div>
+  </section>
+
+  <!-- READINESS -->
+  <section class="view" id="v-ready" aria-label="Readiness monitors">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Readiness</h2>
+      <div class="navR"><button class="textbtn" data-act="loadReady">Refresh</button></div></div>
+    <div class="content" id="readybody"></div>
+  </section>
+
+  <!-- ALL SYSTEMS -->
+  <section class="view" id="v-systems" aria-label="All systems">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>All Systems</h2>
+      <div class="navR"><button class="textbtn" data-act="startScan" id="rescan" style="visibility:hidden">Rescan</button></div></div>
+    <div class="content" id="sysbody"></div>
+  </section>
+
+  <!-- MODULE -->
+  <section class="view" id="v-module" aria-label="Module">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Systems</span></button><h2 id="m-title">Module</h2><span></span></div>
+    <div class="content" id="modbody"></div>
+  </section>
+
+  <!-- MISFIRE -->
+  <section class="view" id="v-misfire" aria-label="Misfire counts">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Misfire</h2>
+      <div class="navR"><button class="textbtn" data-act="loadMis">Refresh</button></div></div>
+    <div class="content" id="misbody"></div>
+  </section>
+
+  <!-- FUEL -->
+  <section class="view" id="v-fuel" aria-label="Fuel trim">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Fuel Trim</h2>
+      <div class="navR"><span class="chip green" id="f-status">—</span></div></div>
+    <div class="content">
+      <div class="stats"><div class="stat"><span class="cap in">Bank 1 total</span><b class="num" id="f-b1">—</b></div><div class="stat"><span class="cap in">Bank 2 total</span><b class="num" id="f-b2">—</b></div></div>
+      <div class="chart"><svg id="fsvg" viewBox="0 0 360 230" preserveAspectRatio="none"></svg></div>
+      <div class="legend"><span><i style="background:var(--blue)"></i>Short B1</span><span><i style="background:var(--blue);opacity:.45"></i>Long B1</span><span><i style="background:var(--orange)"></i>Short B2</span><span><i style="background:var(--orange);opacity:.45"></i>Long B2</span></div>
+      <div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>Total trim within ±10% is normal. Positive = engine adding fuel (often an air leak); negative = removing fuel.</span></div>
+    </div>
+  </section>
+
+  <!-- EXTRA -->
+  <section class="view" id="v-extra" aria-label="Extra data">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Extra Data</h2>
+      <div class="navR"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--greenT)" id="x-live"><span class="dot"></span>Live</span></div></div>
+    <div class="content" id="extrabody"></div>
+  </section>
+
+</div>
+
+<!-- overlays -->
+<div class="scrim" id="alertscrim">
+  <div class="alert" role="alertdialog" aria-labelledby="al-t" aria-describedby="al-m">
+    <div class="ab"><h3 id="al-t"></h3><p id="al-m"></p></div>
+    <div class="acts" id="al-acts"><button id="al-no">Cancel</button><button id="al-ok">OK</button></div>
+  </div>
+</div>
+<div class="scrim" id="sheetscrim" data-act="closeSheet"></div>
+<div class="sheet" id="sheet" role="dialog" aria-labelledby="sh-t">
+  <div class="grab"></div>
+  <div class="sh"><span></span><h3 id="sh-t"></h3><button class="textbtn" style="justify-self:end;font-weight:600" data-act="closeSheet">Done</button></div>
+  <div class="sb" id="sh-b"></div>
+</div>
+<div class="hud" id="hud"><svg class="ic" id="hudic"><use href="#i-check"/></svg><span id="hudtxt"></span></div>
+
+<script>
+// Generated from the firmware's tools/vehicle_db.json and DTC table.
+const VEHICLE_DB = {"toyota":{"name":"Toyota / Lexus / Scion","wmi":["JT","4T","5T","2T","JTE","JTD","JTH","JTJ","5TD","5TF","4T1","4T3","2T1","2T3"],"modules":[{"name":"Engine (ECM)","tx":"7E0","proto":"obd+kwp+uds"},{"name":"Engine (alt. address)","tx":"700","proto":"uds"},{"name":"Transmission (ECT)","tx":"7E1","proto":"kwp+uds"},{"name":"Transmission (alt.)","tx":"701","proto":"uds"},{"name":"Hybrid control","tx":"7E2","proto":"kwp"},{"name":"Hybrid control (UDS)","tx":"7D2","proto":"uds"},{"name":"ABS / VSC / Brakes","tx":"7B0","proto":"kwp+uds"},{"name":"Steering angle sensor","tx":"7B3","proto":"kwp"},{"name":"Airbag (SRS)","tx":"780","proto":"kwp+uds"},{"name":"Airbag (SRS 2)","tx":"784","proto":"kwp"},{"name":"Power steering (EPS)","tx":"7A1","proto":"kwp+uds"},{"name":"Power steering (EPS alt.)","tx":"7A0","proto":"kwp"},{"name":"Cruise / DSU","tx":"791","proto":"kwp"},{"name":"Instrument cluster","tx":"7C0","proto":"uds"},{"name":"Climate control (HVAC)","tx":"7C4","proto":"kwp+uds"},{"name":"Brake / EPB (2nd)","tx":"730","proto":"uds"},{"name":"Body control (BCM)","tx":"750","ext":"40","proto":"kwp"},{"name":"Central gateway","tx":"750","ext":"5F","proto":"kwp"},{"name":"Electric parking brake","tx":"750","ext":"2C","proto":"uds"},{"name":"Front radar","tx":"750","ext":"0F","proto":"kwp+uds"},{"name":"Front camera","tx":"750","ext":"6D","proto":"kwp+uds"}],"ident":{"kwp":"1A8801","uds":"22F181"},"warnings":{"7B0":"On many older Toyota/Lexus trucks and cars, clearing ABS codes also erases the VSC sensor zero-point calibration. That sets C1336 and keeps the VSC light on until the calibration is redone (a short jumper procedure in the repair manual)."},"live":[{"name":"ATF temp G/H ('05-09)","tx":"7E0","req":"21D9","bytes":[6,7],"formula":"atf_toyota_07","unit":"F","note":"Owner-forum PID for 2005-09 Tacoma/4Runner. Posts disagree on which of the two is pan vs converter; the one that swings more while driving is the converter outlet."},{"name":"ATF temp E/F ('05-09)","tx":"7E0","req":"21D9","bytes":[4,5],"formula":"atf_toyota_07","unit":"F","note":"Owner-forum PID for 2005-09 Tacoma/4Runner. Posts disagree on which of the two is pan vs converter; the one that swings more while driving is the converter outlet."},{"name":"ATF temp 1 ('10-15)","tx":"7E0","req":"2182","bytes":[0,1],"formula":"atf_toyota_07","unit":"F"},{"name":"ATF temp 2 ('10-15)","tx":"7E0","req":"2182","bytes":[2,3],"formula":"atf_toyota_07","unit":"F"},{"name":"ATF pan temp ('16+)","tx":"701","req":"221627","bytes":[0,1],"formula":"atf_toyota_16","unit":"F"}],"dtc_text":{"C0200":"Right front wheel speed sensor signal malfunction","C0205":"Left front wheel speed sensor signal malfunction","C0210":"Right rear wheel speed sensor signal malfunction","C0215":"Left rear wheel speed sensor signal malfunction","C1201":"Engine control system malfunction (ABS/VSC disabled because of an engine code - fix the engine code first)","C1223":"ABS control system malfunction (often follows C1249 or C1241)","C1231":"Steering angle sensor malfunction","C1241":"Low / abnormal power supply voltage to the brake control system","C1249":"Open in stop light (brake light) switch circuit","C1336":"Zero-point calibration of deceleration/acceleration sensor not done","C1381":"Yaw rate and/or acceleration sensor power supply"}},"honda":{"name":"Honda / Acura","wmi":["JH","1HG","2HG","5J6","5FN","19X","SHH"],"modules":[{"name":"Engine (PGM-FI)","tx":"18DA10F1","proto":"uds"},{"name":"Transmission","tx":"18DA1EF1","proto":"uds"},{"name":"Shift-by-wire","tx":"18DA0BF1","proto":"uds"},{"name":"ABS / VSA","tx":"18DA28F1","proto":"uds"},{"name":"Electric brake booster","tx":"18DA2BF1","proto":"uds"},{"name":"Power steering (EPS)","tx":"18DA30F1","proto":"uds"},{"name":"Airbag (SRS)","tx":"18DA53F1","proto":"uds"},{"name":"Instrument cluster","tx":"18DA60F1","proto":"uds"},{"name":"Gateway","tx":"18DAEFF1","proto":"uds"},{"name":"Front radar","tx":"18DAB0F1","proto":"uds"},{"name":"Front camera","tx":"18DAB5F1","proto":"uds"}]},"hyundai":{"name":"Hyundai / Kia / Genesis","wmi":["KM","KN","5NP","5XY","5NM","KMH","KNA","KND"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"Transmission","tx":"7E1","proto":"uds"},{"name":"ABS / ESC","tx":"7D1","proto":"uds"},{"name":"Power steering (MDPS)","tx":"7D4","proto":"uds"},{"name":"ADAS / radar","tx":"7D0","proto":"uds"},{"name":"Front camera","tx":"7C4","proto":"uds"},{"name":"Instrument cluster","tx":"7C6","proto":"uds"},{"name":"Climate (HVAC)","tx":"7B3","proto":"uds"},{"name":"Parking assist","tx":"7B1","proto":"uds"},{"name":"Corner radar","tx":"7B7","proto":"uds"}]},"ford":{"name":"Ford / Lincoln","wmi":["1F","2F","3F","1FA","1FM","1FT","1LN","5LM"],"modules":[{"name":"Engine (PCM)","tx":"7E0","proto":"uds"},{"name":"ABS","tx":"760","proto":"uds"},{"name":"Power steering","tx":"730","proto":"uds"},{"name":"Shift-by-wire","tx":"732","proto":"uds"},{"name":"Front camera","tx":"706","proto":"uds"},{"name":"Front radar","tx":"764","proto":"uds"}]},"mazda":{"name":"Mazda","wmi":["JM1","JM3","3MZ","3MV"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"Transmission","tx":"7E1","proto":"uds"},{"name":"ABS","tx":"760","proto":"uds"},{"name":"Power steering","tx":"730","proto":"uds"},{"name":"Front camera","tx":"706","proto":"uds"},{"name":"Front radar","tx":"764","proto":"uds"}]},"nissan":{"name":"Nissan / Infiniti","wmi":["JN","1N4","1N6","3N1","5N1","JN1","JN8"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"ABS","tx":"740","proto":"uds"},{"name":"Power steering","tx":"742","proto":"uds"},{"name":"Instrument cluster","tx":"743","proto":"uds"},{"name":"Front camera","tx":"707","proto":"uds"},{"name":"Gateway","tx":"18DAD0F1","proto":"uds"}]},"subaru":{"name":"Subaru","wmi":["JF1","JF2","4S3","4S4"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"Transmission","tx":"7E1","proto":"uds"},{"name":"ABS / VDC","tx":"7B0","proto":"uds"},{"name":"Power steering","tx":"746","proto":"uds"},{"name":"EyeSight camera","tx":"787","proto":"uds"}]},"volkswagen":{"name":"VW / Audi / Skoda / Seat","wmi":["WVW","WV1","WV2","3VW","1VW","WAU","WA1","TMB","VSS"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"Transmission","tx":"7E1","proto":"uds"},{"name":"Airbag (SRS)","tx":"715","proto":"uds"},{"name":"Power steering","tx":"712","proto":"uds"},{"name":"Front radar","tx":"757","proto":"uds"},{"name":"Front camera","tx":"74F","proto":"uds"}]},"chrysler":{"name":"Chrysler / Jeep / Dodge / Ram","wmi":["1C","2C","3C","1J","1D","3D","2D"],"modules":[{"name":"Engine","tx":"7E0","proto":"uds"},{"name":"Transmission","tx":"7E1","proto":"uds"},{"name":"Hybrid","tx":"7E2","proto":"uds"},{"name":"ABS","tx":"747","proto":"uds"},{"name":"Airbag (ORC)","tx":"744","proto":"uds"},{"name":"Instrument cluster","tx":"742","proto":"uds"},{"name":"Power steering","tx":"75A","proto":"uds"},{"name":"Front radar","tx":"753","proto":"uds"}],"warnings":{"_all":"2018+ FCA vehicles have a Secure Gateway that blocks clearing codes without an authorized unlock; reading usually still works."}}};
+const DTC_GENERIC = {"P0011":"Cam timing over-advanced (Bank 1)","P0016":"Crank/cam position correlation (B1)","P0101":"MAF sensor range/performance","P0102":"MAF sensor circuit low","P0113":"Intake air temp sensor high","P0118":"Coolant temp sensor circuit high","P0125":"Coolant temp too low for closed loop","P0128":"Coolant below thermostat temp","P0130":"O2 sensor circuit (B1 S1)","P0135":"O2 sensor heater circuit (B1 S1)","P0141":"O2 sensor heater circuit (B1 S2)","P0155":"O2 sensor heater circuit (B2 S1)","P0171":"System too lean (Bank 1)","P0172":"System too rich (Bank 1)","P0174":"System too lean (Bank 2)","P0175":"System too rich (Bank 2)","P0300":"Random/multiple cylinder misfire","P0325":"Knock sensor circuit (B1)","P0335":"Crankshaft position sensor circuit","P0340":"Camshaft position sensor circuit","P0400":"EGR flow malfunction","P0401":"EGR flow insufficient","P0420":"Catalyst efficiency below threshold B1","P0430":"Catalyst efficiency below threshold B2","P0440":"EVAP system malfunction","P0441":"EVAP incorrect purge flow","P0442":"EVAP small leak detected","P0446":"EVAP vent control circuit","P0455":"EVAP large leak detected","P0456":"EVAP very small leak detected","P0500":"Vehicle speed sensor","P0504":"Brake switch A/B correlation","P0505":"Idle air control system","P0506":"Idle RPM lower than expected","P0507":"Idle RPM higher than expected","P0562":"System voltage low","P0563":"System voltage high","P0700":"Transmission control system fault","P0715":"Transmission input speed sensor","P0741":"Torque converter clutch stuck off"};
+
+// ============================================================================
+// OBD core: Bluetooth LE transport, ELM327/STN command layer, OBD-II services
+// and the manufacturer "all systems" engine. Same logic as the ESP32 firmware
+// (src/enhanced.h), ported to JavaScript. Needs db.js (VEHICLE_DB, DTC_GENERIC).
+// ============================================================================
+
+// Serial-over-BLE services used by ELM327-style adapters. FFF0 is used by
+// OBDLink CX and most clones; the others cover common clone/Vgate variants.
+const BLE_SERVICES = [
+  '0000fff0-0000-1000-8000-00805f9b34fb',
+  '0000ffe0-0000-1000-8000-00805f9b34fb',
+  '000018f0-0000-1000-8000-00805f9b34fb',
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+  '0000beef-0000-1000-8000-00805f9b34fb',
+];
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+class BleTransport {
+  constructor() { this.buf = ''; this.waiter = null; this.dev = null; this.rx = null; this.tx = null; this.onDisconnect = null; }
+
+  async connect() {
+    if (!navigator.bluetooth) throw new Error('This browser has no Bluetooth. Open the page in Bluefy.');
+    const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES });
+    this.dev = dev;
+    dev.addEventListener('gattserverdisconnected', () => { if (this.onDisconnect) this.onDisconnect(); });
+    const server = await dev.gatt.connect();
+    const services = await server.getPrimaryServices();
+    for (const svc of services) {
+      let chars;
+      try { chars = await svc.getCharacteristics(); } catch (e) { continue; }
+      let r = null, t = null;
+      for (const c of chars) {
+        const p = c.properties;
+        if (!r && (p.notify || p.indicate)) r = c;
+        if (!t && (p.write || p.writeWithoutResponse)) t = c;
+      }
+      if (r && t) { this.rx = r; this.tx = t; break; }
+    }
+    if (!this.rx) throw new Error('This adapter has no serial service I recognise.');
+    await this.rx.startNotifications();
+    this.rx.addEventListener('characteristicvaluechanged', (e) => this._onData(e.target.value));
+    return dev.name || 'OBD adapter';
+  }
+
+  disconnect() { try { if (this.dev && this.dev.gatt.connected) this.dev.gatt.disconnect(); } catch (e) { /* ignore */ } }
+
+  _onData(dv) {
+    let s = '';
+    for (let i = 0; i < dv.byteLength; i++) s += String.fromCharCode(dv.getUint8(i));
+    this.buf += s;
+    this._check();
+  }
+
+  _check() {
+    const i = this.buf.indexOf('>');
+    if (this.waiter && i >= 0) {
+      const w = this.waiter; this.waiter = null;
+      const out = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1);
+      w(out);
+    }
+  }
+
+  async _write(str) {
+    const bytes = new TextEncoder().encode(str);
+    for (let i = 0; i < bytes.length; i += 20) {          // 20 bytes fits every BLE MTU
+      const part = bytes.slice(i, i + 20);
+      const p = this.tx.properties;
+      if (p.write && this.tx.writeValueWithResponse) await this.tx.writeValueWithResponse(part);
+      else if (p.writeWithoutResponse && this.tx.writeValueWithoutResponse) await this.tx.writeValueWithoutResponse(part);
+      else await this.tx.writeValue(part);
+    }
+  }
+
+  request(cmd, timeoutMs) {
+    this.buf = '';
+    return new Promise((resolve) => {
+      const w = (s) => { clearTimeout(timer); resolve(s); };
+      const timer = setTimeout(() => {
+        if (this.waiter === w) { this.waiter = null; const b = this.buf; this.buf = ''; resolve(b + '\rTIMEOUT'); }
+      }, timeoutMs);
+      this.waiter = w;
+      this._write(cmd + '\r').catch((e) => { if (this.waiter === w) { this.waiter = null; clearTimeout(timer); resolve('\rERROR ' + e.message); } });
+    });
+  }
+}
+
+// ---------------------------------------------------------------- helpers
+const hexVal = (c) => { const v = parseInt(c, 16); return isNaN(v) ? -1 : v; };
+function hexToBytes(s) {
+  const b = [];
+  for (let i = 0; i + 1 < s.length; i += 2) {
+    const hi = hexVal(s[i]), lo = hexVal(s[i + 1]);
+    if (hi < 0 || lo < 0) break;
+    b.push(hi * 16 + lo);
+  }
+  return b;
+}
+function decodeDTC(a, b) {
+  return 'PCBU'[a >> 6] + ((a >> 4) & 3) + (a & 15).toString(16).toUpperCase() + (b >> 4).toString(16).toUpperCase() + (b & 15).toString(16).toUpperCase();
+}
+const h2 = (n) => n.toString(16).toUpperCase().padStart(2, '0');
+const h3 = (n) => n.toString(16).toUpperCase().padStart(3, '0');
+
+// Reassemble ISO-TP ("0:", "1:"...) and single-line replies; drops CAN padding.
+function toMessages(L) {
+  const msgs = [], want = [];
+  let pending = -1;
+  for (const line of L) {
+    const colon = line.indexOf(':');
+    if (colon === 1 || colon === 2) {
+      const idx = parseInt(line.slice(0, colon), 16) || 0;
+      const part = hexToBytes(line.slice(colon + 1));
+      if (idx === 0 || !msgs.length) { msgs.push([]); want.push(pending); pending = -1; }
+      msgs[msgs.length - 1].push(...part);
+    } else if (line.length % 2 === 1) {
+      pending = /^[0-9A-F]+$/.test(line) ? parseInt(line, 16) : -1;
+    } else {
+      const b = hexToBytes(line);
+      if (b.length) { msgs.push(b); want.push(-1); }
+    }
+  }
+  msgs.forEach((m, i) => { if (want[i] > 0 && m.length > want[i]) m.length = want[i]; });
+  return msgs;
+}
+const hasError = (L) => L.some((s) => /NODATA|UNABLETOCONNECT|ERROR|STOPPED|TIMEOUT|BUSBUSY|CANERROR/.test(s) || s === '?');
+
+// ---------------------------------------------------------------- PID decoders (metric)
+const PID_DEC = {
+  0x04: (d) => d[0] * 100 / 255,
+  0x05: (d) => d[0] - 40,
+  0x06: (d) => (d[0] - 128) * 100 / 128, 0x07: (d) => (d[0] - 128) * 100 / 128,
+  0x08: (d) => (d[0] - 128) * 100 / 128, 0x09: (d) => (d[0] - 128) * 100 / 128,
+  0x0B: (d) => d[0],
+  0x0C: (d) => (d[0] * 256 + d[1]) / 4,
+  0x0D: (d) => d[0],
+  0x0E: (d) => d[0] / 2 - 64,
+  0x0F: (d) => d[0] - 40,
+  0x10: (d) => (d[0] * 256 + d[1]) / 100,
+  0x11: (d) => d[0] * 100 / 255,
+  0x14: (d) => d[0] / 200,
+  0x1F: (d) => d[0] * 256 + d[1],
+  0x2F: (d) => d[0] * 100 / 255,
+  0x33: (d) => d[0],
+  0x42: (d) => (d[0] * 256 + d[1]) / 1000,
+  0x46: (d) => d[0] - 40,
+  0x5C: (d) => d[0] - 40,
+};
+const PID_LEN = { 0x0C: 2, 0x10: 2, 0x1F: 2, 0x42: 2 };
+
+// ---------------------------------------------------------------- ELM layer
+class Elm {
+  constructor(transport) {
+    this.t = transport; this.q = Promise.resolve();
+    this.reset();
+  }
+  reset() {
+    this.connected = false; this.proto = 0; this.protoDesc = ''; this.vin = ''; this.volts = null; this.id = ''; this.stn = '';
+    this.sup = new Array(0x61).fill(false); this.noSuffix = false;
+    // enhanced-session state
+    this.curProto = 0; this.ceaOk = true; this.selTx = 0; this.selExt = -1; this.extUsed = false; this.enhActive = false;
+  }
+  isCAN() { return this.proto >= 6 && this.proto <= 9; }
+
+  raw(cmd, ms = 2000) {
+    const p = this.q.then(() => this.t.request(cmd, ms));
+    this.q = p.catch(() => {});
+    return p;
+  }
+  async lines(cmd, ms = 2000) {
+    const r = await this.raw(cmd, ms);
+    const want = cmd.replace(/ /g, '').toUpperCase();
+    const out = [];
+    for (const line of r.split(/[\r\n]+/)) {
+      const ns = line.trim().replace(/ /g, '').toUpperCase();
+      if (!ns || ns === want || ns.startsWith('SEARCHING') || ns.startsWith('BUSINIT')) continue;
+      out.push(ns);
+    }
+    return out;
+  }
+  async atOK(cmd) { return (await this.lines(cmd, 1000)).some((s) => s.indexOf('OK') >= 0); }
+
+  markSupported(base, d) {
+    if (d.length < 4) return;
+    const mask = ((d[0] << 24) >>> 0) + (d[1] << 16) + (d[2] << 8) + d[3];
+    for (let i = 0; i < 32; i++) { const pid = base + 1 + i; if (pid <= 0x60) this.sup[pid] = !!((mask >>> (31 - i)) & 1); }
+  }
+
+  async queryPID(pid, ms = 1500) {
+    const base = '01' + h2(pid);
+    let L = await this.lines(this.isCAN() && !this.noSuffix ? base + '1' : base, ms);
+    if (this.isCAN() && !this.noSuffix && L.includes('?')) { this.noSuffix = true; L = await this.lines(base, ms); }
+    if (hasError(L)) return null;
+    for (const m of toMessages(L)) if (m.length >= 2 && m[0] === 0x41 && m[1] === pid) return m.slice(2);
+    return null;
+  }
+  async readPID(pid) {
+    const d = await this.queryPID(pid);
+    if (!d || d.length < (PID_LEN[pid] || 1) || !PID_DEC[pid]) return null;
+    return PID_DEC[pid](d);
+  }
+
+  async readDTCs(mode) {
+    const L = await this.lines(h2(mode), 5000);
+    if (L.some((s) => s.indexOf('NODATA') >= 0)) return [];
+    if (hasError(L)) return null;
+    const out = [];
+    for (const m of toMessages(L)) {
+      if (!m.length || m[0] !== mode + 0x40) continue;
+      let start = 1, end = m.length;
+      if (this.isCAN() && m.length >= 2) { start = 2; end = Math.min(m.length, 2 + 2 * m[1]); }
+      for (let i = start; i + 1 < end; i += 2) {
+        if (m[i] === 0 && m[i + 1] === 0) continue;
+        const c = decodeDTC(m[i], m[i + 1]);
+        if (!out.includes(c)) out.push(c);
+      }
+    }
+    return out;
+  }
+
+  async readVoltage() {
+    for (const s of await this.lines('ATRV', 1000)) { const v = parseFloat(s); if (s.endsWith('V') && !isNaN(v)) { this.volts = v; return v; } }
+    return null;
+  }
+
+  async readVIN() {
+    const L = await this.lines('0902', 5000);
+    if (hasError(L)) return '';
+    let v = '';
+    for (const m of toMessages(L)) {
+      if (m.length < 3 || m[0] !== 0x49 || m[1] !== 0x02) continue;
+      for (let i = 3; i < m.length; i++) { const c = String.fromCharCode(m[i]); if (/[A-Z0-9]/i.test(c)) v += c; }
+    }
+    this.vin = v.length >= 17 ? v.slice(-17).toUpperCase() : '';
+    return this.vin;
+  }
+
+  async connect(status) {
+    this.reset();
+    status = status || (() => {});
+    status('Waking adapter...');
+    let id = await this.raw('ATZ', 3000);
+    await sleep(400);
+    if (!/ELM|STN|OBD|V\d/i.test(id)) id = await this.raw('ATI', 1500);
+    if (!/ELM|STN|OBD|V\d/i.test(id)) throw new Error('Adapter did not answer. Is it plugged in?');
+    this.id = (id.match(/(ELM327|STN\d+|OBD\w*)[^\r\n>]*/i) || [id.trim()])[0].trim();
+    for (const c of ['ATE0', 'ATL0', 'ATS0', 'ATH0', 'ATAT1', 'ATSP0']) await this.raw(c, 1000);
+    const sti = (await this.lines('STI', 1000)).find((s) => /STN/.test(s));
+    this.stn = sti || '';
+    await this.readVoltage();
+    status('Searching for the vehicle...');
+    const L = await this.lines('0100', 20000);
+    const m = toMessages(L).find((x) => x.length >= 6 && x[0] === 0x41 && x[1] === 0x00);
+    if (!m) throw new Error('No reply from the vehicle. Is the ignition on?');
+    this.markSupported(0x00, m.slice(2));
+    const dpn = await this.lines('ATDPN', 1000);
+    if (dpn.length) this.proto = hexVal(dpn[0].replace(/^A/, '')[0]);
+    let dp = await this.raw('ATDP', 1000);
+    this.protoDesc = dp.replace(/ATDP/g, '').replace(/AUTO,\s*/g, '').replace(/[\r\n]+/g, ' ').trim();
+    for (const b of [0x20, 0x40]) if (this.sup[b]) { const d = await this.queryPID(b); if (d) this.markSupported(b, d); }
+    status('Reading VIN...');
+    await this.readVIN();
+    this.connected = true;
+    this.curProto = this.proto;
+    return true;
+  }
+
+  // ---- readiness monitors (PID 01)
+  async readiness() {
+    const d = await this.queryPID(0x01);
+    if (!d || d.length < 4) return null;
+    const mil = !!(d[0] & 0x80), count = d[0] & 0x7F, diesel = !!(d[1] & 0x08);
+    const mons = [
+      ['Misfire', d[1] & 0x01, d[1] & 0x10], ['Fuel system', d[1] & 0x02, d[1] & 0x20], ['Components', d[1] & 0x04, d[1] & 0x40],
+    ];
+    if (!diesel) {
+      ['Catalyst', 'Heated catalyst', 'EVAP system', 'Secondary air', 'A/C refrigerant', 'O2 sensor', 'O2 heater', 'EGR / VVT']
+        .forEach((n, i) => mons.push([n, d[2] & (1 << i), d[3] & (1 << i)]));
+    }
+    return { mil, count, diesel, monitors: mons.filter((x) => x[1]).map((x) => ({ name: x[0], ready: !x[2] })) };
+  }
+
+  // ---- freeze frame (mode 02, frame 0)
+  async freezeFrame() {
+    const L = await this.lines('020200', 2000);
+    const m = toMessages(L).find((x) => x[0] === 0x42 && x[1] === 0x02);
+    if (!m || m.length < 5 || (m[3] === 0 && m[4] === 0)) return null;
+    const ff = { code: decodeDTC(m[3], m[4]) };
+    for (const [k, pid] of [['rpm', 0x0C], ['speed', 0x0D], ['cool', 0x05], ['load', 0x04], ['stft1', 0x06], ['ltft1', 0x07]]) {
+      const LL = await this.lines('02' + h2(pid) + '00', 1500);
+      const mm = toMessages(LL).find((x) => x[0] === 0x42 && x[1] === pid);
+      if (mm && mm.length >= 3 + (PID_LEN[pid] || 1)) ff[k] = PID_DEC[pid](mm.slice(3));
+    }
+    return ff;
+  }
+
+  // ---- per-cylinder misfire counts (mode 06, CAN only)
+  async misfire() {
+    if (!this.isCAN()) return null;
+    let mids = [];
+    const L0 = await this.lines('06A0', 2000);
+    const s = toMessages(L0).find((x) => x[0] === 0x46 && x[1] === 0xA0 && x.length >= 6);
+    if (s) { for (let i = 0; i < 32; i++) if ((s[2 + (i >> 3)] >> (7 - (i & 7))) & 1) { const mid = 0xA1 + i; if (mid >= 0xA2 && mid <= 0xAD) mids.push(mid); } }
+    if (!mids.length) mids = [0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7];
+    const out = [];
+    for (const mid of mids) {
+      const L = await this.lines('06' + h2(mid), 2000);
+      let cur = null, avg = null;
+      for (const m of toMessages(L)) {
+        if (m[0] !== 0x46) continue;
+        for (let i = 1; i + 9 <= m.length; i += 9) {
+          if (m[i] !== mid) continue;
+          const v = m[i + 3] * 256 + m[i + 4];
+          if (m[i + 1] === 0x0C) cur = v;
+          if (m[i + 1] === 0x0B) avg = v;
+        }
+      }
+      if (cur === null && avg === null) { if (out.length) break; continue; }
+      out.push({ cyl: mid - 0xA1, cur: cur || 0, avg: avg || 0 });
+    }
+    return out.length ? out : null;
+  }
+
+  // ================================================================ enhanced (all systems)
+  static is29(id) { return id > 0x7FF; }
+
+  enhBegin() { this.curProto = this.proto; this.selTx = 0; this.selExt = -1; this.extUsed = false; this.enhActive = true; }
+  async enhEnd() {
+    if (!this.enhActive) return;
+    if (this.extUsed) { await this.atOK('ATCEA'); await this.atOK('ATTAF1'); }
+    await this.atOK('ATFCSM0'); await this.atOK('ATAR'); await this.atOK('ATCP18');
+    if (this.curProto !== this.proto) { await this.atOK('ATSP' + this.proto.toString(16).toUpperCase()); this.curProto = this.proto; }
+    await this.atOK(this.proto === 7 || this.proto === 9 ? 'ATSHDB33F1' : 'ATSH7DF');
+    this.selTx = 0; this.selExt = -1; this.extUsed = false; this.enhActive = false;
+  }
+  async setProtoFor(tx) {
+    let want = this.proto;
+    if (Elm.is29(tx)) { if (want === 6) want = 7; else if (want === 8) want = 9; }
+    else { if (want === 7) want = 6; else if (want === 9) want = 8; }
+    if (want === this.curProto) return true;
+    if (!(await this.atOK('ATSP' + want.toString(16).toUpperCase()))) return false;
+    this.curProto = want; return true;
+  }
+  async modSelect(tx, ext) {
+    if (!this.isCAN()) return false;
+    if (ext >= 0 && !this.ceaOk) return false;
+    if (tx === this.selTx && ext === this.selExt) return true;
+    if (!this.enhActive) this.enhBegin();
+    if (!(await this.setProtoFor(tx))) return false;
+    if (Elm.is29(tx)) {
+      const rx = ((tx & 0xFFFF0000) >>> 0) + ((tx << 8) & 0xFF00) + ((tx >>> 8) & 0xFF);
+      await this.atOK('ATCP' + h2(tx >>> 24));
+      if (!(await this.atOK('ATSH' + (tx & 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0')))) return false;
+      if (!(await this.atOK('ATCRA' + rx.toString(16).toUpperCase().padStart(8, '0')))) return false;
+      if (!(await this.atOK('ATFCSH' + tx.toString(16).toUpperCase().padStart(8, '0')))) return false;
+    } else {
+      if (!(await this.atOK('ATSH' + h3(tx)))) return false;
+      if (!(await this.atOK('ATCRA' + h3(tx + 8)))) return false;
+      if (!(await this.atOK('ATFCSH' + h3(tx)))) return false;
+    }
+    if (ext >= 0) {
+      if (!(await this.atOK('ATCEA' + h2(ext)))) { this.ceaOk = false; this.selTx = 0; return false; }
+      this.extUsed = true;
+      await this.atOK('ATTA' + h2(ext));
+      if (!(await this.atOK('ATFCSD' + h2(ext) + '300000'))) return false;
+    } else {
+      if (this.extUsed) { await this.atOK('ATCEA'); await this.atOK('ATTAF1'); this.extUsed = false; }
+      if (!(await this.atOK('ATFCSD300000'))) return false;
+    }
+    if (!(await this.atOK('ATFCSM1'))) return false;
+    this.selTx = tx; this.selExt = ext;
+    return true;
+  }
+  // -> {r:'pos'|'neg'|'none', msg, nrc}
+  async enhRequest(hex, ms = 3000) {
+    const sid = parseInt(hex.slice(0, 2), 16);
+    const L = await this.lines(hex, ms);
+    let neg = null;
+    for (let m of toMessages(L)) {
+      if (this.selExt >= 0 && m.length > 1 && m[0] === this.selExt && (m[1] === 0x7F || m[1] === sid + 0x40)) m = m.slice(1);
+      if (m.length >= 3 && m[0] === 0x7F && m[1] === sid) { if (m[2] === 0x78) continue; neg = m[2]; continue; }
+      if (m.length && m[0] === sid + 0x40) return { r: 'pos', msg: m };
+    }
+    return neg !== null ? { r: 'neg', nrc: neg } : { r: 'none' };
+  }
+}
+
+const NRC_TEXT = {
+  0x10: 'Module rejected the request', 0x11: 'Service not supported', 0x12: 'Sub-function not supported',
+  0x13: 'Wrong message length', 0x21: 'Module busy - try again', 0x22: 'Conditions not correct (key on, engine off?)',
+  0x31: 'Request out of range', 0x33: 'Security access required (dealer tool)', 0x7E: 'Needs a dealer diagnostic session',
+  0x7F: 'Needs a dealer diagnostic session',
+};
+const nrcText = (n) => NRC_TEXT[n] || 'Module refused';
+
+// ---------------------------------------------------------------- vehicle database helpers
+function makeFromVIN(vin) {
+  let best = null, len = 0;
+  if (!vin || vin.length < 3) return null;
+  for (const [key, mk] of Object.entries(VEHICLE_DB)) for (const w of mk.wmi) if (vin.startsWith(w) && w.length > len) { best = key; len = w.length; }
+  return best;
+}
+function modelYear(vin) {
+  if (!vin || vin.length < 17) return null;
+  const codes = 'ABCDEFGHJKLMNPRSTVWXY123456789';
+  const i = codes.indexOf(vin[9]);
+  if (i < 0) return null;
+  let y = 1980 + i;
+  if (/[A-Z]/.test(vin[6]) && y < 2010) y += 30;
+  return y;
+}
+function modulesFor(key) {
+  const mk = VEHICLE_DB[key];
+  return mk.modules.map((m) => ({
+    name: m.name, tx: parseInt(m.tx, 16), ext: m.ext ? parseInt(m.ext, 16) : -1,
+    proto: m.proto.split('+'),
+    warn: (mk.warnings || {})[m.tx + (m.ext ? '/' + m.ext : '')] || (!m.ext ? (mk.warnings || {})[m.tx] : null) || null,
+  }));
+}
+function dtcText(code, makeKey) {
+  const base = code.split('-')[0];
+  if (makeKey && VEHICLE_DB[makeKey] && VEHICLE_DB[makeKey].dtc_text && VEHICLE_DB[makeKey].dtc_text[base]) return VEHICLE_DB[makeKey].dtc_text[base];
+  if (DTC_GENERIC[base]) return DTC_GENERIC[base];
+  if (/^P03(0|1)\d$/.test(base) && +base.slice(3) > 0) return 'Cylinder ' + (+base.slice(3)) + ' misfire detected';
+  const s = base[0], d1 = base[1], d2 = base[2];
+  if (s === 'P') {
+    if (d1 === '1' || d1 === '3') return 'Manufacturer-specific powertrain code';
+    return ({ 1: 'Fuel/air metering', 2: 'Fuel/air metering (injectors)', 3: 'Ignition or misfire', 4: 'Emission controls',
+      5: 'Speed, idle control or input circuit', 6: 'Computer or output circuit', 7: 'Transmission', 8: 'Transmission', 9: 'Transmission' })[d2] || 'Powertrain';
+  }
+  return ({ C: 'Chassis (ABS/suspension) code', B: 'Body (airbag/comfort) code', U: 'Network/communication code' })[s] || '';
+}
+
+// ---------------------------------------------------------------- all-systems engine
+class AllSystems {
+  constructor(elm) { this.elm = elm; }
+
+  static parseUDS(m) {
+    const out = [];
+    for (let i = 3; i + 3 < m.length; i += 4) {
+      const st = m[i + 3];
+      if ((m[i] | m[i + 1] | m[i + 2]) === 0 || !(st & 0xAD)) continue;
+      let c = decodeDTC(m[i], m[i + 1]);
+      if (m[i + 2]) c += '-' + h2(m[i + 2]);
+      if (!out.some((d) => d.code === c)) out.push({ code: c, status: st });
+    }
+    return out;
+  }
+  static parseCounted(m) {
+    const out = [];
+    if (m.length < 2 || !m[1]) return out;
+    const n = m[1], rest = m.length - 2;
+    let stride = 2;
+    if (m[0] === 0x58) stride = 3;
+    if (m[0] === 0x53 && rest === 3 * n) stride = 3;
+    for (let k = 0, i = 2; k < n && i + 1 < m.length; k++, i += stride) {
+      if (m[i] === 0 && m[i + 1] === 0) continue;
+      const c = decodeDTC(m[i], m[i + 1]);
+      if (!out.some((d) => d.code === c)) out.push({ code: c, status: stride === 3 && i + 2 < m.length ? m[i + 2] : 0x08 });
+    }
+    return out;
+  }
+  static tag(svc, st) {
+    if (svc !== 'uds') return 'Stored';
+    if (st & 0x01) return 'Active';
+    if (st & 0x08) return 'Stored';
+    if (st & 0x04) return 'Pending';
+    return 'History';
+  }
+
+  async readCodes(mod, r) {
+    const e = this.elm;
+    r.dtcs = []; r.readOk = false; r.svc = null;
+    if (!(await e.modSelect(mod.tx, mod.ext))) return false;
+    let x = null;
+    if (mod.proto.includes('uds') && (x = await e.enhRequest('1902FF')).r === 'pos') { r.dtcs = AllSystems.parseUDS(x.msg); r.svc = 'uds'; }
+    else if (mod.proto.includes('kwp') && (x = await e.enhRequest('1800FF00')).r === 'pos') { r.dtcs = AllSystems.parseCounted(x.msg); r.svc = 'kwp'; }
+    else if (mod.proto.includes('kwp') && (x = await e.enhRequest('13')).r === 'pos') { r.dtcs = AllSystems.parseCounted(x.msg); r.svc = 'kwp'; }
+    else if ((x = await e.enhRequest('03')).r === 'pos') { r.dtcs = e.isCAN() ? AllSystems.parseCounted(x.msg) : []; r.svc = 'obd'; }
+    else { r.note = x && x.r === 'neg' ? nrcText(x.nrc) : 'Answered, but codes not readable'; return false; }
+    r.readOk = true;
+    return true;
+  }
+
+  async scanModule(mod) {
+    const e = this.elm;
+    const r = { mod, present: false, readOk: false, svc: null, dtcs: [], note: '' };
+    if (!(await e.modSelect(mod.tx, mod.ext))) {
+      r.note = mod.ext >= 0 && !e.ceaOk ? 'Adapter can’t reach this module' : 'Not reachable';
+      return r;
+    }
+    if (mod.proto.includes('uds') && (await e.enhRequest('3E00', 1500)).r !== 'none') r.present = true;
+    else if ((mod.proto.includes('kwp') || mod.proto.includes('obd')) && (await e.enhRequest('3E', 1500)).r !== 'none') r.present = true;
+    else if (mod.proto.includes('obd') && (await e.enhRequest('0100', 1500)).r === 'pos') r.present = true;
+    if (r.present) await this.readCodes(mod, r);
+    return r;
+  }
+
+  async clear(mod, svc) {
+    const e = this.elm;
+    if (!(await e.modSelect(mod.tx, mod.ext))) return { ok: false, msg: 'Module not reachable' };
+    let x;
+    if (svc === 'uds') x = await e.enhRequest('14FFFFFF', 5000);
+    else if (svc === 'kwp') { x = await e.enhRequest('14FF00', 5000); if (x.r === 'neg' && x.nrc === 0x13) x = await e.enhRequest('14FFFFFF', 5000); }
+    else if (svc === 'obd') x = await e.enhRequest('04', 5000);
+    else return { ok: false, msg: 'Read codes first' };
+    if (x.r === 'pos') return { ok: true, msg: 'Codes cleared' };
+    return { ok: false, msg: x.r === 'neg' ? nrcText(x.nrc) : 'No reply from module' };
+  }
+
+  // manufacturer live value; returns metric (°C for temperatures)
+  async readLive(p) {
+    const e = this.elm;
+    if (!(await e.modSelect(parseInt(p.tx, 16), -1))) return null;
+    const x = await e.enhRequest(p.req, 1500);
+    if (x.r !== 'pos') return null;
+    const b = x.msg, echo = p.req.length / 2;
+    for (let i = 1; i < echo; i++) if (b[i] !== parseInt(p.req.slice(2 * i, 2 * i + 2), 16)) return null;
+    if (b.length < echo + Math.max(p.bytes[0], p.bytes[1]) + 1) return null;
+    const A = b[echo + p.bytes[0]], B = b[echo + p.bytes[1]], raw = A * 256 + B;
+    let v;
+    if (p.formula === 'atf_toyota_07') v = raw * 0.007 - 40;
+    else if (p.formula === 'atf_toyota_16') v = A * 459 / 255 + B * 1.6 / 255 - 40;
+    else if (p.formula === 'temp_a40') v = A - 40;
+    else v = raw;
+    if (p.unit === 'F') v = (v - 32) * 5 / 9;
+    return v;
+  }
+
+  // What can this adapter do? Each item: {name, ok (true/false/null=skipped), detail}
+  async adapterCheck(makeKey) {
+    const e = this.elm, res = [];
+    res.push({ name: 'Adapter responds', ok: !!e.id, detail: e.id || 'No answer' });
+    res.push({ name: 'Chip', ok: true, detail: e.stn ? e.stn + ' (genuine STN)' : 'ELM327-compatible (likely a clone)' });
+    res.push({ name: 'Vehicle connection', ok: e.connected, detail: e.connected ? e.protoDesc : 'Turn the ignition on, then reconnect' });
+    if (!e.connected) return res;
+    res.push({ name: 'Multi-frame replies (VIN)', ok: e.vin.length === 17, detail: e.vin || 'VIN not reported' });
+    if (!e.isCAN()) { res.push({ name: 'Module access', ok: null, detail: 'Needs a CAN vehicle (most 2008+)' }); return res; }
+    e.enhBegin();
+    const sh = await e.atOK('ATSH7E0'), cra = await e.atOK('ATCRA7E8');
+    res.push({ name: 'Custom headers (ATSH)', ok: sh, detail: sh ? 'Supported' : 'Not supported' });
+    res.push({ name: 'Receive filter (ATCRA)', ok: cra, detail: cra ? 'Supported' : 'Not supported' });
+    const fc = (await e.atOK('ATFCSH7E0')) && (await e.atOK('ATFCSD300000')) && (await e.atOK('ATFCSM1'));
+    res.push({ name: 'Flow control setup', ok: fc, detail: fc ? 'Supported' : 'Not supported (multi-frame module replies may fail)' });
+    const cea = await e.atOK('ATCEA40');
+    if (cea) { e.extUsed = true; await e.atOK('ATCEA'); }
+    res.push({ name: 'Extended addressing', ok: cea, detail: cea ? 'Supported (Toyota body modules)' : 'Not supported - body/gateway modules will be skipped' });
+    e.selTx = 0; e.selExt = -1;
+    let ecm = false;
+    if (sh && cra && (await e.modSelect(0x7E0, -1))) {
+      ecm = (await e.enhRequest('0100', 1500)).r === 'pos' || (await e.enhRequest('3E', 1500)).r !== 'none';
+    }
+    res.push({ name: 'Engine answers when addressed', ok: ecm, detail: ecm ? 'Direct module access works' : 'No reply - All Systems won’t work with this adapter' });
+    if (ecm && makeKey) {
+      const abs = modulesFor(makeKey).find((m) => /ABS/.test(m.name));
+      if (abs) {
+        const r = await this.scanModule(abs);
+        res.push({ name: 'ABS module test', ok: r.present, detail: r.present ? (r.readOk ? 'Read ' + r.dtcs.length + ' code(s)' : r.note) : 'No reply at ' + abs.tx.toString(16).toUpperCase() });
+      }
+    }
+    await e.enhEnd();
+    return res;
+  }
+}
+
+
+// ============================================================================
+// Scanner app UI. Backends: RealBackend (Bluetooth adapter) and DemoBackend.
+// ============================================================================
+(function () {
+'use strict';
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.prototype.slice.call(document.querySelectorAll(s));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('scanner.' + k); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('scanner.' + k, v); } catch (e) { /* private mode */ } },
+};
+
+// ---------------------------------------------------------------- live data definitions (metric)
+const PIDS = [
+  { k: 'rpm', pid: 0x0C, n: 'Engine speed', g: 'Engine', u: 'rpm', d: 0, min: 0, max: 4000, col: 'blue' },
+  { k: 'speed', pid: 0x0D, n: 'Vehicle speed', g: 'Speed', conv: 'speed', d: 0, min: 0, max: 130, col: 'green' },
+  { k: 'cool', pid: 0x05, n: 'Coolant temp', g: 'Coolant', conv: 'temp', d: 0, min: 40, max: 115, col: 'orange' },
+  { k: 'load', pid: 0x04, n: 'Engine load', g: 'Load', u: '%', d: 0, min: 0, max: 100, col: 'indigo' },
+  { k: 'tps', pid: 0x11, n: 'Throttle position', g: 'Throttle', u: '%', d: 0, min: 0, max: 100, col: 'teal' },
+  { k: 'volt', pid: 0x42, n: 'Battery voltage', g: 'Battery', u: 'V', d: 1, min: 11, max: 15.5, col: 'yellow' },
+  { k: 'iat', pid: 0x0F, n: 'Intake air temp', conv: 'temp', d: 0, min: 0, max: 70, col: 'teal' },
+  { k: 'maf', pid: 0x10, n: 'Mass airflow', u: 'g/s', d: 1, min: 0, max: 60, col: 'blue' },
+  { k: 'map', pid: 0x0B, n: 'Manifold pressure', u: 'kPa', d: 0, min: 0, max: 110, col: 'indigo' },
+  { k: 'timing', pid: 0x0E, n: 'Timing advance', u: '°', d: 1, min: 0, max: 40, col: 'indigo' },
+  { k: 'stft1', pid: 0x06, n: 'Short trim B1', u: '%', d: 1, min: -15, max: 15, col: 'blue', sign: true },
+  { k: 'ltft1', pid: 0x07, n: 'Long trim B1', u: '%', d: 1, min: -15, max: 15, col: 'blue', sign: true },
+  { k: 'stft2', pid: 0x08, n: 'Short trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
+  { k: 'ltft2', pid: 0x09, n: 'Long trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
+  { k: 'o2', pid: 0x14, n: 'O2 sensor B1S1', u: 'V', d: 2, min: 0, max: 1, col: 'green' },
+  { k: 'fuel', pid: 0x2F, n: 'Fuel level', u: '%', d: 0, min: 0, max: 100, col: 'green' },
+  { k: 'baro', pid: 0x33, n: 'Barometric pressure', u: 'kPa', d: 0, min: 60, max: 110, col: 'teal' },
+  { k: 'amb', pid: 0x46, n: 'Outside air temp', conv: 'temp', d: 0, min: -20, max: 50, col: 'teal' },
+  { k: 'oil', pid: 0x5C, n: 'Oil temp', conv: 'temp', d: 0, min: 40, max: 140, col: 'orange' },
+  { k: 'runtime', pid: 0x1F, n: 'Run time', u: 's', d: 0, min: 0, max: 3600, col: 'indigo' },
+];
+const P = {}; PIDS.forEach((p) => { P[p.k] = p; });
+const GAUGES = ['rpm', 'speed', 'cool', 'load', 'tps', 'volt'];
+const GRAPHS = ['rpm', 'speed', 'cool', 'load', 'maf', 'stft1'];
+const NH = 150;
+const D = {}, H = {};
+const pushH = (k, v) => { (H[k] = H[k] || []).push(v); if (H[k].length > NH) H[k].shift(); };
+
+const CAUSES = {
+  P0441: ['Purge valve (VSV) stuck or not opening', 'Cracked EVAP hose at the purge valve', 'Charcoal canister problem'],
+  P0455: ['Loose, cracked or wrong gas cap', 'Disconnected or cracked EVAP hose', 'Canister or vent valve leaking'],
+  P0442: ['Gas cap seal worn', 'Small crack in an EVAP hose', 'Leaking purge or vent valve'],
+  P0456: ['Gas cap seal worn', 'Tiny EVAP hose or seal leak', 'Vent valve not sealing'],
+  P0504: ['Worn brake light switch (most common)', 'Wiring or connector at the switch', 'Blown stop-light fuse'],
+  P0171: ['Vacuum leak (hoses, intake gasket)', 'Dirty MAF sensor', 'Weak fuel pump or clogged filter'],
+  P0174: ['Vacuum leak (hoses, intake gasket)', 'Dirty MAF sensor', 'Weak fuel pump or clogged filter'],
+  P0420: ['Worn catalytic converter', 'Exhaust leak before the O2 sensor', 'Lazy downstream O2 sensor'],
+  P0430: ['Worn catalytic converter', 'Exhaust leak before the O2 sensor', 'Lazy downstream O2 sensor'],
+  P0128: ['Thermostat stuck open', 'Coolant temp sensor reading low', 'Low coolant'],
+  P0300: ['Worn spark plugs or coils', 'Vacuum leak', 'Low fuel pressure'],
+};
+for (let c = 1; c <= 8; c++) CAUSES['P030' + c] = ['Spark plug or ignition coil on that cylinder', 'Injector on that cylinder', 'Low compression (valve, rings)'];
+
+// ---------------------------------------------------------------- state
+const S = {
+  mode: 'off', status: '', theme: store.get('theme', 'dark'), tempU: store.get('tempU', 'F'), speedU: store.get('speedU', 'mph'),
+  stack: ['home'], liveMode: 'gauges', graphKey: 'rpm', misMode: 'cur',
+  codes: null, codesLoading: false, ff: null, ready: null, readyLoading: false, mis: null, misLoading: false,
+  scan: { state: 'intro', results: [], i: 0, n: 0, name: '' }, makeKey: null, selMod: null,
+  extra: [], busy: 0, inRead: false, rec: false, recRows: [], recStart: 0, lastRec: 0,
+};
+let B = null;
+
+// ---------------------------------------------------------------- units
+function conv(k, v) {
+  const p = P[k];
+  if (p && p.conv === 'temp' && S.tempU === 'F') return v * 9 / 5 + 32;
+  if (p && p.conv === 'speed' && S.speedU === 'mph') return v / 1.609;
+  return v;
+}
+function unit(k) {
+  const p = P[k];
+  if (p.conv === 'temp') return S.tempU === 'F' ? '°F' : '°C';
+  if (p.conv === 'speed') return S.speedU === 'mph' ? 'mph' : 'km/h';
+  return p.u;
+}
+function fmt(k, v) {
+  if (v === undefined || v === null || isNaN(v)) return '—';
+  const p = P[k], x = conv(k, v);
+  let s = Math.abs(x) >= 1000 && p.d === 0 ? Math.round(x).toLocaleString('en-US') : x.toFixed(p.d);
+  if (p.sign && x > 0) s = '+' + s;
+  return s;
+}
+const tempStr = (c) => (c === null || c === undefined ? '—' : Math.round(S.tempU === 'F' ? c * 9 / 5 + 32 : c) + (S.tempU === 'F' ? '°F' : '°C'));
+const colVar = (c) => 'var(--' + c + ')';
+const pct = (v) => (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+
+// ---------------------------------------------------------------- real backend
+class RealBackend {
+  constructor() { this.t = new BleTransport(); this.e = new Elm(this.t); this.a = new AllSystems(this.e); this.adapterName = ''; }
+  async connect(status) {
+    this.adapterName = await this.t.connect();
+    this.t.onDisconnect = () => onDisconnected();
+    await this.e.connect(status);
+  }
+  get vin() { return this.e.vin; }
+  get protoDesc() { return this.e.protoDesc; }
+  get chip() { return this.e.stn || this.e.id; }
+  get isCAN() { return this.e.isCAN(); }
+  async _func() { if (this.e.enhActive) await this.e.enhEnd(); }
+  supported(k) { return k === 'volt' || !!this.e.sup[P[k].pid]; }
+  async readPid(k) {
+    await this._func();
+    if (k === 'volt' && !this.e.sup[0x42]) return this.e.readVoltage();
+    return this.e.readPID(P[k].pid);
+  }
+  async codes() {
+    await this._func();
+    const rd = await this.e.readiness();
+    const st = await this.e.readDTCs(3), pe = await this.e.readDTCs(7), pm = this.e.isCAN() ? await this.e.readDTCs(0x0A) : [];
+    const ff = st && st.length ? await this.e.freezeFrame() : null;
+    return { ok: st !== null, mil: rd ? rd.mil : false, stored: st || [], pending: pe || [], permanent: pm || [], ff };
+  }
+  async clearCodes() { await this._func(); return (await this.e.lines('04', 6000)).some((s) => s.startsWith('44')); }
+  async readiness() { await this._func(); return this.e.readiness(); }
+  async misfire() { await this._func(); return this.e.misfire(); }
+  async scan(mods, step) {
+    await this._func();
+    this.e.enhBegin();
+    const out = [];
+    for (let i = 0; i < mods.length; i++) { step(i, mods[i], out); const r = await this.a.scanModule(mods[i]); if (r.present) out.push(r); }
+    await this.e.enhEnd();
+    return out;
+  }
+  async reread(r) { await this.a.readCodes(r.mod, r); await this.e.enhEnd(); }
+  async clearModule(r) { const x = await this.a.clear(r.mod, r.svc); await this.e.enhEnd(); return x; }
+  readExtra(p) { return this.a.readLive(p); }
+  async check() { await this._func(); return this.a.adapterCheck(S.makeKey); }
+  disconnect() { this.t.onDisconnect = null; this.t.disconnect(); }
+}
+
+// ---------------------------------------------------------------- demo backend
+class DemoBackend {
+  constructor() {
+    this.vin = '5TETU62N37Z412345'; this.protoDesc = 'ISO 15765-4 (CAN 11/500)'; this.chip = 'Demo adapter'; this.adapterName = 'Demo'; this.isCAN = true;
+    this.T = 45; this.codesList = ['P0441', 'P0455', 'P0504']; this.abs = [{ code: 'C0200', status: 8 }, { code: 'C1249', status: 8 }];
+    this.misCur = [0, 0, 4, 0, 1, 0]; this.misAvg = [1, 0, 6, 0, 2, 1];
+    for (let i = 0; i < NH; i++) { this.sim(); Object.keys(this.D).forEach((k) => pushH(k, this.D[k])); this.T += 0.2; }
+    this.timer = setInterval(() => {
+      this.sim(); this.T += 0.1; this.tick = (this.tick || 0) + 1;
+      Object.assign(D, this.D);
+      if (this.tick % 2 === 0) Object.keys(this.D).forEach((k) => pushH(k, this.D[k]));
+      updateAll();
+    }, 100);
+  }
+  async connect() { await sleep(600); }
+  sim() {
+    const t = this.T, ph = t % 40, rnd = (a) => (Math.random() * 2 - 1) * a, ease = (x) => x * x * (3 - 2 * x);
+    let mph;
+    if (ph < 8) mph = 0; else if (ph < 16) mph = 45 * ease((ph - 8) / 8); else if (ph < 30) mph = 45 + 2 * Math.sin(ph * 0.9);
+    else if (ph < 36) mph = 45 * (1 - ease((ph - 30) / 6)); else mph = 0;
+    const moving = mph > 0.5, accel = ph >= 8 && ph < 16, decel = ph >= 30 && ph < 36;
+    let rpm;
+    if (!moving) rpm = 700 + 14 * Math.sin(t * 2 * Math.PI * 1.6) + rnd(6);
+    else { const g = mph < 12 ? 1 : mph < 24 ? 2 : mph < 36 ? 3 : 4; rpm = Math.max(820, mph * [0, 118, 66, 44, 33][g] + (accel ? 260 : 0)) + rnd(10); }
+    const load = !moving ? 21 + rnd(1) : accel ? 62 + rnd(3) : decel ? 12 + rnd(1) : 34 + rnd(2);
+    const f2c = (f) => (f - 32) * 5 / 9;
+    this.D = {
+      rpm, speed: mph * 1.609, load, tps: !moving ? 14.5 + rnd(.2) : accel ? 38 + rnd(2) : decel ? 13.7 : 18 + rnd(1),
+      cool: f2c(150 + 46 * (1 - Math.exp(-t / 40)) + rnd(.3)), iat: f2c(88 + rnd(.4) - (moving ? 3 : 0)),
+      maf: rpm * load / 100 * 0.024 + rnd(.1), map: 30 + load * 0.6 + rnd(1), timing: !moving ? 10 + rnd(1) : accel ? 18 + rnd(1) : 32 + rnd(1),
+      stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
+      o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
+      atfA: f2c(140 + 35 * (1 - Math.exp(-t / 90)) + (moving ? 1.5 * Math.sin(t / 3) : 0) + rnd(.15)), atfB: f2c(130 + 30 * (1 - Math.exp(-t / 120)) + rnd(.1)),
+    };
+    if (!moving && Math.random() < 0.012) this.misCur[2]++;
+  }
+  supported(k) { return !['amb', 'oil'].includes(k); }
+  async readPid(k) { await sleep(15); return this.D[k]; }
+  async codes() {
+    await sleep(700);
+    return { ok: true, mil: this.codesList.length > 0, stored: this.codesList.slice(), pending: [], permanent: [],
+      ff: this.codesList.length ? { code: 'P0441', rpm: 1840, speed: 61, cool: 90, load: 31, stft1: 2.3, ltft1: 4.7 } : null };
+  }
+  async clearCodes() { await sleep(800); this.codesList = []; return true; }
+  async readiness() {
+    await sleep(600);
+    return { mil: this.codesList.length > 0, count: this.codesList.length, diesel: false, monitors: ['Misfire', 'Fuel system', 'Components', 'Catalyst', 'EVAP system', 'O2 sensor', 'O2 heater', 'EGR / VVT'].map((n) => ({ name: n, ready: n !== 'EVAP system' })) };
+  }
+  async misfire() { await sleep(700); return this.misCur.map((c, i) => ({ cyl: i + 1, cur: c, avg: this.misAvg[i] })); }
+  async scan(mods, step) {
+    const out = [];
+    for (let i = 0; i < mods.length; i++) {
+      step(i, mods[i], out);
+      await sleep(170);
+      const n = mods[i].name;
+      if (/Engine \(ECM\)/.test(n)) out.push({ mod: mods[i], present: true, readOk: true, svc: 'obd', dtcs: this.codesList.map((c) => ({ code: c, status: 8 })), note: '' });
+      if (/ABS/.test(n)) out.push({ mod: mods[i], present: true, readOk: true, svc: 'kwp', dtcs: this.abs.slice(), note: '' });
+      if (/^Airbag \(SRS\)$/.test(n)) out.push({ mod: mods[i], present: true, readOk: true, svc: 'kwp', dtcs: [], note: '' });
+      if (/Body control/.test(n)) out.push({ mod: mods[i], present: true, readOk: true, svc: 'kwp', dtcs: [], note: '' });
+    }
+    return out;
+  }
+  async reread(r) { await sleep(500); if (/ABS/.test(r.mod.name)) r.dtcs = this.abs.slice(); if (/Engine/.test(r.mod.name)) r.dtcs = this.codesList.map((c) => ({ code: c, status: 8 })); }
+  async clearModule(r) {
+    await sleep(700);
+    if (/ABS/.test(r.mod.name)) this.abs = [];
+    if (/Engine/.test(r.mod.name)) this.codesList = [];
+    return { ok: true, msg: 'Codes cleared' };
+  }
+  async readExtra(p) { await sleep(40); if (p.req === '21D9') return p.bytes[0] === 4 ? this.D.atfA : this.D.atfB; return null; }
+  async check() {
+    await sleep(900);
+    return [
+      { name: 'Adapter responds', ok: true, detail: 'Demo' }, { name: 'Chip', ok: true, detail: 'Simulated' },
+      { name: 'Vehicle connection', ok: true, detail: this.protoDesc }, { name: 'Custom headers (ATSH)', ok: true, detail: 'Supported' },
+      { name: 'Extended addressing', ok: false, detail: 'Example of an unsupported feature' }, { name: 'ABS module test', ok: true, detail: 'Read 2 code(s)' },
+    ];
+  }
+  disconnect() { clearInterval(this.timer); }
+}
+
+// ---------------------------------------------------------------- navigation
+const TITLES = { home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', fuel: 'Fuel Trim', extra: 'Extra' };
+const view = (n) => $('#v-' + n);
+const top = () => S.stack[S.stack.length - 1];
+function push(n) {
+  const cur = top();
+  if (cur === n) return;
+  view(cur).classList.remove('active'); view(cur).classList.add('behind');
+  const v = view(n); v.style.zIndex = S.stack.length + 1; v.classList.remove('behind');
+  const bk = v.querySelector('.back span'); if (bk) bk.textContent = TITLES[cur] || 'Back';
+  void v.offsetWidth; v.classList.add('active');
+  S.stack.push(n); onShow(n);
+}
+function pop() {
+  if (S.stack.length < 2) return;
+  const cur = S.stack.pop(); view(cur).classList.remove('active');
+  const prev = top(); view(prev).classList.remove('behind'); view(prev).classList.add('active');
+  onShow(prev);
+}
+function goHome() { while (S.stack.length > 1) pop(); }
+function onShow(n) {
+  if (n === 'home') renderHome();
+  if (n === 'codes') { renderCodes(); if (!S.codes && !S.codesLoading) loadCodes(); }
+  if (n === 'ready') { renderReady(); if (!S.ready && !S.readyLoading) loadReady(); }
+  if (n === 'systems') renderSystems();
+  if (n === 'module') renderModule();
+  if (n === 'misfire') { renderMis(); if (!S.mis && !S.misLoading) loadMis(); }
+  if (n === 'live') { buildLive(); updateLive(); }
+  if (n === 'extra') initExtra();
+  if (n === 'fuel') drawFuel();
+}
+
+// ---------------------------------------------------------------- overlays
+function alertBox(o) {
+  $('#al-t').textContent = o.title; $('#al-m').textContent = o.msg || '';
+  const ok = $('#al-ok'), no = $('#al-no'), acts = $('#al-acts');
+  ok.textContent = o.ok || 'OK'; ok.className = o.dest ? 'dest' : 'bold';
+  no.style.display = o.cancel === false ? 'none' : ''; acts.classList.toggle('one', o.cancel === false);
+  no.textContent = o.cancel || 'Cancel';
+  const sc = $('#alertscrim'); sc.classList.add('on');
+  const close = () => sc.classList.remove('on');
+  no.onclick = () => { close(); if (o.onCancel) o.onCancel(); };
+  ok.onclick = () => { close(); if (o.onOk) o.onOk(); };   // synchronous: keeps the tap gesture for Bluetooth
+}
+function openSheet(title, html) { $('#sh-t').textContent = title; $('#sh-b').innerHTML = html; $('#sheetscrim').classList.add('on'); $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheetscrim').classList.remove('on'); $('#sheet').classList.remove('on'); }
+let hudT;
+function hud(txt, icon) {
+  $('#hudtxt').textContent = txt; $('#hudic').innerHTML = '<use href="#' + (icon || 'i-check') + '"/>';
+  const h = $('#hud'); h.classList.add('on'); clearTimeout(hudT); hudT = setTimeout(() => h.classList.remove('on'), 1500);
+}
+
+// ---------------------------------------------------------------- segmented controls
+function segSet(seg, val) {
+  const btns = $$('[data-seg="' + seg + '"] button'), ind = $('[data-seg="' + seg + '"] .ind');
+  if (!ind) return;
+  let idx = 0;
+  btns.forEach((b, i) => { const on = b.dataset.val === val; b.classList.toggle('on', on); if (on) idx = i; });
+  ind.style.width = 'calc((100% - 4px) / ' + btns.length + ')';
+  ind.style.transform = 'translateX(' + idx * 100 + '%)';
+}
+function onSeg(seg, val) {
+  segSet(seg, val);
+  if (seg === 'live') { S.liveMode = val; ['gauges', 'list', 'graph'].forEach((m) => $('#p-' + m).classList.toggle('on', m === val)); updateLive(); }
+  if (seg === 'mis') { S.misMode = val; renderMis(); }
+  if (seg === 'theme') { S.theme = val; store.set('theme', val); applyTheme(); }
+  if (seg === 'temp') { S.tempU = val; store.set('tempU', val); liveBuilt = ''; buildLive(); refreshAll(); }
+  if (seg === 'speedu') { S.speedU = val; store.set('speedU', val); liveBuilt = ''; buildLive(); refreshAll(); }
+}
+function applyTheme() {
+  document.documentElement.dataset.theme = S.theme;
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = S.theme === 'dark' ? '#000000' : '#F2F2F7';
+}
+
+// ---------------------------------------------------------------- connection
+function vehicleName() {
+  if (!B) return 'No vehicle';
+  const saved = store.get('vname.' + B.vin, '');
+  if (saved) return saved;
+  const y = modelYear(B.vin), mk = S.makeKey && VEHICLE_DB[S.makeKey] ? VEHICLE_DB[S.makeKey].name.split(' /')[0] : '';
+  return [y, mk].filter(Boolean).join(' ') || 'Vehicle';
+}
+async function connect(demo) {
+  if (S.mode !== 'off') return;
+  const b = demo ? new DemoBackend() : new RealBackend();
+  S.mode = 'connecting'; S.status = demo ? 'Starting demo...' : 'Choose your adapter...'; renderHome();
+  try {
+    await b.connect((s) => { S.status = s; renderHome(); });
+  } catch (err) {
+    S.mode = 'off'; S.status = '';
+    try { b.disconnect(); } catch (e) { /* ignore */ }
+    renderHome();
+    if (err && (err.name === 'NotFoundError' || /cancel/i.test(err.message))) return;
+    alertBox({ title: 'Couldn’t connect', msg: (err && err.message) || String(err), cancel: false });
+    return;
+  }
+  B = b; S.mode = demo ? 'demo' : 'live';
+  S.makeKey = makeFromVIN(B.vin) || store.get('make', null);
+  resetData();
+  renderHome();
+  hud(demo ? 'Demo running' : 'Connected', demo ? 'i-gauge' : 'i-check');
+  pollLoop();
+  loadCodes();
+}
+function resetData() {
+  S.codes = null; S.ff = null; S.ready = null; S.mis = null; S.scan = { state: 'intro', results: [], i: 0, n: 0, name: '' }; S.selMod = null; S.extra = [];
+  Object.keys(D).forEach((k) => { delete D[k]; });
+  if (S.mode === 'live') Object.keys(H).forEach((k) => { delete H[k]; });
+}
+function disconnect() {
+  if (B) B.disconnect();
+  B = null; S.mode = 'off'; S.rec = false; resetData(); goHome(); renderHome(); closeSheet();
+}
+function onDisconnected() {
+  if (S.mode !== 'live') return;
+  B = null; S.mode = 'off'; resetData(); goHome(); renderHome();
+  alertBox({ title: 'Adapter disconnected', msg: 'The Bluetooth connection dropped. Check the adapter is plugged in, then connect again.', cancel: false });
+}
+function needConnection() {
+  alertBox({ title: 'Not connected', msg: 'Plug the adapter in, turn the key on, then connect. Or try the demo.', cancel: 'Try Demo', ok: 'Connect',
+    onOk: () => connect(false), onCancel: () => connect(true) });
+}
+
+// Long operations pause live polling so they have the adapter to themselves.
+async function job(fn) {
+  S.busy++;
+  try { while (S.inRead) await sleep(20); return await fn(); }
+  finally { S.busy--; }
+}
+
+// ---------------------------------------------------------------- polling
+let polling = false;
+function pollKeys() {
+  const t = top();
+  if (t === 'live') {
+    if (S.liveMode === 'gauges') return GAUGES;
+    if (S.liveMode === 'graph') return [S.graphKey];
+    return PIDS.map((p) => p.k);
+  }
+  if (t === 'fuel') return ['stft1', 'ltft1', 'stft2', 'ltft2'];
+  if (t === 'home') return ['rpm', 'speed', 'cool', 'volt'];
+  if (t === 'extra') return 'extra';
+  return ['volt'];
+}
+async function pollLoop() {
+  if (polling) return; polling = true;
+  while (S.mode === 'live' || S.mode === 'demo') {
+    if (S.busy) { await sleep(80); continue; }
+    const keys = pollKeys();
+    let did = 0;
+    if (keys === 'extra') {
+      for (let i = 0; i < S.extra.length; i++) {
+        const x = S.extra[i];
+        if (S.busy || top() !== 'extra' || !B || x.state === 2) continue;
+        S.inRead = true;
+        let v = null;
+        try { v = await B.readExtra(x.p); } finally { S.inRead = false; }
+        if (v !== null && v !== undefined) { x.v = v; x.state = 1; x.fails = 0; x.h.push(v); if (x.h.length > 80) x.h.shift(); }
+        else if (++x.fails >= 2) x.state = 2;
+        did++;
+        if (top() === 'extra') drawExtra();
+      }
+    } else {
+      for (const k of keys) {
+        if (S.busy || !B || (S.mode !== 'live' && S.mode !== 'demo')) break;
+        if (!B.supported(k)) continue;
+        S.inRead = true;
+        let v = null;
+        try { v = await B.readPid(k); } catch (e) { v = null; } finally { S.inRead = false; }
+        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); }
+        did++;
+      }
+      if (S.mode === 'live') updateAll();
+    }
+    await sleep(did ? (S.mode === 'demo' ? 150 : 5) : 300);
+  }
+  polling = false;
+}
+
+// ---------------------------------------------------------------- home
+function renderHome() {
+  const c = $('#carcard'), on = S.mode === 'live' || S.mode === 'demo';
+  if (S.mode === 'off') {
+    c.innerHTML = '<div class="carrow"><span class="sq" style="background:var(--fill2);color:var(--sec)"><svg class="ic"><use href="#i-bt"/></svg></span>' +
+      '<div class="grow"><b>Not connected</b><span class="s">Plug in the adapter and turn the key on</span></div></div>' +
+      '<button class="btn primary tap" data-act="connect">Connect Adapter</button><button class="btn tap" data-act="demo" style="height:44px">Try Demo</button>';
+  } else if (S.mode === 'connecting') {
+    c.innerHTML = '<div class="carrow"><div class="spin"></div><div class="grow"><b>Connecting</b><span class="s">' + esc(S.status) + '</span></div></div>';
+  } else {
+    c.innerHTML = '<div class="carrow"><span class="sq" style="background:#5E5CE6"><svg class="ic"><use href="#i-car"/></svg></span>' +
+      '<div class="grow"><b>' + esc(vehicleName()) + (S.mode === 'demo' ? ' <span class="demo">DEMO</span>' : '') + '</b><span class="s">' + esc(B.protoDesc || 'Connected') + '</span></div>' +
+      '<div class="vpill num"><span class="dot"></span><span id="h-volt">' + (D.volt ? D.volt.toFixed(1) + ' V' : '—') + '</span></div></div>' +
+      '<div class="mini num"><div><b id="h-rpm">—</b><span>RPM</span></div><div><b id="h-spd">—</b><span id="h-spdu">' + unit('speed').toUpperCase() + '</span></div><div><b id="h-cool">—</b><span>COOLANT</span></div></div>';
+  }
+  $$('.tile').forEach((t) => { t.style.opacity = on ? '' : '.55'; });
+  renderTiles();
+  updateHome();
+}
+function renderTiles() {
+  const on = S.mode === 'live' || S.mode === 'demo';
+  const n = S.codes ? S.codes.stored.length + S.codes.pending.length : null;
+  const b = $('#h-badge'); b.style.display = n ? 'flex' : 'none'; b.textContent = n || '';
+  const tc = $('#t-codes');
+  tc.textContent = !on ? '—' : S.codesLoading && !S.codes ? 'Reading...' : n === null ? 'Tap to read' : n ? n + ' found' : 'No codes';
+  tc.className = 'tv' + (n ? ' red' : '');
+  $('#t-ready').textContent = !on ? '—' : S.ready ? S.ready.monitors.filter((m) => m.ready).length + ' of ' + S.ready.monitors.length + ' ready' : 'Tap to check';
+  const sc = S.scan;
+  $('#t-sys').textContent = !on ? '—' : sc.state === 'done' ? sc.results.length + ' found · ' + sc.results.filter((r) => r.dtcs.length).length + ' w/ codes' : sc.state === 'scanning' ? 'Scanning...' : 'Tap to scan';
+  if (S.mis && S.mis.length) { const w = S.mis.reduce((a, x) => (x.cur > a.cur ? x : a), S.mis[0]); $('#t-mis').textContent = w.cur ? 'Cyl ' + w.cyl + ' · ' + w.cur : 'All clear'; }
+  else $('#t-mis').textContent = !on ? '—' : 'Tap to read';
+  const xa = S.extra.find((x) => x.state === 1);
+  $('#t-extra').textContent = !on ? '—' : xa ? 'ATF ' + tempStr(xa.v) : 'Maker data';
+}
+function updateHome() {
+  const on = S.mode === 'live' || S.mode === 'demo';
+  if (!on) { ['#t-live', '#t-fuel'].forEach((s) => { $(s).textContent = '—'; }); return; }
+  const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
+  set('#h-rpm', fmt('rpm', D.rpm)); set('#h-spd', fmt('speed', D.speed)); set('#h-cool', D.cool === undefined ? '—' : tempStr(D.cool).replace(/°[FC]/, '°'));
+  set('#h-volt', D.volt ? D.volt.toFixed(1) + ' V' : '—');
+  $('#t-live').textContent = D.rpm === undefined ? 'Tap to view' : fmt('rpm', D.rpm) + ' rpm · ' + fmt('speed', D.speed) + ' ' + unit('speed');
+  $('#t-fuel').textContent = D.stft1 !== undefined && D.ltft1 !== undefined ? 'B1 ' + pct(D.stft1 + D.ltft1) : 'Tap to view';
+}
+
+// ---------------------------------------------------------------- codes
+async function loadCodes() {
+  if (!B || S.codesLoading) return;
+  S.codesLoading = true; renderCodes(); renderTiles();
+  try {
+    const r = await job(() => B.codes());
+    S.codes = r; S.ff = r.ff;
+  } catch (e) { S.codes = { ok: false, mil: false, stored: [], pending: [], permanent: [] }; }
+  S.codesLoading = false; renderCodes(); renderTiles();
+}
+function codeRows(list, tag, cls) {
+  return list.map((c) => '<button class="row tap" data-act="openCode" data-code="' + c + '"><span class="grow"><b style="font-weight:600">' + c + '</b><span class="sub">' + esc(dtcText(c, S.makeKey)) +
+    '</span></span><span class="chip ' + cls + '">' + tag + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('');
+}
+function renderCodes() {
+  const el = $('#codesbody');
+  if (!B) { el.innerHTML = ''; return; }
+  if (S.codesLoading && !S.codes) { el.innerHTML = '<div class="loading"><div class="spin"></div>Reading codes...</div>'; return; }
+  if (!S.codes) { el.innerHTML = ''; return; }
+  const c = S.codes, n = c.stored.length + c.pending.length + c.permanent.length;
+  let h = '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="dot" style="background:' + (c.mil ? 'var(--red)' : 'var(--green)') + '"></span><b style="font-size:17px;font-weight:600;flex:1">Check engine light ' + (c.mil ? 'on' : 'off') + '</b>' +
+    (S.codesLoading ? '<div class="spin" style="width:18px;height:18px"></div>' : '') + '</div>';
+  if (!c.ok) h += '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-warn"/></svg><b>Couldn’t read codes</b>Check the key is on, then tap Refresh.</div>';
+  else if (!n) h += '<div class="empty"><svg class="ic" style="color:var(--greenT)"><use href="#i-checkc"/></svg><b>No codes stored</b>The engine computer has no trouble codes.</div>';
+  else {
+    if (c.stored.length) h += '<div class="cap">Stored</div><div class="group">' + codeRows(c.stored, 'Stored', 'red') + '</div>';
+    if (c.pending.length) h += '<div class="cap">Pending</div><div class="group">' + codeRows(c.pending, 'Pending', 'orange') + '</div>';
+    if (c.permanent.length) h += '<div class="cap">Permanent</div><div class="group">' + codeRows(c.permanent, 'Permanent', 'gray') + '</div><p class="foot">Permanent codes clear themselves after the repair and a few drive cycles.</p>';
+  }
+  h += '<div class="btns" style="margin-top:6px"><button class="btn tap" data-act="loadCodes"><svg class="ic"><use href="#i-refresh"/></svg>Refresh</button><button class="btn danger tap" data-act="clearEngine">Clear Codes</button></div>';
+  el.innerHTML = h;
+}
+function openCode(code) {
+  const ff = S.ff, cell = (v, l) => '<div><b class="num">' + v + '</b><span>' + l + '</span></div>';
+  let h = '<div style="font-size:19px;font-weight:600;line-height:24px">' + esc(dtcText(code, S.makeKey)) + '</div>';
+  if (ff && ff.code === code) {
+    h += '<div class="cap in">Freeze frame · conditions when it set</div><div class="ff">' +
+      cell(ff.rpm !== undefined ? Math.round(ff.rpm).toLocaleString('en-US') : '—', 'RPM') + cell(ff.speed !== undefined ? Math.round(conv('speed', ff.speed)) : '—', unit('speed').toUpperCase()) +
+      cell(ff.cool !== undefined ? tempStr(ff.cool).replace(/°[FC]/, '°') : '—', 'COOLANT') + cell(ff.load !== undefined ? Math.round(ff.load) + '%' : '—', 'LOAD') +
+      cell(ff.stft1 !== undefined ? pct(ff.stft1) : '—', 'SHORT TRIM') + cell(ff.ltft1 !== undefined ? pct(ff.ltft1) : '—', 'LONG TRIM') + '</div>';
+  } else if (ff) h += '<p class="foot" style="text-align:left">The freeze frame was saved for ' + ff.code + ', not this code.</p>';
+  const cz = CAUSES[code.split('-')[0]];
+  if (cz) h += '<div class="cap in">Common causes</div><ul class="causes">' + cz.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  h += '<p class="foot" style="text-align:left">Look the code up for your exact model before buying parts.</p>';
+  openSheet(code, h);
+}
+
+// ---------------------------------------------------------------- readiness
+async function loadReady() {
+  if (!B || S.readyLoading) return;
+  S.readyLoading = true; renderReady();
+  try { S.ready = await job(() => B.readiness()); } catch (e) { S.ready = null; }
+  S.readyLoading = false; renderReady(); renderTiles();
+}
+function renderReady() {
+  const el = $('#readybody');
+  if (S.readyLoading && !S.ready) { el.innerHTML = '<div class="loading"><div class="spin"></div>Reading monitors...</div>'; return; }
+  if (!S.ready) { el.innerHTML = B ? '<div class="empty"><b>No monitor data</b>Tap Refresh with the key on.</div>' : ''; return; }
+  const mons = S.ready.monitors, done = mons.filter((m) => m.ready).length, N = mons.length || 1;
+  const r = 46, C = 2 * Math.PI * r, seg = C / N, gap = N > 1 ? 6 : 0;
+  let ring = '<circle cx="55" cy="55" r="' + r + '" fill="none" stroke="var(--fill)" stroke-width="11"/>';
+  mons.forEach((m, i) => {
+    ring += '<circle cx="55" cy="55" r="' + r + '" fill="none" stroke="' + (m.ready ? 'var(--green)' : 'var(--orange)') + '" stroke-width="11" stroke-linecap="round" stroke-dasharray="' +
+      Math.max(1, seg - gap - 5).toFixed(2) + ' ' + (C - seg + gap + 5).toFixed(2) + '" stroke-dashoffset="' + (-(i * seg) - gap / 2).toFixed(2) + '" transform="rotate(-90 55 55)"/>';
+  });
+  const notReady = mons.filter((m) => !m.ready);
+  el.innerHTML = '<div class="ringcard"><div class="big"><svg viewBox="0 0 110 110" width="110" height="110" role="img" aria-label="' + done + ' of ' + mons.length + ' monitors ready">' + ring + '</svg><b>' + done + '/' + mons.length + '</b></div>' +
+    '<p><b>' + (notReady.length ? notReady.length + ' not ready' : 'All ready') + '</b>' + (notReady.length ? 'Many states allow one incomplete monitor on 2001+ vehicles. Monitors complete after normal driving.' : 'Ready for an emissions inspection.') + '</p></div>' +
+    '<div class="group">' + mons.map((m) => '<div class="row"><span class="grow">' + m.name + '</span>' +
+      (m.ready ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg><span class="val" style="width:84px">Ready</span>'
+        : '<svg class="ic" style="color:var(--orangeT)"><use href="#i-clock"/></svg><span class="val" style="width:84px;color:var(--orangeT);font-weight:600">Not ready</span>') + '</div>').join('') + '</div>';
+}
+
+// ---------------------------------------------------------------- all systems
+const MOD_ICON = (n) => /Engine/.test(n) ? ['i-engine', '#0A84FF'] : /Trans/.test(n) ? ['i-gears', '#30B0C7'] : /ABS|Brake|parking/i.test(n) ? ['i-wheel', '#FF9500']
+  : /Airbag/.test(n) ? ['i-seat', '#FF2D55'] : /steer/i.test(n) ? ['i-steer', '#34C759'] : /Hybrid/.test(n) ? ['i-bolt', '#30C452'] : ['i-car', '#5E5CE6'];
+function renderSystems() {
+  const el = $('#sysbody'), sc = S.scan;
+  $('#rescan').style.visibility = sc.state === 'done' ? 'visible' : 'hidden';
+  if (!B) { el.innerHTML = ''; return; }
+  if (!B.isCAN) { el.innerHTML = '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-info"/></svg><b>Needs a CAN vehicle</b>All Systems works on most 2008+ vehicles (many 2004+). Engine diagnostics still work.</div>'; return; }
+  const mk = S.makeKey && VEHICLE_DB[S.makeKey];
+  if (sc.state === 'intro') {
+    el.innerHTML = '<button class="carcard tap" data-act="pickMake" style="border:0;text-align:left;width:100%"><div class="carrow"><span class="sq" style="background:#5E5CE6;width:46px;height:46px;border-radius:12px"><svg class="ic" style="width:26px;height:26px"><use href="#i-car"/></svg></span>' +
+      '<div class="grow"><b>' + esc(mk ? mk.name : 'Choose make') + '</b><span class="s">' + (mk ? mk.modules.length + ' modules in database · tap to change' : 'Tap to choose the vehicle make') + '</span></div><svg class="ic chev" style="color:var(--sec)"><use href="#i-chev-r"/></svg></div></button>' +
+      '<p class="foot" style="text-align:left;margin:0 4px">Checks ABS, airbag, transmission, body and more for codes. Key on, engine off is best. Takes 20–60 seconds.</p>' +
+      (mk && mk.warnings && mk.warnings._all ? '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>' + esc(mk.warnings._all) + '</span></div>' : '') +
+      '<button class="btn primary tap" data-act="startScan"' + (mk ? '' : ' disabled') + '>Start Scan</button>';
+  } else if (sc.state === 'scanning') {
+    const p = sc.n ? (sc.i + 1) / sc.n : 0, C = 2 * Math.PI * 42;
+    el.innerHTML = '<div class="center" style="padding-top:30px"><div style="position:relative;width:100px;height:100px"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--fill)" stroke-width="8"/>' +
+      '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--blue)" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (p * C).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 50 50)" style="transition:stroke-dasharray .2s"/></svg>' +
+      '<b class="num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">' + Math.round(p * 100) + '%</b></div>' +
+      '<div style="display:flex;flex-direction:column;gap:3px"><b style="font-size:21px;font-weight:600;letter-spacing:-.3px">' + esc(sc.name) + '</b><span class="num" style="font-size:15px;color:var(--sec)">Module ' + (sc.i + 1) + ' of ' + sc.n + ' · ' + sc.results.length + ' found</span></div>' +
+      '<div class="found">' + sc.results.map((r) => '<span class="chip green">' + esc(r.mod.name.replace(/ \(.*\)/, '')) + '</span>').join('') + '</div></div>';
+  } else {
+    const withCodes = sc.results.filter((r) => r.dtcs.length).length;
+    el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 4px"><b style="font-size:17px;font-weight:600">' + sc.results.length + ' modules responded</b><span style="font-size:15px;font-weight:600;color:' + (withCodes ? 'var(--redT)' : 'var(--greenT)') + '">' + (withCodes ? withCodes + ' with codes' : 'All clear') + '</span></div>' +
+      (sc.results.length ? '<div class="group">' + sc.results.map((r, i) => {
+        const ic = MOD_ICON(r.mod.name), n = r.dtcs.length;
+        const right = !r.readOk ? '<span class="val" style="color:var(--orangeT)">No access</span>' : n ? '<span class="val" style="color:var(--redT);font-weight:600">' + n + (n === 1 ? ' code' : ' codes') + '</span>'
+          : '<svg class="ic" style="color:var(--greenT);width:18px;height:18px"><use href="#i-check"/></svg><span class="val">No codes</span>';
+        return '<button class="row ic-row tap" data-act="openModule" data-i="' + i + '"><span class="sq sm" style="background:' + ic[1] + '"><svg class="ic"><use href="#' + ic[0] + '"/></svg></span><span class="grow">' + esc(r.mod.name) + '</span>' + right + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
+      }).join('') + '</div>' : '<div class="empty"><b>No modules answered</b>Is the key on? Is the right make selected?</div>') +
+      '<p class="foot">Modules your vehicle doesn’t have are hidden.</p>';
+  }
+}
+async function startScan() {
+  if (!B || S.scan.state === 'scanning' || !S.makeKey) return;
+  const mods = modulesFor(S.makeKey);
+  S.scan = { state: 'scanning', results: [], i: 0, n: mods.length, name: mods[0].name };
+  renderSystems(); renderTiles();
+  try {
+    const res = await job(() => B.scan(mods, (i, m, out) => { S.scan.i = i; S.scan.name = m.name; S.scan.results = out; if (top() === 'systems') renderSystems(); }));
+    S.scan = { state: 'done', results: res, i: 0, n: mods.length, name: '' };
+  } catch (e) { S.scan.state = 'intro'; alertBox({ title: 'Scan stopped', msg: e.message || String(e), cancel: false }); }
+  renderSystems(); renderTiles();
+}
+function pickMake() {
+  const keys = Object.keys(VEHICLE_DB);
+  openSheet('Vehicle Make', '<div class="group">' + keys.map((k) => '<button class="row tap" data-act="setMake" data-k="' + k + '"><span class="grow">' + esc(VEHICLE_DB[k].name) + '</span>' +
+    (k === S.makeKey ? '<svg class="ic" style="color:var(--blueT)"><use href="#i-check"/></svg>' : '') + '</button>').join('') + '</div><p class="foot">Detected from the VIN when possible.</p>');
+}
+function renderModule() {
+  const r = S.selMod, el = $('#modbody');
+  if (!r) { el.innerHTML = ''; return; }
+  $('#m-title').textContent = r.mod.name.replace(/ \/ Brakes/, '');
+  const addr = r.mod.tx.toString(16).toUpperCase() + (r.mod.ext >= 0 ? '/' + r.mod.ext.toString(16).toUpperCase().padStart(2, '0') : '');
+  const lang = { uds: 'UDS', kwp: 'KWP2000', obd: 'OBD-II' }[r.svc] || '';
+  let h = '<span style="font-size:15px;color:var(--sec);padding:0 4px">Module ' + addr + (lang ? ' · ' + lang : '') + '</span>';
+  if (r.loading) h += '<div class="loading"><div class="spin"></div>Working...</div>';
+  else if (!r.readOk) h += '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-warn"/></svg><b>Codes not readable</b>' + esc(r.note || '') + '</div>';
+  else if (!r.dtcs.length) h += '<div class="empty"><svg class="ic" style="color:var(--greenT)"><use href="#i-checkc"/></svg><b>No codes stored</b></div>';
+  else {
+    h += '<div class="group">' + r.dtcs.map((d) => {
+      const tag = AllSystems.tag(r.svc, d.status), cls = tag === 'Active' || tag === 'Stored' ? 'red' : tag === 'Pending' ? 'orange' : 'gray';
+      return '<div class="row"><span class="grow"><b style="font-weight:600">' + d.code + '</b><span class="sub">' + esc(dtcText(d.code, S.makeKey)) + '</span></span><span class="chip ' + cls + '">' + tag + '</span></div>';
+    }).join('') + '</div>';
+    const eng = S.codes ? S.codes.stored.concat(S.codes.pending) : [];
+    if (r.dtcs.some((d) => d.code === 'C1249') && eng.includes('P0504')) h += '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>C1249 together with engine code P0504 usually points to the brake light switch.</span></div>';
+    if (r.dtcs.some((d) => d.code === 'C1201')) h += '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>C1201 means the engine computer has a code. Fix the engine code first; C1201 usually clears with it.</span></div>';
+  }
+  h += '<div class="btns" style="margin-top:6px"><button class="btn tap" data-act="rereadModule">Re-read</button>' + (r.readOk && r.dtcs.length ? '<button class="btn danger tap" data-act="clearModule">Clear Codes</button>' : '<span></span>') + '</div>';
+  el.innerHTML = h;
+}
+async function rereadModule() {
+  const r = S.selMod; if (!r || r.loading) return;
+  r.loading = true; renderModule();
+  try { await job(() => B.reread(r)); } finally { r.loading = false; }
+  renderModule(); renderTiles();
+}
+function clearModule() {
+  const r = S.selMod; if (!r) return;
+  let warn = r.mod.warn;
+  if (!warn && /Airbag/.test(r.mod.name)) warn = 'If the fault is still there, the airbag light comes straight back. Crash data can’t be erased with any scan tool.';
+  if (!warn) warn = 'Erases this module’s stored codes. Lights for faults that are still present will come back.';
+  alertBox({ title: 'Clear ' + r.mod.name.replace(/ \/ Brakes/, '') + ' codes?', msg: warn, ok: 'Clear', dest: true, onOk: async () => {
+    r.loading = true; renderModule();
+    let x;
+    try { x = await job(() => B.clearModule(r)); } catch (e) { x = { ok: false, msg: e.message }; }
+    if (x.ok) { await job(() => B.reread(r)); hud('Codes cleared'); if (/Engine/.test(r.mod.name)) { S.codes = null; loadCodes(); } }
+    else alertBox({ title: 'Clear failed', msg: x.msg, cancel: false });
+    r.loading = false; renderModule(); renderTiles();
+  } });
+}
+
+// ---------------------------------------------------------------- live data screens
+let liveBuilt = '';
+function gaugeSvg(k) {
+  return '<svg viewBox="0 0 112 112" aria-hidden="true"><circle cx="56" cy="56" r="46" fill="none" stroke="var(--fill)" stroke-width="9" stroke-linecap="round" stroke-dasharray="216.8 289" transform="rotate(135 56 56)"/>' +
+    '<circle id="ga-' + k + '" cx="56" cy="56" r="46" fill="none" stroke="' + colVar(P[k].col) + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(135 56 56)" style="transition:stroke-dasharray .3s linear"/></svg>';
+}
+function buildLive() {
+  const key = S.tempU + S.speedU + S.graphKey + (B ? B.vin : '');
+  if (liveBuilt === key) return; liveBuilt = key;
+  const sup = (k) => !B || B.supported(k);
+  $('#gauges').innerHTML = GAUGES.map((k) => '<div class="gauge">' + gaugeSvg(k) + '<div class="gv"><b class="num" id="gv-' + k + '">—</b><span>' + unit(k).toUpperCase() + '</span></div><span class="gl">' + P[k].g + (sup(k) ? '' : ' · n/a') + '</span></div>').join('');
+  $('#pidlist').innerHTML = PIDS.filter((p) => sup(p.k)).map((p) => '<div class="row"><span class="grow">' + p.n + '</span><svg class="spark" viewBox="0 0 64 24" preserveAspectRatio="none" aria-hidden="true"><path id="sp-' + p.k + '" fill="none" stroke="' + colVar(p.col) + '" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>' +
+    '<span class="v num"><span id="lv-' + p.k + '">—</span><small>' + unit(p.k) + '</small></span></div>').join('');
+  $('#gchips').innerHTML = GRAPHS.filter(sup).map((k) => '<button class="pill tap' + (k === S.graphKey ? ' on' : '') + '" data-act="graphKey" data-k="' + k + '">' + ({ rpm: 'RPM', speed: 'Speed', cool: 'Coolant', load: 'Load', maf: 'Airflow', stft1: 'Short trim' })[k] + '</button>').join('');
+  $('#gunit').textContent = unit(S.graphKey);
+}
+function spath(arr, w, h, min, max, pad) {
+  pad = pad || 0;
+  const n = arr.length, span = (max - min) || 1;
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const x = n > 1 ? (i / (n - 1)) * w : w;
+    const y = pad + (1 - Math.min(1, Math.max(0, (arr[i] - min) / span))) * (h - 2 * pad);
+    d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+  }
+  return d;
+}
+function range(arr, lo, hi) {
+  if (!arr.length) return [0, 1];
+  let mn = Math.min.apply(null, arr), mx = Math.max.apply(null, arr);
+  if (lo !== undefined) mn = Math.min(mn, lo);
+  if (hi !== undefined) mx = Math.max(mx, hi);
+  const pad = (mx - mn) * 0.12 || 1;
+  return [mn - pad, mx + pad];
+}
+function updateLive() {
+  if (top() !== 'live') return;
+  if (S.liveMode === 'gauges') {
+    GAUGES.forEach((k) => {
+      const p = P[k], v = D[k];
+      const f = v === undefined ? 0 : Math.min(1, Math.max(0, (v - p.min) / (p.max - p.min)));
+      const a = $('#ga-' + k); if (a) a.setAttribute('stroke-dasharray', (f * 216.8).toFixed(1) + ' 289');
+      const e = $('#gv-' + k); if (e) e.textContent = fmt(k, v);
+    });
+  } else if (S.liveMode === 'list') {
+    PIDS.forEach((p) => {
+      const e = $('#lv-' + p.k); if (e) e.textContent = fmt(p.k, D[p.k]);
+      const sp = $('#sp-' + p.k), arr = (H[p.k] || []).slice(-40);
+      if (sp && arr.length > 1) { const r = range(arr); sp.setAttribute('d', spath(arr, 64, 24, r[0], r[1], 2)); }
+    });
+  } else drawGraph();
+}
+function drawGraph() {
+  const k = S.graphKey, p = P[k], arr = (H[k] || []).map((v) => conv(k, v));
+  const W = 360, Ht = 240, t0 = 62, bot = 22, ph = Ht - t0 - bot;
+  const r = k === 'rpm' ? range(arr, 0, 2000) : k === 'speed' ? range(arr, 0, conv('speed', 80)) : p.sign ? range(arr, -10, 10) : range(arr);
+  let g = '';
+  for (let i = 0; i <= 3; i++) {
+    const y = t0 + (i / 3) * ph, v = r[1] - (i / 3) * (r[1] - r[0]);
+    g += '<line x1="0" x2="' + W + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="var(--sep)" stroke-width="1" vector-effect="non-scaling-stroke"/>' +
+      '<text x="' + (W - 8) + '" y="' + (y - 4).toFixed(1) + '" text-anchor="end" font-size="11" fill="var(--sec)">' + (Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(Math.abs(v) < 20 && p.d ? 1 : 0)) + '</text>';
+  }
+  if (arr.length > 1) {
+    const line = spath(arr, W, ph, r[0], r[1]).replace(/([ML])([\d.]+) ([\d.]+)/g, (m, c, x, y) => c + x + ' ' + (parseFloat(y) + t0).toFixed(1));
+    g += '<defs><linearGradient id="gfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + colVar(p.col) + '" stop-opacity=".3"/><stop offset="1" stop-color="' + colVar(p.col) + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + line + 'L' + W + ' ' + (t0 + ph) + 'L0 ' + (t0 + ph) + 'Z" fill="url(#gfill)"/><path d="' + line + '" fill="none" stroke="' + colVar(p.col) + '" stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  }
+  g += '<text x="8" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)">older</text><text x="' + (W - 8) + '" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)" text-anchor="end">now</text>';
+  $('#gsvg').innerHTML = g;
+  $('#gnow').textContent = fmt(k, D[k]);
+}
+function drawFuel() {
+  if (top() !== 'fuel') return;
+  const W = 360, Ht = 230, lo = -20, hi = 20, y = (v) => ((1 - (v - lo) / (hi - lo)) * Ht).toFixed(1);
+  let g = '<rect x="0" y="' + y(10) + '" width="' + W + '" height="' + (y(-10) - y(10)).toFixed(1) + '" fill="var(--green)" opacity=".09"/>' +
+    '<line x1="0" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="var(--sep)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+  [10, -10].forEach((v) => { g += '<text x="' + (W - 8) + '" y="' + (parseFloat(y(v)) - 4) + '" text-anchor="end" font-size="11" fill="var(--sec)">' + (v > 0 ? '+' : '') + v + '%</text>'; });
+  [['stft1', 'blue', 1], ['ltft1', 'blue', .45], ['stft2', 'orange', 1], ['ltft2', 'orange', .45]].forEach((s) => {
+    const a = H[s[0]] || []; if (a.length > 1) g += '<path d="' + spath(a, W, Ht, lo, hi) + '" fill="none" stroke="var(--' + s[1] + ')" stroke-opacity="' + s[2] + '" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  });
+  $('#fsvg').innerHTML = g;
+  const tot = (a, b) => (D[a] !== undefined ? D[a] + (D[b] || 0) : null);
+  const b1 = tot('stft1', 'ltft1'), b2 = tot('stft2', 'ltft2');
+  $('#f-b1').textContent = b1 === null ? '—' : pct(b1); $('#f-b2').textContent = b2 === null ? 'n/a' : pct(b2);
+  const st = $('#f-status');
+  if (b1 === null) { st.textContent = '—'; st.className = 'chip gray'; }
+  else { const ok = Math.abs(b1) < 10 && (b2 === null || Math.abs(b2) < 10); st.textContent = ok ? 'Normal' : 'Check'; st.className = 'chip ' + (ok ? 'green' : 'orange'); }
+}
+
+// ---------------------------------------------------------------- misfire
+async function loadMis() {
+  if (!B || S.misLoading) return;
+  S.misLoading = true; renderMis();
+  try { S.mis = await job(() => B.misfire()); } catch (e) { S.mis = null; }
+  S.misLoading = false; renderMis(); renderTiles();
+}
+function renderMis() {
+  const el = $('#misbody');
+  if (S.misLoading && !S.mis) { el.innerHTML = '<div class="loading"><div class="spin"></div>Reading misfire counters...</div>'; return; }
+  if (!S.mis) { el.innerHTML = B ? '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-info"/></svg><b>No misfire data</b>' + (B.isCAN ? 'This engine computer doesn’t report per-cylinder counts.' : 'Per-cylinder counts need a CAN vehicle.') + '</div>' : ''; return; }
+  const key = S.misMode, data = S.mis.map((m) => m[key]), mx = Math.max(8, Math.max.apply(null, data));
+  const worst = data.indexOf(Math.max.apply(null, data));
+  el.innerHTML = '<div class="seg" data-seg="mis"><span class="ind"></span><button data-val="cur">This drive</button><button data-val="avg">Recent average</button></div>' +
+    '<div class="bars">' + S.mis.map((m, i) => '<div class="bar"><b class="num">' + data[i] + '</b><div class="track"><div class="fillb" style="height:' + Math.max(3, data[i] / mx * 100) + '%;background:' + (i === worst && data[i] >= 3 ? 'var(--orange)' : 'var(--blue)') + '"></div></div><span>CYL ' + m.cyl + '</span></div>').join('') + '</div>' +
+    '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>' + (data[worst] >= 3 ? 'Cylinder ' + S.mis[worst].cyl + ' is misfiring most. Swap its coil with a neighbouring cylinder; if the misfires move, it’s the coil.' : 'No cylinder stands out. A few counts per drive are normal.') + '</span></div>' +
+    '<p class="foot">Counts come from the engine computer’s own misfire monitor (Mode 06). Tap Refresh after a drive.</p>';
+  segSet('mis', key);
+}
+
+// ---------------------------------------------------------------- extra data
+function initExtra() {
+  const mk = S.makeKey && VEHICLE_DB[S.makeKey];
+  if (!S.extra.length && mk && mk.live) S.extra = mk.live.map((p) => ({ p, v: null, state: 0, fails: 0, h: [] }));
+  drawExtra(true);
+}
+function drawExtra(full) {
+  const el = $('#extrabody');
+  if (!B) { el.innerHTML = ''; return; }
+  if (!S.extra.length) { el.innerHTML = '<div class="empty"><svg class="ic" style="color:var(--sec)"><use href="#i-thermo"/></svg><b>Nothing for this make yet</b>Extra data is only defined for Toyota so far.</div>'; return; }
+  const ok = S.extra.filter((x) => x.state === 1).slice(0, 2);
+  const key = ok.map((x) => x.p.name).join('|') + S.extra.map((x) => x.state).join('');
+  if (full || el.dataset.key !== key) {
+    el.dataset.key = key;
+    el.innerHTML = (ok.length ? '<div class="bigcards">' + ok.map((x, i) => '<div class="bigcard"><span class="cap in">' + esc(x.p.name) + '</span><div class="bv num"><b id="xb' + i + '">—</b><span>' + (S.tempU === 'F' ? '°F' : '°C') + '</span></div><svg id="xs' + i + '" viewBox="0 0 160 28" preserveAspectRatio="none" aria-hidden="true"></svg></div>').join('') + '</div>' : '') +
+      '<div class="group">' + S.extra.map((x, i) => '<div class="row"><span class="grow">' + esc(x.p.name) + '</span><span class="val num" id="xr' + i + '"></span></div>').join('') + '</div>' +
+      '<p class="foot">Rows are model-year specific; only the matching ones show values. Transmission temperature formulas come from owner forums. Sanity-check them against outside temperature on a cold start.</p>';
+  }
+  ok.forEach((x, i) => {
+    const b = $('#xb' + i); if (b) b.textContent = tempStr(x.v).replace(/°[FC]/, '');
+    const s = $('#xs' + i); if (s && x.h.length > 1) { const r = range(x.h); s.innerHTML = '<path d="' + spath(x.h, 160, 28, r[0], r[1], 3) + '" fill="none" stroke="var(--' + (i ? 'green' : 'orange') + ')" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'; }
+  });
+  S.extra.forEach((x, i) => {
+    const e = $('#xr' + i); if (!e) return;
+    e.textContent = x.state === 1 ? tempStr(x.v) : x.state === 2 ? 'Not on this vehicle' : 'Checking...';
+    e.style.color = x.state === 1 ? 'var(--label)' : '';
+  });
+}
+
+// ---------------------------------------------------------------- recording
+function recTick() {
+  if (!S.rec) return;
+  const now = performance.now();
+  if (now - S.lastRec < 200) return;
+  S.lastRec = now;
+  S.recRows.push([((now - S.recStart) / 1000).toFixed(1)].concat(PIDS.map((p) => (D[p.k] === undefined ? '' : (+conv(p.k, D[p.k]).toFixed(p.d + 1)).toString()))));
+  const s = Math.floor((now - S.recStart) / 1000);
+  $('#rectxt').textContent = 'REC ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+async function saveRecording() {
+  const header = ['time_s'].concat(PIDS.map((p) => p.k + '_' + unit(p.k).replace('°', 'deg').replace('/', 'per')));
+  const csv = [header.join(',')].concat(S.recRows.map((r) => r.join(','))).join('\n');
+  const d = new Date(), name = 'scan_' + d.toISOString().slice(0, 16).replace(/[-:T]/g, '') + '.csv';
+  try {
+    const file = new File([csv], name, { type: 'text/csv' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    hud('Saved ' + name);
+  } catch (e) { alertBox({ title: 'Couldn’t save the log', msg: 'This browser blocked the download.', cancel: false }); }
+}
+
+// ---------------------------------------------------------------- settings & adapter check
+function settings() {
+  const seg = (name, opts, cur) => '<div class="seg" data-seg="' + name + '" style="width:170px"><span class="ind"></span>' + opts.map((o) => '<button data-val="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
+  const row = (l, ctl) => '<div class="row"><span class="grow">' + l + '</span>' + ctl + '</div>';
+  const info = (l, v) => '<div class="row"><span class="grow">' + l + '</span><span class="val num" style="max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(v) + '</span></div>';
+  let h = '<div class="group">' + row('Appearance', seg('theme', [['dark', 'Dark'], ['light', 'Light']])) + row('Temperature', seg('temp', [['F', '°F'], ['C', '°C']])) + row('Speed', seg('speedu', [['mph', 'mph'], ['kmh', 'km/h']])) + '</div>';
+  if (B) {
+    h += '<div class="cap">Vehicle</div><div class="group">' + row('Name', '<input type="text" id="vname" value="' + esc(vehicleName()) + '" aria-label="Vehicle name">') +
+      info('VIN', B.vin || 'Not reported') + info('Make', S.makeKey ? VEHICLE_DB[S.makeKey].name : 'Unknown') + info('Protocol', B.protoDesc || '—') + '</div>';
+    h += '<div class="cap">Adapter</div><div class="group">' + info('Device', B.adapterName) + info('Chip', B.chip || '—') +
+      '<button class="row tap" data-act="check"><span class="grow" style="color:var(--blueT)">Run Adapter Check</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>' +
+      '<button class="row tap" data-act="disconnect"><span class="grow" style="color:var(--redT)">' + (S.mode === 'demo' ? 'Exit Demo' : 'Disconnect') + '</span></button></div>';
+  } else {
+    h += '<div class="group"><button class="row tap" data-act="connect"><span class="grow" style="color:var(--blueT)">Connect Adapter</span></button><button class="row tap" data-act="demo"><span class="grow" style="color:var(--blueT)">Try Demo</span></button></div>';
+  }
+  h += '<p class="foot">Works with Bluetooth LE OBD adapters (ELM327-compatible or OBDLink CX) in the Bluefy browser.</p>';
+  openSheet('Settings', h);
+  segSet('theme', S.theme); segSet('temp', S.tempU); segSet('speedu', S.speedU);
+  const vn = $('#vname');
+  if (vn) vn.addEventListener('change', () => { store.set('vname.' + B.vin, vn.value.trim()); renderHome(); });
+}
+async function runCheck() {
+  if (!B) return;
+  openSheet('Adapter Check', '<div class="loading"><div class="spin"></div>Testing the adapter...</div>');
+  let res;
+  try { res = await job(() => B.check()); } catch (e) { res = [{ name: 'Check failed', ok: false, detail: e.message || String(e) }]; }
+  const icon = (ok) => ok === true ? '<span class="sq sm" style="background:var(--green)"><svg class="ic"><use href="#i-check"/></svg></span>'
+    : ok === false ? '<span class="sq sm" style="background:var(--red)"><svg class="ic"><use href="#i-x"/></svg></span>' : '<span class="sq sm" style="background:#8E8E93"><svg class="ic"><use href="#i-minus"/></svg></span>';
+  const bad = res.filter((r) => r.ok === false).map((r) => r.name);
+  const verdict = !bad.length ? 'Everything this app needs works with your adapter.'
+    : bad.some((b) => /addressed|headers|filter/.test(b)) ? 'Engine diagnostics work, but this adapter can’t talk to individual modules. All Systems and Extra Data need a better adapter (e.g. OBDLink CX).'
+    : bad.includes('Extended addressing') ? 'Almost everything works. Toyota body/gateway modules will be skipped in All Systems.' : 'Some features may not work. See the red items.';
+  $('#sh-b').innerHTML = '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>' + verdict + '</span></div><div class="group">' +
+    res.map((r) => '<div class="row ic-row">' + icon(r.ok) + '<span class="grow"><span>' + esc(r.name) + '</span><span class="sub" style="white-space:normal">' + esc(r.detail) + '</span></span></div>').join('') + '</div>';
+}
+
+// ---------------------------------------------------------------- refresh
+function updateAll() {
+  const t = top();
+  if (t === 'home') updateHome();
+  if (t === 'live') updateLive();
+  if (t === 'fuel') drawFuel();
+  if (S.rec) recTick();
+}
+function refreshAll() { renderHome(); const t = top(); if (t !== 'home') onShow(t); }
+
+// ---------------------------------------------------------------- actions
+const ACT = {
+  connect: () => { closeSheet(); connect(false); },
+  demo: () => { closeSheet(); connect(true); },
+  disconnect,
+  settings, closeSheet,
+  check: runCheck,
+  loadCodes: () => loadCodes(),
+  loadReady: () => loadReady(),
+  loadMis: () => loadMis(),
+  openCode: (el) => openCode(el.dataset.code),
+  clearEngine: () => {
+    if (!B) return needConnection();
+    alertBox({ title: 'Clear engine codes?', msg: 'This also erases freeze frame data and resets readiness monitors, so the vehicle won’t pass an emissions test until they re-run. Key on, engine off.',
+      ok: 'Clear', dest: true, onOk: async () => {
+        let ok = false;
+        try { ok = await job(() => B.clearCodes()); } catch (e) { ok = false; }
+        if (ok) { hud('Codes cleared'); S.codes = null; S.ready = null; loadCodes(); }
+        else alertBox({ title: 'Clear failed', msg: 'The engine computer didn’t confirm. Try with the key on and the engine off.', cancel: false });
+      } });
+  },
+  startScan: () => startScan(),
+  pickMake,
+  setMake: (el) => { S.makeKey = el.dataset.k; store.set('make', S.makeKey); S.extra = []; closeSheet(); renderSystems(); },
+  openModule: (el) => { S.selMod = S.scan.results[+el.dataset.i]; push('module'); },
+  rereadModule, clearModule,
+  graphKey: (el) => { S.graphKey = el.dataset.k; liveBuilt = ''; buildLive(); drawGraph(); },
+  rec: () => {
+    S.rec = !S.rec; $('#recbtn').classList.toggle('on', S.rec);
+    if (S.rec) { S.recRows = []; S.recStart = performance.now(); S.lastRec = 0; $('#rectxt').textContent = 'REC 0:00'; }
+    else { $('#rectxt').textContent = 'Record'; if (S.recRows.length) saveRecording(); }
+  },
+};
+
+document.addEventListener('click', (e) => {
+  const segBtn = e.target.closest('.seg button');
+  if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
+  const g = e.target.closest('[data-go]');
+  if (g) { if (S.mode === 'live' || S.mode === 'demo') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (e.target.closest('[data-pop]')) { pop(); return; }
+  const a = e.target.closest('[data-act]');
+  if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
+});
+
+// ---------------------------------------------------------------- start
+applyTheme();
+segSet('live', 'gauges');
+renderHome();
+if (!navigator.bluetooth) {
+  $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
+}
+window.__scanner = { S, D, H, connect, push, pop, ACT };
+})();
+
+</script>
+</body>
+</html>
