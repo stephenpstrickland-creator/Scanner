@@ -50,8 +50,49 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) pass++; else { fail++; con
   click('[data-go="live"]'); await until(() => txt('#gv-rpm') === '700', 8000, 'gauge');
   click('[data-seg="live"] [data-val="list"]'); await until(() => txt('#lv-volt') === '14.1', 8000, 'list volt');
   click('[data-seg="live"] [data-val="graph"]'); await sleep(800); ok(d.querySelector('#gsvg path') !== null, 'graph drawn');
-  click('#recbtn'); await sleep(700); click('#recbtn'); if (NATIVE) ok(shared && /time_s/.test(shared.data), 'native share');
+  // graphs: add a third reading, legend + min/avg/max, time window, drag cursor
+  click('#gchips [data-k="cool"]'); await sleep(1500);
+  ok(w.__scanner.S.graphKeys.join() === 'rpm,speed,cool' && d.querySelectorAll('#gsvg path').length >= 3, 'three readings ' + w.__scanner.S.graphKeys);
+  ok(d.querySelectorAll('#glegend .lg').length === 3 && /700 rpm/.test(txt('#glegend')) && d.querySelectorAll('#gstats .gst').length === 4, 'legend + stats ' + txt('#glegend'));
+  click('[data-seg="gwin"] [data-val="300"]'); ok(w.__scanner.S.gWin === 300 && /-5:00/.test(d.querySelector('#gsvg').innerHTML), 'five-minute window');
+  d.querySelector('#gchart').dispatchEvent(new w.MouseEvent('pointerdown', { bubbles: true, clientX: 500 }));
+  ok(d.querySelector('#glegend .lg.at') && d.querySelector('#gsvg circle'), 'drag cursor shows values');
+  d.querySelector('#gchart').dispatchEvent(new w.MouseEvent('pointerup', { bubbles: true }));
+  // record -> saved in the app -> replay -> share
+  click('#recbtn'); await sleep(900); click('#recbtn'); await sleep(100);
+  ok(txt('#sh-t') === 'Recording Saved' && w.__scanner.getRECS().length === 1, 'recording saved');
+  click('#sh-b [data-act="openRec"]'); await sleep(300);
+  ok(w.__scanner.S.stack.join() === 'home,live,replay' && d.querySelector('#rp-svg path') && d.querySelectorAll('#rp-chips .pill').length >= 4, 'replay ' + w.__scanner.S.stack);
+  click('#v-replay [data-act="shareRec"]'); await sleep(200);
+  if (NATIVE) ok(shared && /^time_s,/.test(shared.data) && /rpm_rpm/.test(shared.data), 'native share');
+  click('#v-replay [data-pop]'); await sleep(200);
+  ok(d.querySelectorAll('#grecs [data-act="openRec"]').length === 1, 'recording listed under the graph');
   click('#v-live [data-pop]'); await sleep(100);
+  // custom alerts: suggestions, then one that fires (engine speed above 500 rpm; the sim idles at 700)
+  click('#v-live [data-go="alerts"]'); await sleep(200);
+  ok(/No alerts yet/.test(txt('#alertsbody')) && /Coolant temp above 220°F/.test(txt('#alertsbody')) && /Transmission temp above 230°F/.test(txt('#alertsbody')), 'alert suggestions');
+  click('#alertsbody [data-act="addPreset"]'); await sleep(100);
+  ok(w.__scanner.AL.rules.length === 1 && w.__scanner.AL.rules[0].k === 'cool' && Math.abs(w.__scanner.AL.rules[0].v - 104.44) < 0.1, 'preset added (stored in °C)');
+  click('#alertsbody [data-act="editAlert"]:not([data-id])'); await sleep(100);
+  d.querySelector('#al-k').value = 'rpm'; d.querySelector('#al-k').dispatchEvent(new w.Event('change'));
+  ok(txt('#al-u') === 'rpm', 'unit follows reading');
+  d.querySelector('#al-v').value = '500'; click('#sh-b [data-act="saveAlert"]'); await sleep(100);
+  ok(w.__scanner.AL.rules.length === 2 && /Engine speed above 500 rpm/.test(txt('#alertsbody')), 'custom alert saved');
+  await until(() => d.querySelector('#alertbar').classList.contains('on'), 12000, 'alert fires');
+  ok(/Engine speed above 500 rpm · now 700 rpm/.test(txt('#ab-t')) && /Engine speed above 500 rpm/.test(txt('#alertsbody')) && w.__scanner.AL.log.length === 1, 'alert bar + log ' + txt('#ab-t'));
+  w.__scanner.AL.snaps.forEach((s) => { s.until = Date.now(); });   // don't wait the 30 s
+  await until(() => w.__scanner.AL.log[0].recId, 8000, 'alert recording');
+  const ar = w.__scanner.getRECS().find((r) => r.id === w.__scanner.AL.log[0].recId);
+  ok(ar && /^Alert: Engine speed/.test(ar.name) && ar.alertKey === 'rpm' && ar.keys.includes('rpm') && ar.secs >= 60, 'alert recording has the 2 minutes before ' + (ar && ar.secs));
+  if (NATIVE) { await sleep(1200); const lu = gauges.filter((g) => g.action === 'update').pop(); ok(lu && lu.alert === 'Engine speed above 500 rpm', 'alert on CarPlay: ' + (lu && lu.alert)); }
+  click('#alertbar .abx'); await sleep(50); ok(!d.querySelector('#alertbar').classList.contains('on'), 'snooze hides the bar');
+  // Toyota transmission temp is read through Extra Data when an alert uses it
+  w.__scanner.AL.rules.push({ id: 'atf1', k: 'atf', op: 'above', v: 150, on: true, run: true, rec: false }); w.__scanner.AL.atfAt = 0;
+  await until(() => w.__scanner.D.atf !== undefined, 15000, 'atf read for alert');
+  ok(Math.abs(w.__scanner.D.atf * 9 / 5 + 32 - 160) < 1, 'atf value (first ATF sensor, 160°F in the sim) ' + w.__scanner.D.atf);
+  click('#v-alerts [data-pop]'); await sleep(200);
+  w.__scanner.AL.rules.splice(0); await sleep(600);
+  await until(() => txt('#h-rpm') === '700', 8000, 'polling fine after atf');
   // readiness
   click('[data-go="ready"]'); await until(() => /not ready/.test(txt('#readybody')), 10000, 'ready');
   ok(/EVAP system/.test(txt('#readybody')) && /7\/8/.test(txt('#readybody')), 'readiness ' + txt('.ringcard b'));

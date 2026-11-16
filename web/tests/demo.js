@@ -10,7 +10,7 @@ const click = (s) => d.querySelector(s).dispatchEvent(new w.MouseEvent('click', 
   console.log('no-bluetooth note:', d.querySelector('.foot').textContent.slice(0, 40));
   click('[data-go="live"]'); await sleep(50); console.log('alert when off:', d.querySelector('#al-t').textContent); click('#al-no');
   await sleep(1500); console.log('mode', w.__scanner.S.mode, '| car:', d.querySelector('#carcard b').textContent);
-  for (const v of ['codes', 'live', 'ready', 'misfire', 'fuel', 'extra', 'systems']) { click('[data-go="' + v + '"]'); await sleep(1600); click('#v-' + v + ' [data-pop]'); await sleep(500); }
+  for (const v of ['codes', 'live', 'ready', 'misfire', 'fuel', 'extra', 'systems', 'health', 'alerts']) { click('[data-go="' + v + '"]'); await sleep(1600); click('#v-' + v + ' [data-pop]'); await sleep(500); }
   click('[data-go="ready"]'); await sleep(1200); click('#readybody [data-act="openTests"]'); await sleep(1500);
   console.log('monitor tests summary:', d.querySelector('#testsbody .ringcard b').textContent.replace('failed', 'not passing')); click('#v-tests [data-pop]'); await sleep(400); click('#v-ready [data-pop]'); await sleep(400);
   click('[data-go="systems"]'); await sleep(100); click('#sysbody [data-act="startScan"]'); await sleep(5000);

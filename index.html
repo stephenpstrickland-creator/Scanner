@@ -160,6 +160,24 @@ button { color: inherit; }
 .hft { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .hft b { font-size: 17px; font-weight: 600; }
 .hfind p { margin: 0; font-size: 15px; line-height: 21px; color: var(--sec); }
+.glegend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 12px 14px 0; min-height: 22px; }
+.lg { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--sec); white-space: nowrap; }
+.lg i, .gst i { width: 10px; height: 10px; border-radius: 5px; display: inline-block; flex-shrink: 0; }
+.lg b { color: var(--label); font-weight: 600; }
+.lg.at { margin-left: auto; color: var(--label); font-weight: 600; }
+.chart svg { touch-action: pan-y; }
+.row.gst { min-height: 40px; font-size: 15px; }
+.row.gst .grow { flex-direction: row; align-items: center; gap: 8px; }
+.row.gst > span:not(.grow) { width: 62px; text-align: right; color: var(--sec); }
+.row.gst > span.num { color: var(--label); font-weight: 600; }
+.sel { border: 0; background: none; color: var(--blueT); font-size: 17px; font-family: inherit; text-align: right; max-width: 60%; -webkit-appearance: none; appearance: none; outline: none; }
+.rowbtn { background: none; border: 0; padding: 4px 0; text-align: left; font-size: 17px; color: var(--label); cursor: pointer; font-family: inherit; }
+.alertbar { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 560px; margin: 0 auto; z-index: 40; display: none; align-items: center; background: var(--red); color: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.alertbar.on { display: flex; }
+body.hasbar .content { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.abmain { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: #fff; padding: 13px 4px 13px 16px; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; font-family: inherit; }
+.abmain span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abx { background: none; border: 0; color: #fff; font-size: 17px; width: 46px; height: 46px; cursor: pointer; opacity: .85; }
 .ringcard p b { color: var(--label); font-size: 19px; font-weight: 600; display: block; margin-bottom: 2px; }
 .center { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 10px 0; }
 .found { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; min-height: 26px; }
@@ -302,6 +320,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
   <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z"/><path d="M10 21a2.2 2.2 0 0 0 4 0"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
   <symbol id="i-engine" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 7V4.5h8V7"/><path d="M9 12.5h6"/></symbol>
   <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></symbol>
@@ -338,14 +357,17 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <!-- LIVE -->
   <section class="view" id="v-live" aria-label="Live data">
     <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Live Data</h2>
-      <div class="navR"><button class="rec tap num" data-act="rec" id="recbtn"><i></i><span id="rectxt">Record</span></button></div></div>
+      <div class="navR"><button class="iconbtn tap" data-go="alerts" aria-label="Custom alerts" style="margin-right:0;width:38px"><svg class="ic"><use href="#i-bell"/></svg></button><button class="rec tap num" data-act="rec" id="recbtn"><i></i><span id="rectxt">Record</span></button></div></div>
     <div class="content">
       <div class="seg" data-seg="live"><span class="ind"></span><button class="on" data-val="gauges">Gauges</button><button data-val="list">All Data</button><button data-val="graph">Graph</button></div>
       <div class="pane on" id="p-gauges"><div class="gauges" id="gauges"></div></div>
       <div class="pane" id="p-list"><div class="group list" id="pidlist"></div></div>
       <div class="pane" id="p-graph"><div class="chips" id="gchips"></div>
-        <div class="chart"><svg id="gsvg" viewBox="0 0 360 240" preserveAspectRatio="none"></svg><div class="now num"><b id="gnow">—</b><span id="gunit"></span></div></div>
-        <p class="foot">Shows the most recent readings. Fewer readings on screen = faster updates.</p></div>
+        <div class="seg" data-seg="gwin"><span class="ind"></span><button data-val="60">1 min</button><button data-val="300">5 min</button><button data-val="600">10 min</button></div>
+        <div class="chart" id="gchart"><div class="glegend" id="glegend"></div><svg id="gsvg" viewBox="0 0 360 220" preserveAspectRatio="none"></svg></div>
+        <div class="group" id="gstats"></div>
+        <p class="foot">Pick up to 3 readings, each on its own scale. Drag across the chart to see the values at any moment. Fewer readings = faster updates.</p>
+        <div id="grecs" style="display:flex;flex-direction:column;gap:12px"></div></div>
     </div>
   </section>
 
@@ -381,6 +403,26 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
     <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Misfire</h2>
       <div class="navR"><button class="textbtn" data-act="loadMis">Refresh</button></div></div>
     <div class="content" id="misbody"></div>
+  </section>
+
+  <!-- CUSTOM ALERTS -->
+  <section class="view" id="v-alerts" aria-label="Custom alerts">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Back</span></button><h2>Custom Alerts</h2><span></span></div>
+    <div class="content" id="alertsbody"></div>
+  </section>
+
+  <!-- RECORDING REPLAY -->
+  <section class="view" id="v-replay" aria-label="Recording">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Back</span></button><h2 id="rp-title">Recording</h2>
+      <div class="navR"><button class="textbtn" data-act="shareRec">Share</button></div></div>
+    <div class="content">
+      <p class="foot" id="rp-info" style="text-align:left;margin:0 4px"></p>
+      <div class="chips" id="rp-chips"></div>
+      <div class="chart" id="rp-chart"><div class="glegend" id="rp-legend"></div><svg id="rp-svg" viewBox="0 0 360 220" preserveAspectRatio="none"></svg></div>
+      <div class="group" id="rp-stats"></div>
+      <p class="foot">Drag across the chart to see the values at any moment.</p>
+      <button class="btn danger tap" data-act="deleteRec" style="flex-shrink:0">Delete Recording</button>
+    </div>
   </section>
 
   <!-- DRIVE HEALTH -->
@@ -436,6 +478,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <div class="sh"><span></span><h3 id="sh-t"></h3><button class="textbtn" style="justify-self:end;font-weight:600" data-act="closeSheet">Done</button></div>
   <div class="sb" id="sh-b"></div>
 </div>
+<div class="alertbar" id="alertbar"><button class="abmain tap" data-go="alerts"><svg class="ic"><use href="#i-bell"/></svg><span id="ab-t"></span></button><button class="abx tap" data-act="snoozeAlert" aria-label="Hide for 10 minutes">✕</button></div>
 <div class="hud" id="hud"><svg class="ic" id="hudic"><use href="#i-check"/></svg><span id="hudtxt"></span></div>
 
 <script>
@@ -1436,11 +1479,22 @@ const PIDS = [
   { k: 'runtime', pid: 0x1F, n: 'Run time', u: 's', d: 0, min: 0, max: 3600, col: 'indigo' },
 ];
 const P = {}; PIDS.forEach((p) => { P[p.k] = p; });
+// Toyota transmission temp comes from Extra Data (manufacturer PID), not a standard PID; alerts and graphs can use it.
+P.atf = { k: 'atf', n: 'Transmission temp', conv: 'temp', d: 0, min: 40, max: 140, col: 'red' };
 const GAUGES = ['rpm', 'speed', 'cool', 'load', 'tps', 'volt'];
-const GRAPHS = ['rpm', 'speed', 'cool', 'load', 'maf', 'stft1'];
-const NH = 150;
-const D = {}, H = {};
-const pushH = (k, v) => { (H[k] = H[k] || []).push(v); if (H[k].length > NH) H[k].shift(); };
+const GRAPH_KEYS = ['rpm', 'speed', 'cool', 'load', 'tps', 'maf', 'map', 'timing', 'volt', 'stft1', 'ltft1', 'stft2', 'ltft2', 'iat', 'o2', 'o2b', 'oil', 'fuel', 'atf'];
+const SHORT = { rpm: 'RPM', speed: 'Speed', cool: 'Coolant', load: 'Load', tps: 'Throttle', maf: 'Airflow', map: 'Manifold', timing: 'Timing', volt: 'Voltage',
+  stft1: 'Short trim 1', ltft1: 'Long trim 1', stft2: 'Short trim 2', ltft2: 'Long trim 2', iat: 'Intake temp', o2: 'O2 front', o2b: 'O2 rear', oil: 'Oil temp',
+  fuel: 'Fuel level', atf: 'Trans temp', baro: 'Baro', amb: 'Outside temp', runtime: 'Run time' };
+const NH = 150, HT_MS = 10 * 60000;
+const D = {}, H = {}, HT = {};   // H: recent values for sparklines; HT: [time, value] for the last 10 minutes (graphs, alert recordings)
+const pushH = (k, v) => {
+  (H[k] = H[k] || []).push(v); if (H[k].length > NH) H[k].shift();
+  const a = HT[k] || (HT[k] = []), t = Date.now();
+  a.push([t, v]);
+  if (a.length % 200 === 0) { let i = 0; while (i < a.length && t - a[i][0] > HT_MS) i++; if (i) a.splice(0, i); }
+  if (a.length > 6000) a.splice(0, a.length - 6000);
+};
 
 const CAUSES = {
   P0441: ['Purge valve (VSV) stuck or not opening', 'Cracked EVAP hose at the purge valve', 'Charcoal canister problem'],
@@ -1460,10 +1514,11 @@ for (let c = 1; c <= 8; c++) CAUSES['P030' + c] = ['Spark plug or ignition coil 
 // ---------------------------------------------------------------- state
 const S = {
   mode: 'off', status: '', theme: store.get('theme', 'dark'), tempU: store.get('tempU', 'F'), speedU: store.get('speedU', 'mph'),
-  stack: ['home'], liveMode: 'gauges', graphKey: 'rpm', misMode: 'cur',
+  stack: ['home'], liveMode: 'gauges', misMode: 'cur',
+  graphKeys: (store.get('graph.keys', 'rpm,speed') || 'rpm').split(',').filter((k) => GRAPH_KEYS.includes(k)).slice(0, 3), gWin: +store.get('graph.win', '60') || 60,
   codes: null, codesLoading: false, ff: null, ready: null, readyLoading: false, mis: null, misLoading: false, tests: null, testsLoading: false,
   scan: { state: 'intro', results: [], i: 0, n: 0, name: '' }, makeKey: null, selMod: null,
-  extra: [], busy: 0, inRead: false, rec: false, recRows: [], recStart: 0, lastRec: 0,
+  extra: [], busy: 0, inRead: false, rec: false, recObj: null, recStart: 0, lastRec: 0,
 };
 let B = null;
 
@@ -1556,12 +1611,14 @@ class DemoBackend {
     this.vin = '5TETU62N37Z412345'; this.protoDesc = 'ISO 15765-4 (CAN 11/500)'; this.chip = 'Demo adapter'; this.adapterName = 'Demo'; this.isCAN = true;
     this.T = 45; this.codesList = ['P0441', 'P0455', 'P0504']; this.abs = [{ code: 'C0200', status: 8 }, { code: 'C1249', status: 8 }];
     this.misCur = [0, 0, 4, 0, 1, 0]; this.misAvg = [1, 0, 6, 0, 2, 1];
-    for (let i = 0; i < NH; i++) { this.sim(); Object.keys(this.D).forEach((k) => pushH(k, this.D[k])); this.T += 0.2; }
+    for (let i = 0; i < NH; i++) {   // pre-fill about 30 s of history, spaced in time like real readings
+      this.sim(); Object.keys(this.D).forEach((k) => { pushH(k, this.D[k]); const a = HT[k]; a[a.length - 1][0] = Date.now() - (NH - i) * 200; }); this.T += 0.2;
+    }
     this.timer = setInterval(() => {
       this.sim(); this.T += 0.1; this.tick = (this.tick || 0) + 1;
       Object.assign(D, this.D);
       if (this.tick % 2 === 0) Object.keys(this.D).forEach((k) => pushH(k, this.D[k]));
-      if (this.tick % 5 === 0) Object.keys(this.D).forEach((k) => hlFeed(k, this.D[k]));
+      if (this.tick % 5 === 0) Object.keys(this.D).forEach((k) => { hlFeed(k, this.D[k]); alCheck(k, this.D[k]); });
       updateAll();
     }, 100);
   }
@@ -1586,6 +1643,7 @@ class DemoBackend {
       o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), o2b: 0.68 + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
       atfA: f2c(140 + 35 * (1 - Math.exp(-t / 90)) + (moving ? 1.5 * Math.sin(t / 3) : 0) + rnd(.15)), atfB: f2c(130 + 30 * (1 - Math.exp(-t / 120)) + rnd(.1)),
     };
+    this.D.atf = this.D.atfA;
     if (!moving && Math.random() < 0.012) this.misCur[2]++;
   }
   supported(k) { return !['amb', 'oil'].includes(k); }
@@ -1642,7 +1700,7 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', fuel: 'Fuel Trim', extra: 'Extra' };
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', alerts: 'Alerts', replay: 'Replay', fuel: 'Fuel Trim', extra: 'Extra' };
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
 function push(n) {
@@ -1669,6 +1727,8 @@ function onShow(n) {
   if (n === 'module') renderModule();
   if (n === 'misfire') { renderMis(); if (!S.mis && !S.misLoading) loadMis(); }
   if (n === 'health') renderHealth();
+  if (n === 'alerts') renderAlerts();
+  if (n === 'replay') renderReplay();
   if (n === 'tests') { renderTests(); if (!S.tests && !S.testsLoading) loadTests(); }
   if (n === 'live') { buildLive(); updateLive(); }
   if (n === 'extra') initExtra();
@@ -1709,6 +1769,8 @@ function onSeg(seg, val) {
   segSet(seg, val);
   if (seg === 'live') { S.liveMode = val; ['gauges', 'list', 'graph'].forEach((m) => $('#p-' + m).classList.toggle('on', m === val)); updateLive(); }
   if (seg === 'mis') { S.misMode = val; renderMis(); }
+  if (seg === 'gwin') { S.gWin = +val; store.set('graph.win', val); GL.cur = null; drawGraph(true); }
+  if (seg === 'alop' && AL.edit) AL.edit.op = val;
   if (seg === 'mpg') { S.mpgMode = val; renderMpg(); }
   if (seg === 'body' && VEH) { VEH.body = val; VEH.bodyUser = val; saveVeh(VEH); const pv = $('.vprev'); if (pv) pv.innerHTML = heroArt(''); renderHome(); }
   if (seg === 'theme') { S.theme = val; store.set('theme', val); applyTheme(); }
@@ -1768,7 +1830,8 @@ async function connect(demo) {
 function resetData() {
   S.codes = null; S.ff = null; S.ready = null; S.mis = null; S.tests = null; S.scan = { state: 'intro', results: [], i: 0, n: 0, name: '' }; S.selMod = null; S.extra = [];
   Object.keys(D).forEach((k) => { delete D[k]; });
-  if (S.mode === 'live') Object.keys(H).forEach((k) => { delete H[k]; });
+  if (S.mode === 'live') { Object.keys(H).forEach((k) => { delete H[k]; }); Object.keys(HT).forEach((k) => { delete HT[k]; }); }
+  AL.st = {}; AL.snaps = []; alBar();
 }
 function disconnect() {
   lgEnd();
@@ -1813,13 +1876,14 @@ function pollKeys() {
   const out = k.concat(fuelKeys().filter((x) => !k.includes(x)));
   lgPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
   hlPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
+  alPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
   return out;
 }
 function basePollKeys() {
   const t = top();
   if (t === 'live') {
     if (S.liveMode === 'gauges') return GAUGES;
-    if (S.liveMode === 'graph') return [S.graphKey];
+    if (S.liveMode === 'graph') return S.graphKeys.filter((k) => k !== 'atf');
     return PIDS.map((p) => p.k);
   }
   if (t === 'fuel') return ['stft1', 'ltft1', 'stft2', 'ltft2'];
@@ -1852,9 +1916,10 @@ async function pollLoop() {
         S.inRead = true;
         let v = null;
         try { v = await B.readPid(k); } catch (e) { v = null; } finally { S.inRead = false; }
-        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); hlFeed(k, v); }
+        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); hlFeed(k, v); alCheck(k, v); }
         did++;
       }
+      await alReadAtf();
       if (S.mode === 'live') updateAll();
     }
     await sleep(did ? (S.mode === 'demo' ? 150 : 5) : 300);
@@ -2649,15 +2714,20 @@ function gaugeSvg(k) {
     '<circle id="ga-' + k + '" cx="56" cy="56" r="46" fill="none" stroke="' + colVar(P[k].col) + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(135 56 56)" style="transition:stroke-dasharray .3s linear"/></svg>';
 }
 function buildLive() {
-  const key = S.tempU + S.speedU + S.graphKey + (B ? B.vin : '');
+  const key = S.tempU + S.speedU + S.graphKeys.join() + (B ? B.vin : '') + S.makeKey;
   if (liveBuilt === key) return; liveBuilt = key;
   const sup = (k) => !B || B.supported(k);
   $('#gauges').innerHTML = GAUGES.map((k) => '<div class="gauge">' + gaugeSvg(k) + '<div class="gv"><b class="num" id="gv-' + k + '">—</b><span>' + unit(k).toUpperCase() + '</span></div><span class="gl">' + P[k].g + (sup(k) ? '' : ' · n/a') + '</span></div>').join('');
   $('#pidlist').innerHTML = PIDS.filter((p) => sup(p.k)).map((p) => '<div class="row"><span class="grow">' + p.n + '</span><svg class="spark" viewBox="0 0 64 24" preserveAspectRatio="none" aria-hidden="true"><path id="sp-' + p.k + '" fill="none" stroke="' + colVar(p.col) + '" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>' +
     '<span class="v num"><span id="lv-' + p.k + '">—</span><small>' + unit(p.k) + '</small></span></div>').join('');
-  $('#gchips').innerHTML = GRAPHS.filter(sup).map((k) => '<button class="pill tap' + (k === S.graphKey ? ' on' : '') + '" data-act="graphKey" data-k="' + k + '">' + ({ rpm: 'RPM', speed: 'Speed', cool: 'Coolant', load: 'Load', maf: 'Airflow', stft1: 'Short trim' })[k] + '</button>').join('');
-  $('#gunit').textContent = unit(S.graphKey);
+  $('#gchips').innerHTML = GRAPH_KEYS.filter(graphable).map((k) => {
+    const i = S.graphKeys.indexOf(k);
+    return '<button class="pill tap' + (i >= 0 ? ' on' : '') + '" data-act="graphKey" data-k="' + k + '"' + (i >= 0 ? ' style="background:var(--' + SER_COL[i] + ');color:#fff"' : '') + '>' + SHORT[k] + '</button>';
+  }).join('');
+  segSet('gwin', String(S.gWin));
+  renderRecList();
 }
+const graphable = (k) => (k === 'atf' ? atfItems().length > 0 || (HT.atf && HT.atf.length > 0) : !B || B.supported(k));
 function spath(arr, w, h, min, max, pad) {
   pad = pad || 0;
   const n = arr.length, span = (max - min) || 1;
@@ -2694,24 +2764,78 @@ function updateLive() {
     });
   } else drawGraph();
 }
-function drawGraph() {
-  const k = S.graphKey, p = P[k], arr = (H[k] || []).map((v) => conv(k, v));
-  const W = 360, Ht = 240, t0 = 62, bot = 22, ph = Ht - t0 - bot;
-  const r = k === 'rpm' ? range(arr, 0, 2000) : k === 'speed' ? range(arr, 0, conv('speed', 80)) : p.sign ? range(arr, -10, 10) : range(arr);
+// ---- charts: up to 3 readings on one chart, each on its own scale; drag across to read values at any moment.
+const SER_COL = ['blue', 'orange', 'green'];
+const mmss = (ms) => { const s = Math.round(Math.abs(ms) / 1000); return (ms < 0 ? '-' : '') + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const valStr = (k, v) => (v === null || v === undefined ? '—' : fmt(k, v) + (unit(k)[0] === '°' ? '' : ' ') + unit(k));
+// ser: [{k, col, pts: [[t, metricValue]]}] -> {svg, stats: [{k, col, min, max, avg, at}]}
+function chartSvg(ser, t0, t1, cursorT, live) {
+  const W = 360, Ht = 220, top = 12, bot = 22, ph = Ht - top - bot, span = (t1 - t0) || 1;
+  const X = (t) => ((t - t0) / span) * W;
   let g = '';
-  for (let i = 0; i <= 3; i++) {
-    const y = t0 + (i / 3) * ph, v = r[1] - (i / 3) * (r[1] - r[0]);
-    g += '<line x1="0" x2="' + W + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="var(--sep)" stroke-width="1" vector-effect="non-scaling-stroke"/>' +
-      '<text x="' + (W - 8) + '" y="' + (y - 4).toFixed(1) + '" text-anchor="end" font-size="11" fill="var(--sec)">' + (Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(Math.abs(v) < 20 && p.d ? 1 : 0)) + '</text>';
-  }
-  if (arr.length > 1) {
-    const line = spath(arr, W, ph, r[0], r[1]).replace(/([ML])([\d.]+) ([\d.]+)/g, (m, c, x, y) => c + x + ' ' + (parseFloat(y) + t0).toFixed(1));
-    g += '<defs><linearGradient id="gfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + colVar(p.col) + '" stop-opacity=".3"/><stop offset="1" stop-color="' + colVar(p.col) + '" stop-opacity="0"/></linearGradient></defs>' +
-      '<path d="' + line + 'L' + W + ' ' + (t0 + ph) + 'L0 ' + (t0 + ph) + 'Z" fill="url(#gfill)"/><path d="' + line + '" fill="none" stroke="' + colVar(p.col) + '" stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
-  }
-  g += '<text x="8" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)">older</text><text x="' + (W - 8) + '" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)" text-anchor="end">now</text>';
-  $('#gsvg').innerHTML = g;
-  $('#gnow').textContent = fmt(k, D[k]);
+  for (let i = 0; i <= 3; i++) { const y = (top + (i / 3) * ph).toFixed(1); g += '<line x1="0" x2="' + W + '" y1="' + y + '" y2="' + y + '" stroke="var(--sep)" stroke-width="1" vector-effect="non-scaling-stroke"/>'; }
+  const stats = ser.map((s, si) => {
+    const p = P[s.k], vals = s.pts.map((x) => conv(s.k, x[1]));
+    const st = { k: s.k, col: s.col, min: null, max: null, avg: null, at: null };
+    if (!vals.length) return st;
+    st.min = Math.min.apply(null, s.pts.map((x) => x[1])); st.max = Math.max.apply(null, s.pts.map((x) => x[1]));
+    st.avg = s.pts.reduce((a, x) => a + x[1], 0) / s.pts.length;
+    const r = s.k === 'rpm' ? range(vals, 0) : s.k === 'speed' ? range(vals, 0, conv('speed', 60)) : p.sign ? range(vals, -10, 10) : range(vals);
+    const minSpan = Math.abs(conv(s.k, p.max) - conv(s.k, p.min)) * 0.1;   // a 1-degree wobble shouldn't fill the chart
+    if (r[1] - r[0] < minSpan) { const c = (r[0] + r[1]) / 2; r[0] = c - minSpan / 2; r[1] = c + minSpan / 2; }
+    if (!p.sign && Math.min.apply(null, vals) >= 0 && r[0] < 0) { r[1] -= r[0]; r[0] = 0; }   // no negative axis for things that can't go negative
+    const Y = (v) => top + (1 - Math.min(1, Math.max(0, (v - r[0]) / ((r[1] - r[0]) || 1)))) * ph;
+    const step = Math.max(1, Math.floor(s.pts.length / 500));
+    let d = '';
+    for (let i = 0; i < s.pts.length; i += step) d += (d ? 'L' : 'M') + X(s.pts[i][0]).toFixed(1) + ' ' + Y(vals[i]).toFixed(1);
+    if (step > 1) { const l = s.pts.length - 1; d += 'L' + X(s.pts[l][0]).toFixed(1) + ' ' + Y(vals[l]).toFixed(1); }
+    if (ser.length === 1 && s.pts.length > 1) g += '<defs><linearGradient id="gfill' + si + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + colVar(s.col) + '" stop-opacity=".28"/><stop offset="1" stop-color="' + colVar(s.col) + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + d + 'L' + X(s.pts[s.pts.length - 1][0]).toFixed(1) + ' ' + (top + ph) + 'L' + X(s.pts[0][0]).toFixed(1) + ' ' + (top + ph) + 'Z" fill="url(#gfill' + si + ')"/>';
+    g += '<path d="' + d + '" fill="none" stroke="' + colVar(s.col) + '" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+    if (si === 0) [0, 3].forEach((i) => { const v = r[1] - (i / 3) * (r[1] - r[0]); g += '<text x="6" y="' + (top + (i / 3) * ph + (i ? -4 : 12)).toFixed(1) + '" font-size="11" fill="' + colVar(s.col) + '">' + (Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(Math.abs(v) < 20 && p.d ? 1 : 0)) + '</text>'; });
+    let pt = s.pts[s.pts.length - 1];
+    if (cursorT !== null) { pt = null; for (let i = s.pts.length - 1; i >= 0; i--) if (s.pts[i][0] <= cursorT) { pt = s.pts[i]; break; } }
+    st.at = pt ? pt[1] : null;
+    if (cursorT !== null && pt) g += '<circle cx="' + X(cursorT).toFixed(1) + '" cy="' + Y(conv(s.k, pt[1])).toFixed(1) + '" r="4" fill="' + colVar(s.col) + '" stroke="var(--card)" stroke-width="2"/>';
+    return st;
+  });
+  if (cursorT !== null) g += '<line x1="' + X(cursorT).toFixed(1) + '" x2="' + X(cursorT).toFixed(1) + '" y1="' + top + '" y2="' + (top + ph) + '" stroke="var(--label)" stroke-opacity=".5" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+  const lab = (t) => (live ? (t1 - t < 500 ? 'now' : mmss(t - t1)) : mmss(t - t0));
+  g += '<text x="6" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)">' + lab(t0) + '</text><text x="' + W / 2 + '" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)" text-anchor="middle">' + lab(t0 + span / 2) + '</text>' +
+    '<text x="' + (W - 6) + '" y="' + (Ht - 7) + '" font-size="11" fill="var(--sec)" text-anchor="end">' + lab(t1) + '</text>';
+  return { svg: g, stats };
+}
+function legendHtml(out, cursorT, t0, t1, live) {
+  return out.stats.map((s) => '<span class="lg"><i style="background:' + colVar(s.col) + '"></i>' + SHORT[s.k] + ' <b class="num">' + valStr(s.k, s.at) + '</b></span>').join('') +
+    (cursorT !== null ? '<span class="lg at num">' + (live ? mmss(cursorT - t1) : mmss(cursorT - t0)) + '</span>' : '');
+}
+function statsHtml(out) {
+  if (!out.stats.some((s) => s.min !== null)) return '';
+  return '<div class="row gst"><span class="grow"></span><span>Min</span><span>Avg</span><span>Max</span></div>' + out.stats.map((s) => '<div class="row gst"><span class="grow"><i style="background:' + colVar(s.col) + '"></i>' + SHORT[s.k] + '</span>' +
+    ['min', 'avg', 'max'].map((m) => '<span class="num">' + (s[m] === null ? '—' : fmt(s.k, s[m])) + '</span>').join('') + '</div>').join('');
+}
+// Drag (or tap) across a chart to put a cursor on it; ctx.cur is 0..1 across the chart.
+function bindScrub(el, ctx, redraw) {
+  if (!el || el.dataset.scrub) return;
+  el.dataset.scrub = '1';
+  const pos = (e) => { const r = el.getBoundingClientRect(); return Math.min(1, Math.max(0, ((e.clientX || 0) - r.left) / (r.width || 1))); };
+  el.addEventListener('pointerdown', (e) => { ctx.hold = true; if (ctx.cur === null) ctx.t1 = Date.now(); ctx.cur = pos(e); clearTimeout(ctx.tm); redraw(true); });
+  el.addEventListener('pointermove', (e) => { if (ctx.hold) { ctx.cur = pos(e); redraw(true); } });
+  const up = () => { if (!ctx.hold) return; ctx.hold = false; if (!ctx.sticky) ctx.tm = setTimeout(() => { ctx.cur = null; redraw(true); }, 2500); };
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((n) => el.addEventListener(n, up));
+}
+const GL = { cur: null, hold: false, t1: 0, drawn: 0 };
+function drawGraph(force) {
+  if (!force && Date.now() - GL.drawn < 250) return;
+  GL.drawn = Date.now();
+  bindScrub($('#gchart'), GL, drawGraph);
+  const t1 = GL.cur !== null ? GL.t1 : Date.now(), t0 = t1 - S.gWin * 1000;
+  const ser = S.graphKeys.map((k, i) => ({ k, col: SER_COL[i], pts: (HT[k] || []).filter((p) => p[0] >= t0 && p[0] <= t1) }));
+  const cursorT = GL.cur === null ? null : t0 + GL.cur * (t1 - t0);
+  const out = chartSvg(ser, t0, t1, cursorT, true);
+  $('#gsvg').innerHTML = out.svg;
+  $('#glegend').innerHTML = legendHtml(out, cursorT, t0, t1, true);
+  $('#gstats').innerHTML = statsHtml(out);
 }
 function drawFuel() {
   if (top() !== 'fuel') return;
@@ -2781,19 +2905,110 @@ function drawExtra(full) {
 }
 
 // ---------------------------------------------------------------- recording
+// Recordings are kept in the app (last 12, metric values) so they can be replayed on the chart or shared as CSV.
+// A custom alert saves one by itself from the last 10 minutes of history: 2 minutes before it fired and 30 seconds after.
+let RECS = [];
+const REC_KEYS = () => PIDS.map((p) => p.k).concat(['atf']);
+const r2 = (v) => Math.round(v * 100) / 100;
+function recsLoad() { try { RECS = JSON.parse(store.get('recs', '[]')) || []; } catch (e) { RECS = []; } }
+function recsSave() {
+  for (let tries = 0; tries < 8; tries++) {
+    try { localStorage.setItem('scanner.recs', JSON.stringify(RECS)); return true; } catch (e) { if (RECS.length <= 1) return false; RECS.shift(); }
+  }
+  return false;
+}
+function recNew(name, at) { return { id: 'r' + Date.now().toString(36) + Math.floor(Math.random() * 1e4), name, at, vehicle: vehicleName(), secs: 0, keys: [], t: [], v: {} }; }
+// Keep only readings that have data, store it, and return it (null if too short)
+function recFinish(r) {
+  r.keys = Object.keys(r.v).filter((k) => P[k] && r.v[k].some((x) => x !== null));
+  Object.keys(r.v).forEach((k) => { if (!r.keys.includes(k)) delete r.v[k]; });
+  r.secs = r.t.length ? r.t[r.t.length - 1] : 0;
+  if (r.t.length < 3 || !r.keys.length) return null;
+  RECS.push(r); RECS = RECS.slice(-12);
+  if (!recsSave()) hud('Saved for now (storage full)', 'i-info');
+  return r;
+}
+function recFromHistory(from, until, name) {
+  const keys = Object.keys(HT).filter((k) => P[k] && HT[k].some((p) => p[0] >= from && p[0] <= until));
+  if (!keys.length) return null;
+  const r = recNew(name, from), idx = {};
+  keys.forEach((k) => { idx[k] = 0; r.v[k] = []; });
+  for (let t = from; t <= until; t += 500) {
+    r.t.push(+((t - from) / 1000).toFixed(1));
+    keys.forEach((k) => {
+      const a = HT[k]; let i = idx[k];
+      while (i + 1 < a.length && a[i + 1][0] <= t) i++;
+      idx[k] = i;
+      const p = a[i];
+      r.v[k].push(p && p[0] <= t && t - p[0] < 15000 ? r2(p[1]) : null);
+    });
+  }
+  return recFinish(r);
+}
 function recTick() {
   if (!S.rec) return;
   const now = performance.now();
   if (now - S.lastRec < 200) return;
   S.lastRec = now;
-  S.recRows.push([((now - S.recStart) / 1000).toFixed(1)].concat(PIDS.map((p) => (D[p.k] === undefined ? '' : (+conv(p.k, D[p.k]).toFixed(p.d + 1)).toString()))));
+  const r = S.recObj;
+  r.t.push(+((now - S.recStart) / 1000).toFixed(1));
+  REC_KEYS().forEach((k) => { (r.v[k] = r.v[k] || []).push(D[k] === undefined || D[k] === null ? null : r2(D[k])); });
   const s = Math.floor((now - S.recStart) / 1000);
   $('#rectxt').textContent = 'REC ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  if (r.t.length >= 9000) ACT.rec();   // 30-minute cap keeps storage in check
 }
-async function saveRecording() {
-  const header = ['time_s'].concat(PIDS.map((p) => p.k + '_' + unit(p.k).replace('°', 'deg').replace('/', 'per')));
-  const csv = [header.join(',')].concat(S.recRows.map((r) => r.join(','))).join('\n');
-  const d = new Date(), name = 'scan_' + d.toISOString().slice(0, 16).replace(/[-:T]/g, '') + '.csv';
+const recWhen = (r) => new Date(r.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+function renderRecList() {
+  const el = $('#grecs');
+  if (!el) return;
+  el.innerHTML = RECS.length ? '<div class="cap">Saved recordings</div><div class="group">' + RECS.slice().reverse().map((r) => '<button class="row tap" data-act="openRec" data-id="' + r.id + '"><span class="grow">' + esc(r.name) +
+    '<span class="sub">' + esc(recWhen(r)) + ' · ' + mmss(r.secs * 1000) + ' · ' + r.keys.length + ' readings</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('') + '</div>' : '';
+}
+function recCsv(r) {
+  const header = ['time_s'].concat(r.keys.map((k) => k + '_' + unit(k).replace('°', 'deg').replace('/', 'per')));
+  return [header.join(',')].concat(r.t.map((t, i) => [t].concat(r.keys.map((k) => { const v = r.v[k][i]; return v === null || v === undefined ? '' : (+conv(k, v).toFixed((P[k].d || 0) + 1)).toString(); })).join(','))).join('\n');
+}
+// ---- replay a saved recording on the same chart
+const GR = { rec: null, keys: [], cur: null, hold: false, sticky: true, t1: 0 };
+function openRec(id) {
+  const r = RECS.find((x) => x.id === id);
+  if (!r) return;
+  const pref = ['cool', 'atf', 'rpm', 'speed', 'volt', 'load'];
+  GR.rec = r; GR.cur = null;
+  GR.keys = (r.alertKey ? [r.alertKey] : []).concat(pref, r.keys).filter((k, i, a) => r.keys.includes(k) && a.indexOf(k) === i).slice(0, 3);
+  GR.order = GR.keys.concat(r.keys.filter((k) => !GR.keys.includes(k)));   // chosen readings first so they're all on screen
+  closeSheet();
+  if (top() === 'replay') renderReplay(); else push('replay');
+}
+function renderReplay() {
+  const r = GR.rec;
+  if (!r) return;
+  $('#rp-title').textContent = r.name.length > 26 ? r.name.slice(0, 25) + '…' : r.name;
+  $('#rp-chips').innerHTML = (GR.order || r.keys).map((k) => { const i = GR.keys.indexOf(k); return '<button class="pill tap' + (i >= 0 ? ' on' : '') + '" data-act="replayKey" data-k="' + k + '"' + (i >= 0 ? ' style="background:var(--' + SER_COL[i] + ');color:#fff"' : '') + '>' + SHORT[k] + '</button>'; }).join('');
+  $('#rp-info').textContent = recWhen(r) + ' · ' + mmss(r.secs * 1000) + (r.vehicle ? ' · ' + r.vehicle : '');
+  drawReplay();
+}
+function drawReplay() {
+  const r = GR.rec;
+  if (!r) return;
+  bindScrub($('#rp-chart'), GR, drawReplay);
+  const t0 = 0, t1 = Math.max(1000, r.secs * 1000);
+  const ser = GR.keys.map((k, i) => ({ k, col: SER_COL[i], pts: r.t.map((t, j) => [t * 1000, r.v[k][j]]).filter((p) => p[1] !== null && p[1] !== undefined) }));
+  const cursorT = GR.cur === null ? null : t0 + GR.cur * (t1 - t0);
+  const out = chartSvg(ser, t0, t1, cursorT, false);
+  $('#rp-svg').innerHTML = out.svg;
+  $('#rp-legend').innerHTML = legendHtml(out, cursorT, t0, t1, false);
+  $('#rp-stats').innerHTML = statsHtml(out);
+}
+function recSavedSheet(r) {
+  openSheet('Recording Saved', '<div style="font-size:19px;font-weight:600;line-height:24px">' + esc(r.name) + '</div><p class="foot" style="text-align:left;margin:0">' + mmss(r.secs * 1000) + ' · ' + r.keys.length + ' readings. It’s saved under Live Data › Graph.</p>' +
+    '<div class="btns"><button class="btn primary tap" data-act="openRec" data-id="' + r.id + '">View</button><button class="btn tap" data-act="shareRec" data-id="' + r.id + '">Share CSV</button></div>');
+}
+async function shareRec(id) {
+  const r = RECS.find((x) => x.id === id);
+  if (r) await shareCsv(recCsv(r), 'scan_' + new Date(r.at).toISOString().slice(0, 16).replace(/[-:T]/g, '') + '.csv');
+}
+async function shareCsv(csv, name) {
   if (NativeTransport.available()) { nativePost({ op: 'share', name, data: csv }); return; }
   try {
     const file = new File([csv], name, { type: 'text/csv' });
@@ -2822,6 +3037,7 @@ function settings() {
   } else {
     h += '<div class="group"><button class="row tap" data-act="connect"><span class="grow" style="color:var(--blueT)">Connect Adapter</span></button><button class="row tap" data-act="demo"><span class="grow" style="color:var(--blueT)">Try Demo</span></button></div>';
   }
+  h += '<div class="group"><button class="row tap" data-act="openAlerts"><span class="grow">Custom Alerts<span class="sub">' + (AL.rules.filter((r) => r.on).length ? AL.rules.filter((r) => r.on).length + ' on' : 'Set your own limits') + '</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>';
   h += lgSettingsHtml();
   h += '<p class="foot">Works with Bluetooth LE OBD adapters (ELM327-compatible or OBDLink CX)' + (NativeTransport.available() ? '.' : ' in the Bluefy browser.') + '</p>';
   openSheet('Settings', h);
@@ -2890,6 +3106,8 @@ function lgAlert() {
   if (D.cool !== undefined && D.cool >= 110) return 'Engine hot: ' + tempStr(D.cool);
   if (D.volt !== undefined && D.volt < 11.8) return 'Battery low: ' + D.volt.toFixed(1) + ' V';
   if (D.volt !== undefined && D.rpm > 500 && D.volt < 12.6) return 'Not charging: ' + D.volt.toFixed(1) + ' V';
+  const ca = alActive()[0];
+  if (ca) return alText(ca);
   const w = HL.d && HL.d.worst();
   if (w && w.level !== 'watch') return w.title;
   return null;
@@ -3054,7 +3272,7 @@ function renderHealth() {
     const n = list.filter((f) => f.level !== 'watch').length;
     const head = !w ? (okN ? 'Looking good' : 'Watching') : w.level === 'urgent' ? w.title : n ? n + ' thing' + (n > 1 ? 's' : '') + ' worth a look' : 'Something to keep an eye on';
     const sub = !w ? (okN ? okN + ' checks passed so far. More fill in as you drive.' : 'Keep the app open while you drive. Checks fill in as the engine warms up and you idle and cruise.')
-      : 'Tap a check below for details. These are hints, not a diagnosis.';
+      : 'Details are below. These are hints from the data, not a diagnosis.';
     h += '<div class="ringcard"><span class="hsq" style="background:' + col + '"><svg class="ic"><use href="#' + (w ? 'i-warn' : 'i-pulse') + '"/></svg></span><p><b>' + esc(head) + '</b>' + sub + '</p></div>';
     if (list.length) h += '<div class="cap">This drive</div>' + findingCards(list);
     h += '<div class="cap">Checks</div>' + checkRows(checks);
@@ -3067,8 +3285,168 @@ function renderHealth() {
         '<span class="chip ' + (u ? 'red">Urgent' : n ? 'orange">' + n : 'green">OK') + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
     }).join('') + '</div>';
   }
+  h += '<div class="group"><button class="row tap" data-act="openAlerts"><span class="grow">Custom alerts<span class="sub">Your own limits, like coolant above 220°F</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>';
   h += '<p class="foot">Drive Health looks for patterns in the live data, like fuel trims, warm-up, charging voltage and misfires. It only flags things that last, but it can’t see everything, so it isn’t a diagnosis. Keep the app open while you drive.</p>';
   el.innerHTML = h;
+}
+
+// ---------------------------------------------------------------- custom alerts
+// The owner's own limits ("coolant above 220°F"). A rule fires after its condition lasts 3 s, clears after 5 s back
+// inside the limit, beeps (optional), shows a bar at the bottom and on CarPlay, logs it, and saves a recording.
+const AL_KEYS = ['cool', 'atf', 'volt', 'speed', 'rpm', 'oil', 'iat', 'load', 'tps', 'maf', 'map', 'timing', 'stft1', 'ltft1', 'stft2', 'ltft2', 'fuel', 'amb'];
+const AL = { rules: [], sound: true, log: [], st: {}, snaps: [], audio: null, snooze: 0, atfAt: 0, atfIdx: -1, edit: null };
+const AL_PRESETS = [
+  { k: 'cool', op: 'above', v: (220 - 32) * 5 / 9, run: true, why: 'Running hot' },
+  { k: 'atf', op: 'above', v: (230 - 32) * 5 / 9, run: true, why: 'Towing or hauling' },
+  { k: 'volt', op: 'below', v: 13.0, run: true, why: 'Charging problem' },
+  { k: 'speed', op: 'above', v: 80 * 1.609, run: false, why: 'Speed reminder' },
+];
+const atfItems = () => ((S.makeKey && VEHICLE_DB[S.makeKey] && VEHICLE_DB[S.makeKey].live) || []).filter((p) => /ATF/.test(p.name));
+const alAvail = (k) => (k === 'atf' ? atfItems().length > 0 : !B || B.supported(k));
+const unconv = (k, x) => { const p = P[k]; if (p.conv === 'temp' && S.tempU === 'F') return (x - 32) * 5 / 9; if (p.conv === 'speed' && S.speedU === 'mph') return x * 1.609; return x; };
+const alText = (r) => P[r.k].n + (r.op === 'below' ? ' below ' : ' above ') + valStr(r.k, r.v);
+function alLoad() {
+  try { AL.rules = JSON.parse(store.get('alerts.rules', '[]')) || []; } catch (e) { AL.rules = []; }
+  try { AL.log = JSON.parse(store.get('alerts.log', '[]')) || []; } catch (e) { AL.log = []; }
+  AL.sound = store.get('alerts.sound', '1') === '1';
+}
+function alSave() {
+  store.set('alerts.rules', JSON.stringify(AL.rules)); store.set('alerts.log', JSON.stringify(AL.log.slice(-30))); store.set('alerts.sound', AL.sound ? '1' : '0');
+}
+function alPollKeys() {
+  if (!B) return [];
+  const out = [];
+  AL.rules.forEach((r) => { if (r.on && r.k !== 'atf' && !out.includes(r.k)) out.push(r.k); if (r.on && r.run && !out.includes('rpm')) out.push('rpm'); });
+  return out;
+}
+// Toyota transmission temp needs a manufacturer request, so it's read every 15 s (5 s while it's on the graph).
+async function alReadAtf() {
+  if (!B || S.mode !== 'live' || S.busy || top() === 'extra') return;
+  const onGraph = top() === 'live' && S.liveMode === 'graph' && S.graphKeys.includes('atf');
+  if (!onGraph && !AL.rules.some((r) => r.on && r.k === 'atf')) return;
+  if (Date.now() - AL.atfAt < (onGraph ? 5000 : 15000)) return;
+  AL.atfAt = Date.now();
+  const items = atfItems(), order = AL.atfIdx >= 0 ? [items[AL.atfIdx]] : items;
+  for (const p of order) {
+    if (!p || S.busy) return;
+    S.inRead = true;
+    let v = null;
+    try { v = await B.readExtra(p); } catch (e) { v = null; } finally { S.inRead = false; }
+    if (v !== null && v !== undefined) { AL.atfIdx = items.indexOf(p); D.atf = v; pushH('atf', v); alCheck('atf', v); return; }
+  }
+}
+function alCheck(k, v) {
+  if (v === null || v === undefined || isNaN(v)) return;
+  const now = Date.now();
+  for (const r of AL.rules) {
+    if (!r.on || r.k !== k) continue;
+    const run = !r.run || D.rpm > 400, hyst = (P[k].max - P[k].min) * 0.02;
+    const st = AL.st[r.id] || (AL.st[r.id] = { since: 0, clear: 0, active: false, peak: null, cur: null });
+    const bad = run && (r.op === 'above' ? v > r.v : v < r.v);
+    const back = !run || (r.op === 'above' ? v < r.v - hyst : v > r.v + hyst);
+    if (!st.active) {
+      if (!bad) { st.since = 0; continue; }
+      if (!st.since) st.since = now;
+      if (now - st.since >= 3000) alFire(r, st, v);
+    } else {
+      st.cur = v; st.peak = r.op === 'above' ? Math.max(st.peak, v) : Math.min(st.peak, v);
+      if (back) { if (!st.clear) st.clear = now; if (now - st.clear >= 5000) { st.active = false; st.since = 0; st.clear = 0; } } else st.clear = 0;
+      alBar();
+    }
+  }
+}
+function alFire(r, st, v) {
+  const now = Date.now(), title = alText(r);
+  Object.assign(st, { active: true, peak: v, cur: v, at: now, clear: 0 });
+  const entry = { id: r.id, k: r.k, title, at: now, peak: v };
+  AL.log.push(entry); AL.log = AL.log.slice(-30); alSave();
+  if (r.rec !== false) AL.snaps.push({ name: 'Alert: ' + title, from: now - 120000, until: now + 30000, entry, k: r.k });
+  AL.snooze = 0;
+  hud(title, 'i-bell'); alBeep(); alBar(); lgTick(true);
+  if (top() === 'alerts') renderAlerts();
+}
+// Alert recordings wait until 30 s after the alert, then are cut from the last 10 minutes of history.
+function alSnaps() {
+  if (!AL.snaps.length) return;
+  const now = Date.now();
+  AL.snaps = AL.snaps.filter((s) => {
+    if (now < s.until) return true;
+    const r = recFromHistory(s.from, s.until, s.name);
+    if (r) { r.alertKey = s.k; recsSave(); s.entry.recId = r.id; alSave(); if (top() === 'alerts') renderAlerts(); }
+    return false;
+  });
+}
+function alActive() { return AL.rules.filter((r) => r.on && AL.st[r.id] && AL.st[r.id].active); }
+function alBar() {
+  const bar = $('#alertbar');
+  if (!bar) return;
+  const a = alActive()[0];
+  if (!a || Date.now() < AL.snooze) { bar.classList.remove('on'); document.body.classList.remove('hasbar'); return; }
+  const st = AL.st[a.id];
+  $('#ab-t').textContent = alText(a) + ' · now ' + valStr(a.k, st.cur);
+  bar.classList.add('on'); document.body.classList.add('hasbar');
+}
+function alAudio() {
+  try {
+    if (!AL.audio) { const C = window.AudioContext || window.webkitAudioContext; if (C) AL.audio = new C(); }
+    if (AL.audio && AL.audio.state === 'suspended') AL.audio.resume();
+  } catch (e) { /* no audio */ }
+}
+function alBeep() {
+  if (!AL.sound) return;
+  try {
+    alAudio();
+    const a = AL.audio; if (!a) return;
+    [0, 0.28].forEach((d) => {
+      const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + d;
+      o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + 0.22);
+    });
+  } catch (e) { /* no audio */ }
+}
+function renderAlerts() {
+  const el = $('#alertsbody');
+  const sw = (on, act, id) => '<button class="switch tap' + (on ? ' on' : '') + '" data-act="' + act + '"' + (id ? ' data-id="' + id + '"' : '') + ' aria-label="On or off"><i></i></button>';
+  let h = '';
+  const act = alActive();
+  if (act.length) h += '<div class="cap">Active now</div><div class="group">' + act.map((r) => { const st = AL.st[r.id]; return '<div class="row"><span class="dot" style="background:var(--red)"></span><span class="grow"><b style="font-weight:600">' + esc(alText(r)) + '</b><span class="sub">Now ' + esc(valStr(r.k, st.cur)) + ' · ' + (r.op === 'above' ? 'peak ' : 'lowest ') + esc(valStr(r.k, st.peak)) + '</span></span></div>'; }).join('') + '</div>';
+  h += '<div class="cap">Your alerts</div>';
+  if (!AL.rules.length) h += '<div class="empty"><svg class="ic" style="color:var(--sec)"><use href="#i-bell"/></svg><b>No alerts yet</b>Set your own limits, like coolant above 220°F. Start from a suggestion below or add your own.</div>';
+  else h += '<div class="group">' + AL.rules.map((r) => '<div class="row"><button class="grow rowbtn tap" data-act="editAlert" data-id="' + r.id + '"><span>' + esc(alText(r)) + '</span><span class="sub">' +
+    [r.run ? 'Engine running' : 'Any time', r.rec !== false ? 'records it' : ''].filter(Boolean).join(' · ') + (alAvail(r.k) ? '' : ' · not on this vehicle') + '</span></button>' + sw(r.on, 'toggleAlert', r.id) + '</div>').join('') + '</div>';
+  h += '<button class="btn primary tap" data-act="editAlert" style="flex-shrink:0">Add Alert</button>';
+  const sug = AL_PRESETS.map((p, i) => Object.assign({ i }, p)).filter((p) => alAvail(p.k) && !AL.rules.some((r) => r.k === p.k && r.op === p.op));
+  if (sug.length) h += '<div class="cap">Suggestions</div><div class="group">' + sug.map((p) => '<button class="row tap" data-act="addPreset" data-i="' + p.i + '"><span class="grow">' + esc(alText(p)) + '<span class="sub">' + p.why + '</span></span><span class="textbtn" style="height:auto">Add</span></button>').join('') + '</div>';
+  h += '<div class="group"><div class="row"><span class="grow">Sound<span class="sub">Two short beeps when an alert goes off</span></span>' + sw(AL.sound, 'alertSound') + '</div></div>';
+  if (AL.log.length) h += '<div class="cap">Recent alerts</div><div class="group">' + AL.log.slice().reverse().slice(0, 10).map((l) => {
+    const sub = new Date(l.at).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) + ' · reached ' + valStr(l.k, l.peak);
+    const has = l.recId && RECS.some((r) => r.id === l.recId);
+    return (has ? '<button class="row tap" data-act="openRec" data-id="' + l.recId + '">' : '<div class="row">') + '<span class="grow">' + esc(l.title) + '<span class="sub">' + esc(sub) + (has ? ' · recording' : '') + '</span></span>' + (has ? '<svg class="ic chev"><use href="#i-chev-r"/></svg></button>' : '</div>');
+  }).join('') + '</div>';
+  h += '<p class="foot">Alerts work while the app is open and connected. One goes off after the reading stays past your limit for 3 seconds, shows at the bottom of the screen' + (NativeTransport.available() ? ' and on CarPlay' : '') + ', and saves a recording of the 2 minutes before and 30 seconds after.</p>';
+  el.innerHTML = h;
+}
+function editAlert(id) {
+  const r = id ? AL.rules.find((x) => x.id === id) : null;
+  AL.edit = Object.assign({ id: '', k: 'cool', op: 'above', v: (220 - 32) * 5 / 9, on: true, run: true, rec: true }, r || {});
+  const e = AL.edit, keys = AL_KEYS.filter((k) => alAvail(k) || k === e.k);
+  const sw = (on, act) => '<button class="switch tap' + (on ? ' on' : '') + '" data-act="' + act + '" aria-label="On or off"><i></i></button>';
+  openSheet(r ? 'Edit Alert' : 'New Alert',
+    '<div class="group"><div class="row"><span class="grow">Reading</span><select id="al-k" class="sel">' + keys.map((k) => '<option value="' + k + '"' + (k === e.k ? ' selected' : '') + '>' + esc(P[k].n) + '</option>').join('') + '</select></div>' +
+    '<div class="row"><span class="grow">Alert when it goes</span><div class="seg" data-seg="alop" style="width:150px"><span class="ind"></span><button data-val="above">Above</button><button data-val="below">Below</button></div></div>' +
+    '<div class="row"><span class="grow">Limit</span><input type="number" id="al-v" inputmode="decimal" step="any" value="' + (+conv(e.k, e.v).toFixed(P[e.k].d || 0)) + '"><span class="val" id="al-u" style="min-width:34px;text-align:left">' + esc(unit(e.k)) + '</span></div></div>' +
+    '<div class="group"><div class="row"><span class="grow">Only with the engine running</span>' + sw(e.run, 'alRun') + '</div><div class="row"><span class="grow">Save a recording when it goes off</span>' + sw(e.rec !== false, 'alRec') + '</div></div>' +
+    '<button class="btn primary tap" data-act="saveAlert">Save</button>' + (r ? '<button class="btn danger tap" data-act="deleteAlert">Delete Alert</button>' : ''));
+  segSet('alop', e.op);
+  $('#al-k').onchange = (ev) => { const k = ev.target.value, x = parseFloat($('#al-v').value); e.v = isNaN(x) ? e.v : unconv(e.k, x); e.k = k; $('#al-u').textContent = unit(k); };
+}
+function saveAlert() {
+  const e = AL.edit, x = parseFloat($('#al-v').value);
+  if (isNaN(x)) { hud('Enter a number', 'i-info'); return; }
+  e.k = $('#al-k').value; e.v = unconv(e.k, x);
+  if (!e.id) { e.id = 'a' + Date.now().toString(36); AL.rules.push(e); } else AL.rules = AL.rules.map((r) => (r.id === e.id ? e : r));
+  delete AL.st[e.id];
+  alSave(); closeSheet(); renderAlerts(); alBar(); hud('Alert saved', 'i-bell');
 }
 
 // ---------------------------------------------------------------- refresh
@@ -3076,6 +3454,7 @@ function updateAll() {
   fuelTick();
   lgTick();
   hlDeep();
+  alSnaps();
   const t = top();
   if (t === 'health' && Date.now() - HL.lastDraw > 2000) renderHealth();
   if (t === 'mpg') updateMpg();
@@ -3154,19 +3533,43 @@ const ACT = {
   setMake: (el) => { S.makeKey = el.dataset.k; store.set('make', S.makeKey); S.extra = []; closeSheet(); renderSystems(); },
   openModule: (el) => { S.selMod = S.scan.results[+el.dataset.i]; push('module'); },
   rereadModule, clearModule,
-  graphKey: (el) => { S.graphKey = el.dataset.k; liveBuilt = ''; buildLive(); drawGraph(); },
+  graphKey: (el) => {
+    const k = el.dataset.k, i = S.graphKeys.indexOf(k);
+    if (i >= 0) { if (S.graphKeys.length > 1) S.graphKeys.splice(i, 1); }
+    else { if (S.graphKeys.length >= 3) S.graphKeys.shift(); S.graphKeys.push(k); }
+    store.set('graph.keys', S.graphKeys.join()); liveBuilt = ''; buildLive(); drawGraph(true);
+  },
+  replayKey: (el) => {
+    const k = el.dataset.k, i = GR.keys.indexOf(k);
+    if (i >= 0) { if (GR.keys.length > 1) GR.keys.splice(i, 1); } else { if (GR.keys.length >= 3) GR.keys.shift(); GR.keys.push(k); }
+    renderReplay();
+  },
+  openRec: (el) => openRec(el.dataset.id),
+  shareRec: (el) => shareRec(el.dataset.id || (GR.rec && GR.rec.id)),
+  deleteRec: () => alertBox({ title: 'Delete this recording?', ok: 'Delete', dest: true, onOk: () => { RECS = RECS.filter((r) => r !== GR.rec); recsSave(); GR.rec = null; pop(); renderRecList(); } }),
+  openAlerts: () => { closeSheet(); if (top() !== 'alerts') push('alerts'); },
+  editAlert: (el) => editAlert(el.dataset.id),
+  saveAlert: () => saveAlert(),
+  deleteAlert: () => { AL.rules = AL.rules.filter((r) => r.id !== AL.edit.id); delete AL.st[AL.edit.id]; alSave(); closeSheet(); renderAlerts(); alBar(); },
+  toggleAlert: (el) => { const r = AL.rules.find((x) => x.id === el.dataset.id); if (!r) return; r.on = !r.on; delete AL.st[r.id]; alSave(); renderAlerts(); alBar(); },
+  addPreset: (el) => { const p = AL_PRESETS[+el.dataset.i]; AL.rules.push({ id: 'a' + Date.now().toString(36), k: p.k, op: p.op, v: p.v, on: true, run: p.run, rec: true }); alSave(); renderAlerts(); hud('Alert added', 'i-bell'); },
+  alertSound: (el) => { AL.sound = !AL.sound; el.classList.toggle('on', AL.sound); alSave(); if (AL.sound) alBeep(); },
+  alRun: (el) => { AL.edit.run = !AL.edit.run; el.classList.toggle('on', AL.edit.run); },
+  alRec: (el) => { AL.edit.rec = AL.edit.rec === false; el.classList.toggle('on', AL.edit.rec); },
+  snoozeAlert: () => { AL.snooze = Date.now() + 10 * 60000; alBar(); hud('Hidden for 10 minutes', 'i-bell'); },
   rec: () => {
     S.rec = !S.rec; $('#recbtn').classList.toggle('on', S.rec);
-    if (S.rec) { S.recRows = []; S.recStart = performance.now(); S.lastRec = 0; $('#rectxt').textContent = 'REC 0:00'; }
-    else { $('#rectxt').textContent = 'Record'; if (S.recRows.length) saveRecording(); }
+    if (S.rec) { S.recObj = recNew('Recording', Date.now()); S.recStart = performance.now(); S.lastRec = 0; $('#rectxt').textContent = 'REC 0:00'; }
+    else { $('#rectxt').textContent = 'Record'; const r = S.recObj && recFinish(S.recObj); S.recObj = null; if (r) { r.name = 'Recording ' + recWhen(r); recsSave(); renderRecList(); recSavedSheet(r); } else hud('Too short to save', 'i-info'); }
   },
 };
 
 document.addEventListener('click', (e) => {
+  if (AL.sound && !AL.audio) alAudio();   // iOS only allows sound after a tap
   const segBtn = e.target.closest('.seg button');
   if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg' || g.dataset.go === 'health') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (g) { if (S.mode === 'live' || S.mode === 'demo' || ['mpg', 'health', 'alerts'].includes(g.dataset.go)) push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
   if (e.target.closest('[data-pop]')) { pop(); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
@@ -3176,11 +3579,12 @@ document.addEventListener('click', (e) => {
 applyTheme();
 segSet('live', 'gauges');
 (function () { const lv = store.get('lastVin', ''); if (lv) VEH = loadVeh(lv); loadFuel(lv || 'none'); })();
+alLoad(); recsLoad();
 renderHome();
 if (!navigator.bluetooth && !NativeTransport.available()) {
   $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
 }
-window.__scanner = { S, D, H, F, HL, connect, push, pop, ACT, getVEH: () => VEH };
+window.__scanner = { S, D, H, HT, F, HL, AL, getRECS: () => RECS, connect, push, pop, ACT, getVEH: () => VEH };
 })();
 
 </script>

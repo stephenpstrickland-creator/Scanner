@@ -25,8 +25,10 @@ web/            the app (single-page, vanilla JS, no framework, no bundler)
                 findings (urgent / warn / watch) on sustained patterns: fuel trims, warm-up, charging, rear O2,
                 knock, idle, misfires, new pending codes. Takes timestamps from the caller so tests fast-forward.
   db.js         VEHICLE_DB (per-make modules, warnings, enhanced PIDs, DTC text) + DTC_GENERIC
-  app.js        UI, screens, polling, vehicle card, fuel/MPG, CarPlay gauges feed (search for the
-                "// -----" section markers)
+  app.js        UI, screens, polling, vehicle card, fuel/MPG, CarPlay gauges feed, Drive Health glue, custom alerts,
+                charts (up to 3 readings, own scales, drag cursor) and recordings (search for the "// -----" markers).
+                `pushH` keeps HT = [time, value] for the last 10 min: graphs and alert recordings read it.
+                Recordings and alert rules live in localStorage (`scanner.recs`, `scanner.alerts.*`), metric values.
   build.py      concatenates everything into ../index.html
   sim_car.py    ELM327 + car simulator (stdin/stdout) used by the tests
   test_core.js  core.js against the simulator
@@ -62,7 +64,7 @@ ios/            native wrapper, built by XcodeGen on GitHub Actions (no local Ma
 - `tests/feat.js`: vehicle lookup/photos (mocked fetch), fuel & MPG, fill-ups
 - `tests/demo.js`: demo mode in both themes, checks for page errors
 
-Add a test with every fix. `window.__scanner` exposes `S, D, H, F, HL, ACT, connect, getVEH` for tests.
+Add a test with every fix. `window.__scanner` exposes `S, D, H, HT, F, HL, AL, getRECS, ACT, connect, getVEH` for tests.
 
 ## Things that bit us (don't undo these)
 1. **Bluefy has its own `window.webkit.messageHandlers.ble`.** The iPhone app's bridge is named `scannerApp`, and
