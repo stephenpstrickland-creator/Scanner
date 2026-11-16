@@ -22,8 +22,9 @@ Two ways to run it:
    - Free Apple IDs: apps must be re-signed every 7 days (SideStore does it on the phone) and max 3 sideloaded apps.
 
 ## Changing the app
-The interface is in `web/` (`app.html`, `app.js`, `core.js`, `db.js`).
-`python3 web/build.py` rebuilds `index.html`; commit it and the iPhone app rebuilds too.
-`node web/test_core.js` tests the diagnostic code against `web/sim_car.py` (a simulated 2007 Tacoma / Honda).
+The interface is in `web/` (`app.html`, `app.js`, `core.js`, `db.js`); the iPhone wrapper is in `ios/`.
+`npm install` once, then `npm test` rebuilds `index.html` and runs all tests against a simulated 2007 Tacoma.
+Commit `index.html` with your changes; pushing to `main` updates the Bluefy page and rebuilds the iPhone app.
+See `CLAUDE.md` for how everything fits together.
 
 Read-only diagnostics plus code clearing. No resets, coding or actuator tests.

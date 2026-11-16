@@ -3,7 +3,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 eval(fs.readFileSync(__dirname + '/db.js', 'utf8') + '\n' + fs.readFileSync(__dirname + '/core.js', 'utf8').replace(/if \(typeof module[\s\S]*$/, '') + '\nglobalThis.C={Elm,AllSystems,makeFromVIN,modelYear,modulesFor,dtcText,DB:VEHICLE_DB};');
 class SimTransport {
-  constructor(car, ver) { this.p = spawn('python3', ['-I', __dirname + '/sim_car.py', car, '--elm', ver]); this.buf = ''; this.w = null;
+  constructor(car, ver) { this.p = spawn(process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3'), ['-I', __dirname + '/sim_car.py', car, '--elm', ver]); this.buf = ''; this.w = null;
     this.p.stdout.on('data', (d) => { this.buf += d.toString('latin1'); const i = this.buf.indexOf('>'); if (this.w && i >= 0) { const w = this.w; this.w = null; const o = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1); w(o); } }); }
   request(cmd) { return new Promise((res) => { this.w = res; this.p.stdin.write(cmd + '\n'); }); }
   close() { this.p.stdin.end(); }

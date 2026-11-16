@@ -1,0 +1,12 @@
+{
+  "name": "diy-obd-scanner",
+  "private": true,
+  "description": "DIY OBD-II scanner: web app (Bluefy) + native iPhone wrapper",
+  "scripts": {
+    "build": "node web/tests/build.js",
+    "test": "node web/tests/build.js && node web/tests/run-all.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

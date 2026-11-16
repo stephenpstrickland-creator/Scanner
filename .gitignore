@@ -5,3 +5,4 @@ ios/Sources/Info.plist
 ios/Payload/
 *.ipa
 ios/Gauges/Info.plist
+node_modules/
