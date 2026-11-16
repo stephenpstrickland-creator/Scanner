@@ -302,7 +302,7 @@ function onSeg(seg, val) {
 }
 function applyTheme() {
   document.documentElement.dataset.theme = S.theme;
-  if (NativeTransport.available()) { try { window.webkit.messageHandlers.ble.postMessage({ op: 'theme', value: S.theme }); } catch (e) { /* ignore */ } }
+  if (NativeTransport.available()) { try { nativePost({ op: 'theme', value: S.theme }); } catch (e) { /* ignore */ } }
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = S.theme === 'dark' ? '#000000' : '#F2F2F7';
 }
 
@@ -452,7 +452,7 @@ function getJSON(url, ms) {
       const id = 'f' + (++fetchSeq);
       const t = setTimeout(() => { delete fetchWait[id]; rej(new Error('timeout')); }, ms);
       fetchWait[id] = (text) => { clearTimeout(t); try { res(JSON.parse(text)); } catch (e) { rej(e); } };
-      window.webkit.messageHandlers.ble.postMessage({ op: 'fetch', id, url });
+      nativePost({ op: 'fetch', id, url });
     });
   }
   const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -1237,7 +1237,7 @@ async function saveRecording() {
   const header = ['time_s'].concat(PIDS.map((p) => p.k + '_' + unit(p.k).replace('°', 'deg').replace('/', 'per')));
   const csv = [header.join(',')].concat(S.recRows.map((r) => r.join(','))).join('\n');
   const d = new Date(), name = 'scan_' + d.toISOString().slice(0, 16).replace(/[-:T]/g, '') + '.csv';
-  if (NativeTransport.available()) { window.webkit.messageHandlers.ble.postMessage({ op: 'share', name, data: csv }); return; }
+  if (NativeTransport.available()) { nativePost({ op: 'share', name, data: csv }); return; }
   try {
     const file = new File([csv], name, { type: 'text/csv' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; }

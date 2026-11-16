@@ -128,8 +128,14 @@ class BleTransport extends SerialBase {
 }
 
 // Native iPhone app: CoreBluetooth lives in Swift (BLEBridge.swift); this talks to it.
+function nativePost(m) { window.webkit.messageHandlers.scannerApp.postMessage(m); }
 class NativeTransport extends SerialBase {
-  static available() { return !!(typeof window !== 'undefined' && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.ble); }
+  // Only inside this project's own iPhone app (it injects __scannerNative). Browsers like Bluefy have their own
+  // webkit message handlers, so checking for a handler alone is not enough.
+  static available() {
+    return !!(typeof window !== 'undefined' && window.__scannerNative === true && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.scannerApp &&
+      !(typeof navigator !== 'undefined' && navigator.bluetooth));
+  }
   constructor() {
     super(); this.pending = null;
     window.__nativeBle = {
@@ -143,7 +149,7 @@ class NativeTransport extends SerialBase {
       onDisconnect: () => { if (this.onDisconnect) this.onDisconnect(); },
     };
   }
-  _post(m) { window.webkit.messageHandlers.ble.postMessage(m); }
+  _post(m) { nativePost(m); }
   connect() { return new Promise((res, rej) => { this.pending = { res, rej }; this._post({ op: 'connect' }); }); }
   disconnect() { try { this._post({ op: 'disconnect' }); } catch (e) { /* ignore */ } }
   _write(str) { this._post({ op: 'write', data: str }); }

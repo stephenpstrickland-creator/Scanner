@@ -30,7 +30,9 @@ final class WebViewController: UIViewController, WKScriptMessageHandler, WKNavig
         view = webView
 
         ble = BLEBridge(webView: webView, presenter: self)
-        contentController.add(WeakScriptHandler(self), name: "ble")
+        // Unique bridge name + flag, so the page never mistakes another browser's handlers (e.g. Bluefy) for this app.
+        contentController.add(WeakScriptHandler(self), name: "scannerApp")
+        contentController.addUserScript(WKUserScript(source: "window.__scannerNative = true;", injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
 
     override func viewDidLoad() {
@@ -42,7 +44,7 @@ final class WebViewController: UIViewController, WKScriptMessageHandler, WKNavig
         }
     }
 
-    // Messages from the page: window.webkit.messageHandlers.ble.postMessage({op: ...})
+    // Messages from the page: window.webkit.messageHandlers.scannerApp.postMessage({op: ...})
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? [String: Any], let op = body["op"] as? String else { return }
         switch op {
