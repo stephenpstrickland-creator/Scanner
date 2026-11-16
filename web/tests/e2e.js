@@ -95,6 +95,15 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) pass++; else { fail++; con
   ok(/175/.test(txt('#xb0') + txt('#xb1')) && /160/.test(txt('#xb0') + txt('#xb1')), 'atf ' + txt('#xb0') + '/' + txt('#xb1'));
   click('#v-extra [data-pop]'); await sleep(400);
   await until(() => txt('#h-rpm') === '700', 8000, 'polling resumes after extra');
+  // drive health: card on home, screen with checks, healthy simulated truck raises nothing
+  ok(/Watching/.test(txt('#hc-sub')), 'health card ' + txt('#hc-sub'));
+  click('[data-go="health"]'); await sleep(300);
+  ok(/Engine temperature/.test(txt('#healthbody')) && /Charging system/.test(txt('#healthbody')) && /Catalytic converter/.test(txt('#healthbody')), 'health checks listed');
+  ok(w.__scanner.HL.d && w.__scanner.HL.d.list().length === 0, 'no false findings: ' + (w.__scanner.HL.d && w.__scanner.HL.d.list().map((f) => f.id)));
+  ok(log.some((c) => /^0115/.test(c)), 'rear O2 sensor polled for health');
+  ok(log.includes('07'), 'pending codes checked in the background');
+  click('[data-act="finishDrive"]'); await sleep(100); ok(/too short/.test(txt('#hudtxt')), 'short drive not saved');
+  click('#v-health [data-pop]'); await sleep(200);
   // adapter check
   click('[data-act="settings"]'); await sleep(100); click('[data-act="check"]');
   await until(() => /Engine answers/.test(txt('#sh-b')), 20000, 'check');

@@ -17,10 +17,13 @@ live gauges. Apple-style UI (SF fonts, grouped lists, sheets, dark/light).
 ## Layout
 ```
 web/            the app (single-page, vanilla JS, no framework, no bundler)
-  app.html      markup + CSS + SVG icons; placeholders /*__DB__*/ /*__CORE__*/ /*__APP__*/
+  app.html      markup + CSS + SVG icons; placeholders /*__DB__*/ /*__CORE__*/ /*__HEALTH__*/ /*__APP__*/
   core.js       transports (BleTransport = Web Bluetooth, NativeTransport = iPhone app bridge), SerialBase,
                 Elm (ELM327/STN command layer, OBD services, ISO-TP), AllSystems (UDS 0x19/0x14, KWP 0x18/0x13,
                 module addressing incl. Toyota 0x750 + extended address)
+  health.js     DriveHealth: pure logic (no DOM) that watches live readings during a drive and raises
+                findings (urgent / warn / watch) on sustained patterns: fuel trims, warm-up, charging, rear O2,
+                knock, idle, misfires, new pending codes. Takes timestamps from the caller so tests fast-forward.
   db.js         VEHICLE_DB (per-make modules, warnings, enhanced PIDs, DTC text) + DTC_GENERIC
   app.js        UI, screens, polling, vehicle card, fuel/MPG, CarPlay gauges feed (search for the
                 "// -----" section markers)
@@ -52,13 +55,14 @@ ios/            native wrapper, built by XcodeGen on GitHub Actions (no local Ma
 ## Testing
 `web/tests/run-all.js` runs:
 - `test_core.js`: ELM/ISO-TP/UDS/KWP logic vs the simulator
+- `tests/health.js`: Drive Health vs synthetic 25-minute drives, one per fault, plus a healthy drive that must stay quiet
 - `tests/e2e.js tacoma2007 1.4b [native]`: the full UI in jsdom over a fake Web Bluetooth device (or the fake
   iPhone bridge with `native`, which also checks the CarPlay gauge feed, lock hand-off and resume)
 - `tests/conn.js`: hanging adapter, silent first channel, Cancel, all-silent, and **Bluefy detection**
 - `tests/feat.js`: vehicle lookup/photos (mocked fetch), fuel & MPG, fill-ups
 - `tests/demo.js`: demo mode in both themes, checks for page errors
 
-Add a test with every fix. `window.__scanner` exposes `S, D, H, F, ACT, connect, getVEH` for tests.
+Add a test with every fix. `window.__scanner` exposes `S, D, H, F, HL, ACT, connect, getVEH` for tests.
 
 ## Things that bit us (don't undo these)
 1. **Bluefy has its own `window.webkit.messageHandlers.ble`.** The iPhone app's bridge is named `scannerApp`, and
@@ -85,6 +89,10 @@ Add a test with every fix. `window.__scanner` exposes `S, D, H, F, ACT, connect,
    dropped. Its license was never confirmed to allow redistribution, and this repo is public.
 8. Units: internal values are metric (km/h, °C, kPa). `conv()` / `fmt()` handle display. MPG uses MAF
    (gal/h = MAF × 3600 / (14.7 × 2798.7)) or speed-density as a fallback.
+
+9. **Background jobs take turns.** `job()` queues: pending-code / misfire checks (Drive Health, every 3 min) and the
+   test-results load must never land in the middle of an All Systems scan (wrong module headers).
+   Drive Health only runs while the page is active; GaugePoller does not run its checks with the phone locked yet.
 
 ## Style
 Vanilla JS, small functions, no new dependencies in the shipped page (it must stay one self-contained HTML file

@@ -153,6 +153,13 @@ button { color: inherit; }
 .ringcard .big { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
 .ringcard .big b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; letter-spacing: -.6px; }
 .ringcard p { margin: 0; font-size: 15px; color: var(--sec); line-height: 21px; }
+.hsq { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.hsq .ic { width: 30px; height: 30px; }
+.hfind { background: var(--card); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.sheet .hfind { background: var(--cell); }
+.hft { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hft b { font-size: 17px; font-weight: 600; }
+.hfind p { margin: 0; font-size: 15px; line-height: 21px; color: var(--sec); }
 .ringcard p b { color: var(--label); font-size: 19px; font-weight: 600; display: block; margin-bottom: 2px; }
 .center { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 10px 0; }
 .found { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; min-height: 26px; }
@@ -294,6 +301,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
   <symbol id="i-engine" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 7V4.5h8V7"/><path d="M9 12.5h6"/></symbol>
   <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></symbol>
@@ -312,6 +320,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
       <div class="homehead"><h1>Scanner</h1><button class="iconbtn tap" data-act="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button></div>
       <div class="carcard" id="carcard"></div>
       <button class="fuelcard tap" data-go="mpg"><span class="sq" style="background:#30C452"><svg class="ic"><use href="#i-pump"/></svg></span><span class="grow"><b>Fuel &amp; MPG</b><span class="s" id="fc-sub">Live MPG, trips &amp; fill-ups</span></span><span class="fcv"><b class="num" id="fc-mpg">—</b><span>TRIP MPG</span></span></button>
+      <button class="fuelcard tap" data-go="health" id="hcard"><span class="sq" style="background:#FF2D55"><svg class="ic"><use href="#i-pulse"/></svg></span><span class="grow"><b>Drive Health</b><span class="s" id="hc-sub">Watches your drive for problems</span></span><span class="chip" id="hc-chip" style="display:none"></span><svg class="ic chev" style="width:15px;height:15px;color:var(--sec);stroke-width:2.8"><use href="#i-chev-r"/></svg></button>
       <div class="tiles">
         <button class="tile tap" data-go="codes"><span class="sq" style="background:#FF3B30"><svg class="ic"><use href="#i-warn"/></svg></span><span class="badge" id="h-badge"></span><span class="tl">Codes</span><span class="tv" id="t-codes">—</span></button>
         <button class="tile tap" data-go="live"><span class="sq" style="background:#0A84FF"><svg class="ic"><use href="#i-gauge"/></svg></span><span class="tl">Live Data</span><span class="tv num" id="t-live">—</span></button>
@@ -374,6 +383,12 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
     <div class="content" id="misbody"></div>
   </section>
 
+  <!-- DRIVE HEALTH -->
+  <section class="view" id="v-health" aria-label="Drive health">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Drive Health</h2><span></span></div>
+    <div class="content" id="healthbody"></div>
+  </section>
+
   <!-- MONITOR TESTS (mode 06) -->
   <section class="view" id="v-tests" aria-label="Monitor test results">
     <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Readiness</span></button><h2 id="tr-title">Test Results</h2>
@@ -426,6 +441,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
 <script>
 /*__DB__*/
 /*__CORE__*/
+/*__HEALTH__*/
 /*__APP__*/
 </script>
 </body>

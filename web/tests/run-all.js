@@ -4,6 +4,7 @@ const path = require('path');
 const R = (...a) => path.join(__dirname, ...a);
 const runs = [
   ['core (ELM/OBD logic vs simulator)', [R('..', 'test_core.js')]],
+  ['drive health checks (synthetic drives)', [R('health.js')]],
   ['end-to-end, Web Bluetooth (Bluefy)', [R('e2e.js'), 'tacoma2007', '1.4b']],
   ['end-to-end, iPhone app bridge + gauges', [R('e2e.js'), 'tacoma2007', '1.4b', 'native']],
   ['connection: timeouts, channel fallback, cancel, Bluefy detection', [R('conn.js')]],

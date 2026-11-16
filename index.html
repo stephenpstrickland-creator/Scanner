@@ -153,6 +153,13 @@ button { color: inherit; }
 .ringcard .big { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
 .ringcard .big b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; letter-spacing: -.6px; }
 .ringcard p { margin: 0; font-size: 15px; color: var(--sec); line-height: 21px; }
+.hsq { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.hsq .ic { width: 30px; height: 30px; }
+.hfind { background: var(--card); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.sheet .hfind { background: var(--cell); }
+.hft { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hft b { font-size: 17px; font-weight: 600; }
+.hfind p { margin: 0; font-size: 15px; line-height: 21px; color: var(--sec); }
 .ringcard p b { color: var(--label); font-size: 19px; font-weight: 600; display: block; margin-bottom: 2px; }
 .center { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 10px 0; }
 .found { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; min-height: 26px; }
@@ -294,6 +301,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12h4.2l2.3-5.5 4.2 11 2.4-5.5h5.9"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
   <symbol id="i-engine" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 7V4.5h8V7"/><path d="M9 12.5h6"/></symbol>
   <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></symbol>
@@ -312,6 +320,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
       <div class="homehead"><h1>Scanner</h1><button class="iconbtn tap" data-act="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button></div>
       <div class="carcard" id="carcard"></div>
       <button class="fuelcard tap" data-go="mpg"><span class="sq" style="background:#30C452"><svg class="ic"><use href="#i-pump"/></svg></span><span class="grow"><b>Fuel &amp; MPG</b><span class="s" id="fc-sub">Live MPG, trips &amp; fill-ups</span></span><span class="fcv"><b class="num" id="fc-mpg">—</b><span>TRIP MPG</span></span></button>
+      <button class="fuelcard tap" data-go="health" id="hcard"><span class="sq" style="background:#FF2D55"><svg class="ic"><use href="#i-pulse"/></svg></span><span class="grow"><b>Drive Health</b><span class="s" id="hc-sub">Watches your drive for problems</span></span><span class="chip" id="hc-chip" style="display:none"></span><svg class="ic chev" style="width:15px;height:15px;color:var(--sec);stroke-width:2.8"><use href="#i-chev-r"/></svg></button>
       <div class="tiles">
         <button class="tile tap" data-go="codes"><span class="sq" style="background:#FF3B30"><svg class="ic"><use href="#i-warn"/></svg></span><span class="badge" id="h-badge"></span><span class="tl">Codes</span><span class="tv" id="t-codes">—</span></button>
         <button class="tile tap" data-go="live"><span class="sq" style="background:#0A84FF"><svg class="ic"><use href="#i-gauge"/></svg></span><span class="tl">Live Data</span><span class="tv num" id="t-live">—</span></button>
@@ -372,6 +381,12 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
     <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Misfire</h2>
       <div class="navR"><button class="textbtn" data-act="loadMis">Refresh</button></div></div>
     <div class="content" id="misbody"></div>
+  </section>
+
+  <!-- DRIVE HEALTH -->
+  <section class="view" id="v-health" aria-label="Drive health">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Drive Health</h2><span></span></div>
+    <div class="content" id="healthbody"></div>
   </section>
 
   <!-- MONITOR TESTS (mode 06) -->
@@ -639,7 +654,7 @@ const PID_DEC = {
   0x0F: (d) => d[0] - 40,
   0x10: (d) => (d[0] * 256 + d[1]) / 100,
   0x11: (d) => d[0] * 100 / 255,
-  0x14: (d) => d[0] / 200,
+  0x14: (d) => d[0] / 200, 0x15: (d) => d[0] / 200,
   0x1F: (d) => d[0] * 256 + d[1],
   0x2F: (d) => d[0] * 100 / 255,
   0x33: (d) => d[0],
@@ -1150,6 +1165,240 @@ class AllSystems {
 
 
 // ============================================================================
+// Drive Health: watches live data during a drive and flags patterns worth a look.
+// Pure logic, no DOM. Values are metric (°C, km/h, V, %). Times are ms from a clock
+// the caller passes in, so tests can fast-forward through a whole drive.
+//
+// Every check only fires on a sustained pattern with enough data, and the wording
+// is "might be worth a look", never "this part is bad".
+// ============================================================================
+const HEALTH_KEYS = ['cool', 'volt', 'stft1', 'ltft1', 'stft2', 'ltft2', 'o2b', 'timing', 'load', 'maf'];
+const HEALTH_RANK = { urgent: 3, warn: 2, watch: 1 };
+const HEALTH_CHECKS = [
+  ['cool', 'Engine temperature'], ['warmup', 'Warm-up (thermostat)'], ['charge', 'Charging system'], ['battery', 'Battery at rest'],
+  ['trims', 'Fuel mixture'], ['banks', 'Bank-to-bank balance'], ['cat', 'Catalytic converter'], ['knock', 'Knock (timing)'],
+  ['idle', 'Idle smoothness'], ['misfire', 'Misfires'], ['codes', 'New trouble codes'],
+];
+const HEALTH_MIN = 60000;
+
+class DriveHealth {
+  // opt: { disp: litres, temp: (c) => '195°F', has: (key) => supported?, describe: (code) => text }
+  constructor(opt = {}) {
+    this.disp = opt.disp || 0;
+    this.temp = opt.temp || ((c) => Math.round(c) + '°C');
+    this.has = opt.has || (() => true);
+    this.describe = opt.describe || ((c) => c);
+    this.cur = {}; this.start = null; this.last = null; this.rpmT = null;
+    this.runMs = 0; this.moveMs = 0;
+    this.found = {}; this.events = []; this.timers = {}; this.bins = {};
+    this.coolMax = null; this.restVolt = null; this.pending0 = null; this.mis0 = null;
+  }
+
+  // ---- input
+  feed(t, k, v) {
+    if (v === null || v === undefined || isNaN(v)) return;
+    if (this.start === null) this.start = t;
+    this.last = this.last === null ? t : Math.max(this.last, t);
+    this.cur[k] = { v, t };
+    if (k === 'rpm') this._clock(t, v);
+    if (k === 'cool') this._cool(t, v);
+    if (k === 'volt') this._volt(t, v);
+    if (k === 'stft1' || k === 'stft2') this._trim(t, +k[4]);
+    if (k === 'o2b') this._o2b(v);
+    if (k === 'timing') this._timing(v);
+    if (k === 'rpm') this._idle(t, v);
+  }
+  // Pending codes (mode 07), read every few minutes. The first read is the baseline.
+  setPending(codes) {
+    if (!codes) return;
+    if (this.pending0 === null) { this.pending0 = codes.slice(); return; }
+    codes.filter((c) => !this.pending0.includes(c)).forEach((c) => this._raise('codes', 'pending_' + c, 'warn', 'New pending code ' + c,
+      this.describe(c) + '. The engine computer saw this problem once. If it happens again, the check engine light comes on.'));
+  }
+  // Per-cylinder misfire counts for this drive cycle (mode 06): [{cyl, cur}]
+  setMisfire(list) {
+    if (!list || !list.length) return;
+    if (!this.mis0) { this.mis0 = {}; list.forEach((m) => { this.mis0[m.cyl] = m.cur; }); return; }
+    const d = list.map((m) => ({ cyl: m.cyl, n: m.cur >= (this.mis0[m.cyl] || 0) ? m.cur - (this.mis0[m.cyl] || 0) : m.cur }));
+    d.sort((a, b) => b.n - a.n);
+    const top = d[0], next = d[1] ? d[1].n : 0;
+    if (top.n >= 20 && top.n >= 3 * (next + 1)) this._raise('misfire', 'misfire', 'warn', 'Cylinder ' + top.cyl + ' is misfiring',
+      'It misfired ' + top.n + ' times this drive, far more than the others. The usual causes are the spark plug or ignition coil on that cylinder. Swapping its coil with a neighbour shows which one: if the misfires move, it’s the coil.');
+    else if (d.length > 2 && d.filter((x) => x.n >= 15).length >= 3) this._raise('misfire', 'misfire_all', 'warn', 'Misfires on several cylinders',
+      'Several cylinders misfired during this drive. That points to something shared: worn plugs, a vacuum leak, low fuel pressure or bad fuel.');
+  }
+
+  // ---- output
+  drain() { const e = this.events; this.events = []; return e; }
+  list() { return Object.values(this.found).sort((a, b) => HEALTH_RANK[b.level] - HEALTH_RANK[a.level] || a.at - b.at); }
+  worst() { return this.list()[0] || null; }
+  checks() {
+    const out = [];
+    for (const [id, name] of HEALTH_CHECKS) {
+      const st = this._state(id);
+      if (!st) continue;
+      const f = this.list().filter((x) => x.check === id);
+      out.push(Object.assign({ id, name }, f.length ? { state: f[0].level, note: f[0].title } : st));
+    }
+    return out;
+  }
+  summary() {
+    const b = (k) => (this.bins[k] && this.bins[k].n >= 12 ? +this._avg(k).toFixed(1) : null);
+    return {
+      start: this.start, secs: this.start === null ? 0 : Math.round((this.last - this.start) / 1000), runMin: +(this.runMs / HEALTH_MIN).toFixed(1),
+      findings: this.list().map((f) => ({ id: f.id, check: f.check, level: f.level, title: f.title, detail: f.detail })),
+      checks: this.checks().map((c) => ({ id: c.id, name: c.name, state: c.state })),
+      stats: { trimIdle1: b('trim1_idle'), trimIdle2: b('trim2_idle'), trimCruise1: b('trim1_cruise'), trimCruise2: b('trim2_cruise'),
+        coolMax: this.coolMax === null ? null : Math.round(this.coolMax), voltRun: b('volt'), restVolt: this.restVolt },
+    };
+  }
+
+  // ---- helpers
+  get(k, age = 8000) { const c = this.cur[k]; return c && this.last - c.t <= age ? c.v : undefined; }
+  running() { return this.get('rpm') > 400; }
+  warm() { return this.get('cool', 60000) >= 75; }
+  idling() { const s = this.get('speed'); return this.running() && s !== undefined && s < 2 && this.get('rpm') < 1200; }
+  cruising() { const s = this.get('speed'), l = this.get('load', 15000); return this.running() && s >= 45 && (l === undefined || (l >= 15 && l <= 75)); }
+  _hold(id, cond, t, ms) {
+    if (!cond) { this.timers[id] = null; return false; }
+    if (this.timers[id] === null || this.timers[id] === undefined) this.timers[id] = t;
+    return t - this.timers[id] >= ms;
+  }
+  _add(k, v, t) {
+    const b = this.bins[k] || (this.bins[k] = { n: 0, sum: 0, sq: 0, t0: t, t1: t, low: 0 });
+    b.n++; b.sum += v; b.sq += v * v; b.t1 = t === undefined ? b.t1 : t;
+    return b;
+  }
+  _avg(k) { const b = this.bins[k]; return b && b.n ? b.sum / b.n : undefined; }
+  _std(k) { const b = this.bins[k]; if (!b || b.n < 2) return undefined; const m = b.sum / b.n; return Math.sqrt(Math.max(0, b.sq / b.n - m * m)); }
+  _enough(k, n = 12, ms = HEALTH_MIN) { const b = this.bins[k]; return !!b && b.n >= n && b.t1 - b.t0 >= ms; }
+  _raise(check, id, level, title, detail) {
+    const old = this.found[id];
+    if (old && HEALTH_RANK[old.level] >= HEALTH_RANK[level]) { old.title = title; old.detail = detail; return; }
+    const f = { id, check, level, title, detail, at: this.last };
+    this.found[id] = f; this.events.push(f);
+  }
+  _clear(id) { delete this.found[id]; }
+
+  // ---- checks
+  _clock(t, rpm) {
+    const dt = this.rpmT === null ? 0 : Math.min(10000, Math.max(0, t - this.rpmT));
+    this.rpmT = t;
+    if (rpm > 400) { this.runMs += dt; if (this.get('speed') > 3) this.moveMs += dt; }
+    this._warmup();
+  }
+  _cool(t, c) {
+    this.coolMax = this.coolMax === null ? c : Math.max(this.coolMax, c);
+    if (this._hold('hot110', c >= 110, t, 10000)) this._raise('cool', 'overheat', 'urgent', 'Engine is overheating',
+      'Coolant reached ' + this.temp(c) + '. Pull over when it’s safe and let it idle or shut it off. Once it has cooled, check the coolant level, look for leaks and make sure the radiator fan runs.');
+    else if (this._hold('hot104', c >= 104, t, HEALTH_MIN)) this._raise('cool', 'hot', 'warn', 'Engine running hot',
+      'Coolant has stayed around ' + this.temp(c) + ' (normal is about ' + this.temp(85) + '–' + this.temp(98) + '). Check the coolant level when the engine is cold, and that the radiator fan comes on. Towing or hot weather makes it worse.');
+    this._warmup();
+  }
+  _warmup() {
+    if (this.coolMax === null || this.found.thermostat) return;
+    const amb = this.get('amb', 10 * HEALTH_MIN), need = amb !== undefined && amb < -10 ? 20 * HEALTH_MIN : 10 * HEALTH_MIN;
+    if (this.runMs >= need && this.moveMs >= need / 2 && this.coolMax < 71) this._raise('warmup', 'thermostat', 'warn', 'Engine never fully warmed up',
+      'After ' + Math.round(this.runMs / HEALTH_MIN) + ' minutes of driving the coolant only reached ' + this.temp(this.coolMax) + ' (normal is about ' + this.temp(85) + '–' + this.temp(98) +
+      '). A thermostat stuck open is the usual cause, and it often sets code P0128 later. Weak heat and worse MPG go with it.');
+  }
+  _volt(t, v) {
+    const rpm = this.get('rpm');
+    if (rpm !== undefined && rpm < 50 && this.runMs === 0 && this.restVolt === null) {
+      this.restVolt = v;
+      if (v < 12.2) this._raise('battery', 'battery', 'watch', 'Battery looks low',
+        'Before starting it read ' + v.toFixed(1) + ' V. A healthy, charged battery rests around 12.6 V. Have it tested (most parts stores do it free), especially before cold weather.');
+    }
+    if (!(rpm > 500) || this.runMs < 30000) return;
+    this._add('volt', v, t);
+    if (this._hold('v126', v < 12.6, t, 20000)) this._raise('charge', 'nocharge', 'urgent', 'Battery isn’t charging',
+      'With the engine running it should read 13.5–14.7 V, but it’s at ' + v.toFixed(1) + ' V. The alternator, its belt or the wiring may be failing. The engine is running on the battery alone, so head home or to a shop.');
+    else if (this._hold('v130', v < 13.0, t, 2 * HEALTH_MIN)) this._raise('charge', 'lowcharge', 'warn', 'Charging voltage is low',
+      'It has stayed around ' + v.toFixed(1) + ' V with the engine running (normal is 13.5–14.7 V). The alternator may be getting weak, or a belt or battery cable may be loose or corroded.');
+    if (this._hold('v150', v > 15.0, t, 20000)) this._raise('charge', 'overcharge', 'warn', 'Charging voltage is too high',
+      'It’s reading ' + v.toFixed(1) + ' V (normal is 13.5–14.7 V). The alternator’s voltage regulator may be failing. Overcharging can boil the battery and damage electronics.');
+  }
+  _trim(t, bank) {
+    const s = this.get('stft' + bank, 10000), l = this.get('ltft' + bank, 2 * HEALTH_MIN);
+    if (s === undefined || !this.warm() || !this.running()) return;
+    const tot = s + (l || 0), where = this.idling() ? 'idle' : this.cruising() ? 'cruise' : null;
+    if (!where) return;
+    this._add('trim' + bank + '_' + where, tot, t);
+    this._trimVerdict();
+  }
+  _trimVerdict() {
+    const v = (b, w) => (this._enough('trim' + b + '_' + w) ? this._avg('trim' + b + '_' + w) : undefined);
+    const p = (x) => (x > 0 ? '+' : '') + x.toFixed(0) + '%';
+    for (const b of [1, 2]) {
+      const I = v(b, 'idle'), C = v(b, 'cruise'), bk = 'bank ' + b;
+      if (I === undefined && C === undefined) continue;
+      const pick = I >= 10 && (C === undefined || C <= I - 5) ? 'vacuum' : I >= 10 && C >= 10 ? 'leanall' : C >= 10 && I < 7 ? 'leanload'
+        : I <= -10 || C <= -10 ? 'rich' : Math.max(Math.abs(I || 0), Math.abs(C || 0)) >= 7 ? 'trimhigh' : null;
+      ['vacuum', 'leanall', 'leanload', 'rich', 'trimhigh'].forEach((x) => { if (x !== pick) this._clear(x + b); });   // newer data can change the pattern
+      if (pick === 'vacuum' && (C === undefined || C <= I - 5)) this._raise('trims', 'vacuum' + b, 'warn', 'Running lean at idle (' + bk + ')',
+        'The engine computer is adding ' + p(I) + ' fuel at idle' + (C !== undefined ? ' but only ' + p(C) + ' when cruising' : '') + '. Lean at idle and better at speed usually means a vacuum leak: a cracked hose, PCV hose or intake gasket. Listen for a hiss with the engine running.');
+      else if (pick === 'leanall') this._raise('trims', 'leanall' + b, 'warn', 'Running lean everywhere (' + bk + ')',
+        'It’s adding about ' + p((I + C) / 2) + ' fuel at idle and at speed. That usually means the airflow (MAF) sensor reads low, so try cleaning it with MAF cleaner first. A weak fuel pump or clogged filter is next.');
+      else if (pick === 'leanload') this._raise('trims', 'leanload' + b, 'warn', 'Running lean under load (' + bk + ')',
+        'Fine at idle but adding ' + p(C) + ' fuel when cruising. That pattern points to fuel delivery: a weak fuel pump, clogged fuel filter or dirty injectors. A dirty MAF sensor can do it too.');
+      else if (pick === 'rich') this._raise('trims', 'rich' + b, 'warn', 'Running rich (' + bk + ')',
+        'The engine computer is pulling ' + p(Math.min(I === undefined ? 0 : I, C === undefined ? 0 : C)) + ' fuel out. Common causes: a leaking injector, a dirty air filter, a MAF sensor reading high, or a fuel pressure regulator stuck closed.');
+      else if (pick === 'trimhigh') this._raise('trims', 'trimhigh' + b, 'watch', 'Fuel trim a little high (' + bk + ')',
+        'It’s correcting the fuel by about ' + p(Math.abs(I || 0) > Math.abs(C || 0) ? I : C) + '. Under 10% is still OK, but if it keeps creeping up there may be a small vacuum leak or a dirty MAF sensor.');
+    }
+    for (const w of ['idle', 'cruise']) {
+      const a = v(1, w), c = v(2, w);
+      if (a === undefined || c === undefined || Math.abs(a - c) < 8) continue;
+      const lean = a > c ? 1 : 2;
+      this._raise('banks', 'banks', 'warn', 'Bank ' + lean + ' is leaner than bank ' + (3 - lean),
+        'At ' + w + ' bank 1 is at ' + p(a) + ' and bank 2 at ' + p(c) + '. When only one side is off, look on that side: a vacuum leak at its intake runners, a clogged injector, or an exhaust leak before its O2 sensor. Bank 1 is the side with cylinder 1.');
+    }
+  }
+  _o2b(v) {
+    if (!this.warm() || !this.cruising() || this.runMs < 5 * HEALTH_MIN) return;
+    const b = this._add('o2b', v, this.last);
+    if (b.n >= 40 && this._std('o2b') > 0.25) this._raise('cat', 'cat', 'watch', 'Catalytic converter may be wearing',
+      'The rear O2 sensor is swinging up and down almost like the front one. A healthy converter keeps it fairly steady. This often shows up months before code P0420. Fix any misfires or exhaust leaks first, since they can cause it.');
+  }
+  _timing(v) {
+    const load = this.get('load', 5000), rpm = this.get('rpm', 5000);
+    if (!this.warm() || !(load >= 50) || !(rpm >= 1200 && rpm <= 4500)) return;
+    const b = this._add('knock', v, this.last);
+    if (v <= 0) b.low++;
+    if (b.low >= 5 && b.low / b.n >= 0.3) this._raise('knock', 'knock', 'watch', 'Timing pulled back under load',
+      'When you accelerate, the engine computer keeps retarding the ignition timing, which it does when it hears knock. Try a tank of the octane the owner’s manual asks for. If it continues, carbon buildup or a knock sensor problem are the next things to check.');
+  }
+  _idle(t, rpm) {
+    const prev = this.prevIdle;
+    if (!this.warm() || !this.idling()) { this.prevIdle = null; return; }
+    this.prevIdle = { t, rpm };
+    if (!prev || t - prev.t > 4000) return;
+    const b = this._add('idle', Math.abs(rpm - prev.rpm), t);
+    if (b.n >= 30 && b.sum / b.n > 50) this._raise('idle', 'roughidle', 'watch', 'Idle is unsteady',
+      'Engine speed at idle keeps jumping by about ' + Math.round(b.sum / b.n) + ' rpm (a smooth idle varies by 10–20). Common causes: a dirty throttle body, a vacuum leak, or a weak plug or coil. Check the Misfire screen too.');
+  }
+
+  // state of a check with no finding: {state: 'ok'|'wait', note} or null when this vehicle can't do it
+  _state(id) {
+    const ok = (note) => ({ state: 'ok', note }), wait = (note) => ({ state: 'wait', note });
+    switch (id) {
+      case 'cool': return !this.has('cool') ? null : this.coolMax === null ? wait('Waiting for data') : ok('Highest ' + this.temp(this.coolMax));
+      case 'warmup': return !this.has('cool') ? null : this.coolMax >= 75 ? ok('Reached ' + this.temp(this.coolMax)) : wait('Needs about 10 minutes of driving');
+      case 'charge': return !this.has('volt') ? null : this.bins.volt && this.bins.volt.n >= 5 ? ok('About ' + this._avg('volt').toFixed(1) + ' V') : wait('Needs the engine running');
+      case 'battery': return !this.has('volt') ? null : this.restVolt !== null ? ok(this.restVolt.toFixed(1) + ' V before starting') : wait('Checked when you connect before starting');
+      case 'trims': return !this.has('stft1') ? null : ['trim1_idle', 'trim1_cruise'].some((k) => this._enough(k)) ? ok('Within normal range') : wait('Needs a few minutes warm, idling and cruising');
+      case 'banks': return !this.has('stft2') ? null : ['idle', 'cruise'].some((w) => this._enough('trim1_' + w) && this._enough('trim2_' + w)) ? ok('Both sides match') : wait('Needs a few minutes warm');
+      case 'cat': return !this.has('o2b') ? null : this.bins.o2b && this.bins.o2b.n >= 40 ? ok('Rear O2 sensor steady') : wait('Needs steady cruising after warm-up');
+      case 'knock': return !this.has('timing') ? null : this.bins.knock && this.bins.knock.n >= 10 ? ok('No sign of knock') : wait('Needs some firmer acceleration');
+      case 'idle': return this.bins.idle && this.bins.idle.n >= 30 ? ok('Smooth') : wait('Needs a minute at idle when warm');
+      case 'misfire': return !this.has('misfire') ? null : this.mis0 ? ok('No cylinder stands out') : wait('Checked a few minutes in');
+      case 'codes': return this.pending0 !== null ? ok('None new this drive') : wait('Checked a few minutes in');
+    }
+    return null;
+  }
+}
+
+// ============================================================================
 // Scanner app UI. Backends: RealBackend (Bluetooth adapter) and DemoBackend.
 // ============================================================================
 (function () {
@@ -1179,6 +1428,7 @@ const PIDS = [
   { k: 'stft2', pid: 0x08, n: 'Short trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
   { k: 'ltft2', pid: 0x09, n: 'Long trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
   { k: 'o2', pid: 0x14, n: 'O2 sensor B1S1', u: 'V', d: 2, min: 0, max: 1, col: 'green' },
+  { k: 'o2b', pid: 0x15, n: 'O2 sensor B1S2', u: 'V', d: 2, min: 0, max: 1, col: 'green' },
   { k: 'fuel', pid: 0x2F, n: 'Fuel level', u: '%', d: 0, min: 0, max: 100, col: 'green' },
   { k: 'baro', pid: 0x33, n: 'Barometric pressure', u: 'kPa', d: 0, min: 60, max: 110, col: 'teal' },
   { k: 'amb', pid: 0x46, n: 'Outside air temp', conv: 'temp', d: 0, min: -20, max: 50, col: 'teal' },
@@ -1284,6 +1534,7 @@ class RealBackend {
   async readiness() { await this._func(); return this.e.readiness(); }
   async misfire() { await this._func(); return this.e.misfire(); }
   async monitorTests() { await this._func(); return this.e.monitorTests(); }
+  async pendingCodes() { await this._func(); return this.e.readDTCs(7); }
   async scan(mods, step) {
     await this._func();
     this.e.enhBegin();
@@ -1310,6 +1561,7 @@ class DemoBackend {
       this.sim(); this.T += 0.1; this.tick = (this.tick || 0) + 1;
       Object.assign(D, this.D);
       if (this.tick % 2 === 0) Object.keys(this.D).forEach((k) => pushH(k, this.D[k]));
+      if (this.tick % 5 === 0) Object.keys(this.D).forEach((k) => hlFeed(k, this.D[k]));
       updateAll();
     }, 100);
   }
@@ -1329,8 +1581,9 @@ class DemoBackend {
       rpm, speed: mph * 1.609, load, tps: !moving ? 14.5 + rnd(.2) : accel ? 38 + rnd(2) : decel ? 13.7 : 18 + rnd(1),
       cool: f2c(150 + 46 * (1 - Math.exp(-t / 40)) + rnd(.3)), iat: f2c(88 + rnd(.4) - (moving ? 3 : 0)),
       maf: rpm * load / 100 * 0.0306 + rnd(.1), map: 30 + load * 0.6 + rnd(1), timing: !moving ? 10 + rnd(1) : accel ? 18 + rnd(1) : 32 + rnd(1),
-      stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
-      o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
+      // bank 1 runs lean at idle only (a small vacuum leak on that side), so Drive Health has something to show
+      stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8) + (moving ? 0 : 7.5), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
+      o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), o2b: 0.68 + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
       atfA: f2c(140 + 35 * (1 - Math.exp(-t / 90)) + (moving ? 1.5 * Math.sin(t / 3) : 0) + rnd(.15)), atfB: f2c(130 + 30 * (1 - Math.exp(-t / 120)) + rnd(.1)),
     };
     if (!moving && Math.random() < 0.012) this.misCur[2]++;
@@ -1348,6 +1601,7 @@ class DemoBackend {
     return { mil: this.codesList.length > 0, count: this.codesList.length, diesel: false, monitors: ['Misfire', 'Fuel system', 'Components', 'Catalyst', 'EVAP system', 'O2 sensor', 'O2 heater', 'EGR / VVT'].map((n) => ({ name: n, ready: n !== 'EVAP system' })) };
   }
   async misfire() { await sleep(700); return this.misCur.map((c, i) => ({ cyl: i + 1, cur: c, avg: this.misAvg[i] })); }
+  async pendingCodes() { await sleep(300); return []; }
   async monitorTests() {
     await sleep(900);
     const T = [[0x01, 0x05, 0x10, 70, 0, 150], [0x01, 0x06, 0x10, 82, 0, 150], [0x02, 0x08, 0x0A, 6557, 4918, 0xFFFF],
@@ -1388,7 +1642,7 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', fuel: 'Fuel Trim', extra: 'Extra' };
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', fuel: 'Fuel Trim', extra: 'Extra' };
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
 function push(n) {
@@ -1414,6 +1668,7 @@ function onShow(n) {
   if (n === 'systems') renderSystems();
   if (n === 'module') renderModule();
   if (n === 'misfire') { renderMis(); if (!S.mis && !S.misLoading) loadMis(); }
+  if (n === 'health') renderHealth();
   if (n === 'tests') { renderTests(); if (!S.tests && !S.testsLoading) loadTests(); }
   if (n === 'live') { buildLive(); updateLive(); }
   if (n === 'extra') initExtra();
@@ -1500,7 +1755,9 @@ async function connect(demo) {
     if (v) VEH = v;
     else look.then((x) => { if (x && B && x.vin === B.vin) { VEH = x; setTimeout(() => { if (top() === 'home') renderHome(); }, Math.max(0, S.arriveUntil - Date.now())); } });
   } else { VEH = null; loadFuel('none'); }
+  hlLoad(B.vin);
   S.mode = demo ? 'demo' : 'live';
+  hlStart();
   S.arrive = true; S.arriveUntil = Date.now() + 2600;
   renderHome();
   S.arrive = false;
@@ -1516,12 +1773,14 @@ function resetData() {
 function disconnect() {
   lgEnd();
   if (F.trip) saveFuel();
+  hlFinish(false, true);
   if (B) B.disconnect();
   B = null; S.mode = 'off'; S.rec = false; resetData(); goHome(); renderHome(); closeSheet();
 }
 function onDisconnected() {
   if (S.mode !== 'live') return;
   lgEnd();
+  hlFinish(false, true);
   B = null; S.mode = 'off'; resetData(); goHome(); renderHome();
   alertBox({ title: 'Adapter disconnected', msg: 'The Bluetooth connection dropped. Check the adapter is plugged in, then connect again.', cancel: false });
 }
@@ -1531,9 +1790,13 @@ function needConnection() {
 }
 
 // Long operations pause live polling so they have the adapter to themselves.
+// Jobs also take turns with each other: a background check must never land in the middle of a module scan.
+let jobQ = Promise.resolve();
 async function job(fn) {
   S.busy++;
-  try { while (S.inRead) await sleep(20); return await fn(); }
+  const run = jobQ.then(async () => { while (S.inRead) await sleep(20); return fn(); });
+  jobQ = run.catch(() => {});
+  try { return await run; }
   finally { S.busy--; }
 }
 
@@ -1549,6 +1812,7 @@ function pollKeys() {
   if (k === 'extra') return k;
   const out = k.concat(fuelKeys().filter((x) => !k.includes(x)));
   lgPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
+  hlPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
   return out;
 }
 function basePollKeys() {
@@ -1588,7 +1852,7 @@ async function pollLoop() {
         S.inRead = true;
         let v = null;
         try { v = await B.readPid(k); } catch (e) { v = null; } finally { S.inRead = false; }
-        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); }
+        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); hlFeed(k, v); }
         did++;
       }
       if (S.mode === 'live') updateAll();
@@ -2050,6 +2314,7 @@ function renderHome() {
   }
   $$('.tile').forEach((t) => { t.style.opacity = on ? '' : '.55'; });
   renderTiles();
+  renderHealthCard();
   updateHome();
 }
 function renderTiles() {
@@ -2078,6 +2343,7 @@ function updateHome() {
   $('#t-live').textContent = D.rpm === undefined ? 'Tap to view' : fmt('rpm', D.rpm) + ' rpm · ' + fmt('speed', D.speed) + ' ' + unit('speed');
   $('#t-fuel').textContent = D.stft1 !== undefined && D.ltft1 !== undefined ? 'B1 ' + pct(D.stft1 + D.ltft1) : 'Tap to view';
   updateFuelCard();
+  if (Date.now() - (HL.cardAt || 0) > 2000) { HL.cardAt = Date.now(); renderHealthCard(); }
 }
 function updateFuelCard() {
   const t = F.trip, m = tripMPG(t), s = spendStats();
@@ -2624,6 +2890,8 @@ function lgAlert() {
   if (D.cool !== undefined && D.cool >= 110) return 'Engine hot: ' + tempStr(D.cool);
   if (D.volt !== undefined && D.volt < 11.8) return 'Battery low: ' + D.volt.toFixed(1) + ' V';
   if (D.volt !== undefined && D.rpm > 500 && D.volt < 12.6) return 'Not charging: ' + D.volt.toFixed(1) + ' V';
+  const w = HL.d && HL.d.worst();
+  if (w && w.level !== 'watch') return w.title;
   return null;
 }
 function lgCfg() {
@@ -2667,11 +2935,149 @@ function lgSettingsHtml() {
     (LG.on ? rows : '') + '</div><p class="foot" style="text-align:left;margin:0 4px">While connected, these show on your CarPlay Dashboard and Lock Screen, and keep updating with the phone locked. Turn on Live Activities in Settings › Scanner if they don’t appear.</p>';
 }
 
+// ---------------------------------------------------------------- drive health
+// health.js does the thinking; this feeds it live readings, runs the slower checks every few minutes,
+// shows what it finds, and keeps a short history of drives per vehicle (for trends later).
+const HL = { d: null, rot: 0, loop: 0, deepAt: 0, deepBusy: false, offSince: 0, drives: [], vin: null, demo0: 0, lastDraw: 0 };
+const hlNow = () => (S.mode === 'demo' ? HL.demo0 + (Date.now() - HL.demo0) * 8 : Date.now());   // the demo runs 8x so findings show up quickly
+const hlKey = () => 'health.drives.' + (HL.vin || 'none');
+const HL_LEVEL = { urgent: ['red', 'Urgent'], warn: ['orange', 'Worth a look'], watch: ['gray', 'Keep an eye on'] };
+function hlLoad(vin) {
+  HL.vin = vin || 'none';
+  try { HL.drives = JSON.parse(store.get(hlKey(), '[]')) || []; } catch (e) { HL.drives = []; }
+}
+function hlStart() {
+  HL.demo0 = Date.now(); HL.offSince = 0; HL.deepAt = 0;
+  HL.d = new DriveHealth({ disp: (VEH && VEH.disp) || 0, temp: tempStr, describe: (c) => dtcText(c, S.makeKey),
+    has: (k) => !!B && (k === 'misfire' ? !!B.isCAN : B.supported(k)) });
+}
+function hlPollKeys() {
+  if (!HL.d || !B) return [];
+  HL.loop++;
+  if (top() === 'live' && S.liveMode === 'graph' && HL.loop % 4) return [];   // keep the graph fast
+  const ks = HEALTH_KEYS.filter((k) => B.supported(k)), out = ['rpm', 'speed'];
+  for (let i = 0; i < 2 && ks.length; i++) out.push(ks[HL.rot++ % ks.length]);
+  return out;
+}
+function hlFeed(k, v) {
+  if (!HL.d) return;
+  const t = hlNow();
+  HL.d.feed(t, k, v);
+  if (k === 'rpm') {   // engine off for 15 s after running = the drive is over
+    if (v < 50 && HL.d.runMs > 0) { if (!HL.offSince) HL.offSince = t; else if (t - HL.offSince > 15000) { hlFinish(true); return; } }
+    else HL.offSince = 0;
+  }
+  hlEvents();
+}
+function hlEvents() {
+  if (!HL.d) return;
+  const ev = HL.d.drain();
+  if (!ev.length) return;
+  const u = ev.find((f) => f.level === 'urgent');
+  if (u) { hud(u.title, 'i-warn'); lgTick(true); }
+  else if (ev.some((f) => f.level === 'warn')) hud('Drive Health: worth a look', 'i-pulse');
+  renderHealthCard();
+  if (top() === 'health') renderHealth();
+}
+// Pending codes and misfire counts need their own requests, so they run every 3 minutes, not every poll.
+function hlDeep() {
+  if (!HL.d || HL.deepBusy || !B || LG.paused || document.hidden || !HL.d.running()) return;
+  const now = Date.now();
+  if (!HL.deepAt) { HL.deepAt = now + 20000; return; }
+  if (now < HL.deepAt) return;
+  HL.deepAt = now + 180000; HL.deepBusy = true;
+  const d = HL.d;
+  job(async () => ({ p: await B.pendingCodes(), m: B.isCAN ? await B.misfire() : null }))
+    .then((r) => { if (HL.d === d) { d.setPending(r.p); if (r.m) d.setMisfire(r.m); hlEvents(); } })
+    .catch(() => {}).finally(() => { HL.deepBusy = false; });
+}
+// Save the drive (if it was a real one) and start watching the next. show = open the summary.
+function hlFinish(show, end) {
+  const d = HL.d;
+  HL.d = null; HL.offSince = 0;
+  if (d && d.runMs >= 2 * 60000) {
+    const s = d.summary();
+    s.vehicle = vehicleName();
+    if (S.mode === 'live') { HL.drives.push(s); HL.drives = HL.drives.slice(-30); store.set(hlKey(), JSON.stringify(HL.drives)); }
+    if (show) openDriveSheet(s, true);
+  }
+  if (!end && (S.mode === 'live' || S.mode === 'demo')) hlStart();
+  renderHealthCard();
+  if (top() === 'health') renderHealth();
+}
+function renderHealthCard() {
+  const sub = $('#hc-sub'), chip = $('#hc-chip');
+  if (!sub) return;
+  const on = (S.mode === 'live' || S.mode === 'demo') && HL.d;
+  const w = on ? HL.d.worst() : null, n = on ? HL.d.list().filter((f) => f.level !== 'watch').length : 0;
+  if (!on) { sub.textContent = HL.drives.length ? 'Last drive: ' + driveVerdict(HL.drives[HL.drives.length - 1]) : 'Watches your drive for problems'; chip.style.display = 'none'; return; }
+  if (w && w.level === 'urgent') { sub.textContent = w.title; chip.className = 'chip red'; chip.textContent = 'Urgent'; }
+  else if (n) { sub.textContent = w.title; chip.className = 'chip orange'; chip.textContent = n === 1 ? '1 to look at' : n + ' to look at'; }
+  else { const okN = HL.d.checks().filter((c) => c.state === 'ok').length; sub.textContent = okN ? 'Watching · ' + okN + ' checks OK so far' : 'Watching this drive'; chip.className = 'chip green'; chip.textContent = w ? '1 to watch' : 'OK'; if (w) chip.className = 'chip gray'; }
+  chip.style.display = '';
+}
+function driveVerdict(s) {
+  const n = s.findings.filter((f) => f.level !== 'watch').length;
+  return s.findings.some((f) => f.level === 'urgent') ? 'something urgent' : n ? n + ' thing' + (n > 1 ? 's' : '') + ' to look at' : 'nothing looked off';
+}
+function findingCards(list) {
+  return list.map((f) => '<div class="hfind"><div class="hft"><span class="chip ' + HL_LEVEL[f.level][0] + '">' + HL_LEVEL[f.level][1] + '</span><b>' + esc(f.title) + '</b></div><p>' + esc(f.detail) + '</p></div>').join('');
+}
+function checkRows(checks) {
+  return '<div class="group">' + checks.map((c) => {
+    const right = c.state === 'ok' ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg>'
+      : c.state === 'wait' ? '<svg class="ic" style="color:var(--sec)"><use href="#i-clock"/></svg>'
+        : '<span class="chip ' + HL_LEVEL[c.state][0] + '">' + HL_LEVEL[c.state][1] + '</span>';
+    return '<div class="row"><span class="grow">' + esc(c.name) + (c.note ? '<span class="sub">' + esc(c.note) + '</span>' : '') + '</span>' + right + '</div>';
+  }).join('') + '</div>';
+}
+const driveWhen = (s) => new Date(s.start).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const driveLen = (s) => Math.max(1, Math.round(s.secs / 60)) + ' min';
+function openDriveSheet(s, justEnded) {
+  let h = '<div style="font-size:19px;font-weight:600;line-height:24px">' + (justEnded ? 'Drive finished' : esc(driveWhen(s))) + ' · ' + driveLen(s) + '</div>';
+  h += s.findings.length ? findingCards(s.findings) : '<div class="tip"><svg class="ic"><use href="#i-check"/></svg><span>Nothing looked off on this drive.</span></div>';
+  const ran = s.checks.filter((c) => c.state !== 'wait');
+  if (ran.length) h += '<div class="cap in">Checked</div>' + checkRows(ran.map((c) => Object.assign({}, c, { note: '' })));
+  h += '<p class="foot" style="text-align:left">Hints from patterns in the live data, not a diagnosis.</p>';
+  openSheet(justEnded ? 'Drive Health' : 'Past drive', h);
+}
+function renderHealth() {
+  HL.lastDraw = Date.now();
+  const el = $('#healthbody');
+  const on = (S.mode === 'live' || S.mode === 'demo') && HL.d;
+  let h = '';
+  if (!on) {
+    h += '<div class="ringcard"><span class="hsq" style="background:var(--fill);color:var(--sec)"><svg class="ic"><use href="#i-pulse"/></svg></span><p><b>Not connected</b>Connect and drive with the app open. It watches the live data and tells you if something looks off.</p></div>';
+  } else {
+    const list = HL.d.list(), w = list[0], checks = HL.d.checks(), okN = checks.filter((c) => c.state === 'ok').length;
+    const col = !w ? 'var(--green)' : w.level === 'urgent' ? 'var(--red)' : w.level === 'warn' ? 'var(--orange)' : 'var(--gray, #8E8E93)';
+    const n = list.filter((f) => f.level !== 'watch').length;
+    const head = !w ? (okN ? 'Looking good' : 'Watching') : w.level === 'urgent' ? w.title : n ? n + ' thing' + (n > 1 ? 's' : '') + ' worth a look' : 'Something to keep an eye on';
+    const sub = !w ? (okN ? okN + ' checks passed so far. More fill in as you drive.' : 'Keep the app open while you drive. Checks fill in as the engine warms up and you idle and cruise.')
+      : 'Tap a check below for details. These are hints, not a diagnosis.';
+    h += '<div class="ringcard"><span class="hsq" style="background:' + col + '"><svg class="ic"><use href="#' + (w ? 'i-warn' : 'i-pulse') + '"/></svg></span><p><b>' + esc(head) + '</b>' + sub + '</p></div>';
+    if (list.length) h += '<div class="cap">This drive</div>' + findingCards(list);
+    h += '<div class="cap">Checks</div>' + checkRows(checks);
+    h += '<button class="btn tap" data-act="finishDrive" style="flex-shrink:0">Finish drive &amp; save summary</button>';
+  }
+  if (HL.drives.length) {
+    h += '<div class="cap">Past drives</div><div class="group">' + HL.drives.slice().reverse().slice(0, 10).map((s, i) => {
+      const u = s.findings.some((f) => f.level === 'urgent'), n = s.findings.filter((f) => f.level !== 'watch').length;
+      return '<button class="row tap" data-act="openDrive" data-i="' + (HL.drives.length - 1 - i) + '"><span class="grow">' + esc(driveWhen(s)) + '<span class="sub">' + driveLen(s) + ' · ' + esc(driveVerdict(s)) + '</span></span>' +
+        '<span class="chip ' + (u ? 'red">Urgent' : n ? 'orange">' + n : 'green">OK') + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
+    }).join('') + '</div>';
+  }
+  h += '<p class="foot">Drive Health looks for patterns in the live data, like fuel trims, warm-up, charging voltage and misfires. It only flags things that last, but it can’t see everything, so it isn’t a diagnosis. Keep the app open while you drive.</p>';
+  el.innerHTML = h;
+}
+
 // ---------------------------------------------------------------- refresh
 function updateAll() {
   fuelTick();
   lgTick();
+  hlDeep();
   const t = top();
+  if (t === 'health' && Date.now() - HL.lastDraw > 2000) renderHealth();
   if (t === 'mpg') updateMpg();
   if (t === 'home') updateHome();
   if (t === 'live') updateLive();
@@ -2731,6 +3137,8 @@ const ACT = {
   openMon: (el) => { const l = monLink(el.dataset.mon); if (l === 'misfire') push('misfire'); else if (l) openTests(MON_GROUP[el.dataset.mon]); },
   openMisfire: () => { closeSheet(); push('misfire'); },
   openCode: (el) => openCode(el.dataset.code),
+  finishDrive: () => { if (HL.d && HL.d.runMs < 2 * 60000) { hud('Drive too short to save', 'i-info'); return; } hlFinish(true); },
+  openDrive: (el) => openDriveSheet(HL.drives[+el.dataset.i], false),
   clearEngine: () => {
     if (!B) return needConnection();
     alertBox({ title: 'Clear engine codes?', msg: 'This also erases freeze frame data and resets readiness monitors, so the vehicle won’t pass an emissions test until they re-run. Key on, engine off.',
@@ -2758,7 +3166,7 @@ document.addEventListener('click', (e) => {
   const segBtn = e.target.closest('.seg button');
   if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg' || g.dataset.go === 'health') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
   if (e.target.closest('[data-pop]')) { pop(); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
@@ -2772,7 +3180,7 @@ renderHome();
 if (!navigator.bluetooth && !NativeTransport.available()) {
   $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
 }
-window.__scanner = { S, D, H, F, connect, push, pop, ACT, getVEH: () => VEH };
+window.__scanner = { S, D, H, F, HL, connect, push, pop, ACT, getVEH: () => VEH };
 })();
 
 </script>

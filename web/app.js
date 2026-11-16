@@ -28,6 +28,7 @@ const PIDS = [
   { k: 'stft2', pid: 0x08, n: 'Short trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
   { k: 'ltft2', pid: 0x09, n: 'Long trim B2', u: '%', d: 1, min: -15, max: 15, col: 'orange', sign: true },
   { k: 'o2', pid: 0x14, n: 'O2 sensor B1S1', u: 'V', d: 2, min: 0, max: 1, col: 'green' },
+  { k: 'o2b', pid: 0x15, n: 'O2 sensor B1S2', u: 'V', d: 2, min: 0, max: 1, col: 'green' },
   { k: 'fuel', pid: 0x2F, n: 'Fuel level', u: '%', d: 0, min: 0, max: 100, col: 'green' },
   { k: 'baro', pid: 0x33, n: 'Barometric pressure', u: 'kPa', d: 0, min: 60, max: 110, col: 'teal' },
   { k: 'amb', pid: 0x46, n: 'Outside air temp', conv: 'temp', d: 0, min: -20, max: 50, col: 'teal' },
@@ -133,6 +134,7 @@ class RealBackend {
   async readiness() { await this._func(); return this.e.readiness(); }
   async misfire() { await this._func(); return this.e.misfire(); }
   async monitorTests() { await this._func(); return this.e.monitorTests(); }
+  async pendingCodes() { await this._func(); return this.e.readDTCs(7); }
   async scan(mods, step) {
     await this._func();
     this.e.enhBegin();
@@ -159,6 +161,7 @@ class DemoBackend {
       this.sim(); this.T += 0.1; this.tick = (this.tick || 0) + 1;
       Object.assign(D, this.D);
       if (this.tick % 2 === 0) Object.keys(this.D).forEach((k) => pushH(k, this.D[k]));
+      if (this.tick % 5 === 0) Object.keys(this.D).forEach((k) => hlFeed(k, this.D[k]));
       updateAll();
     }, 100);
   }
@@ -178,8 +181,9 @@ class DemoBackend {
       rpm, speed: mph * 1.609, load, tps: !moving ? 14.5 + rnd(.2) : accel ? 38 + rnd(2) : decel ? 13.7 : 18 + rnd(1),
       cool: f2c(150 + 46 * (1 - Math.exp(-t / 40)) + rnd(.3)), iat: f2c(88 + rnd(.4) - (moving ? 3 : 0)),
       maf: rpm * load / 100 * 0.0306 + rnd(.1), map: 30 + load * 0.6 + rnd(1), timing: !moving ? 10 + rnd(1) : accel ? 18 + rnd(1) : 32 + rnd(1),
-      stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
-      o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
+      // bank 1 runs lean at idle only (a small vacuum leak on that side), so Drive Health has something to show
+      stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8) + (moving ? 0 : 7.5), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
+      o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), o2b: 0.68 + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
       atfA: f2c(140 + 35 * (1 - Math.exp(-t / 90)) + (moving ? 1.5 * Math.sin(t / 3) : 0) + rnd(.15)), atfB: f2c(130 + 30 * (1 - Math.exp(-t / 120)) + rnd(.1)),
     };
     if (!moving && Math.random() < 0.012) this.misCur[2]++;
@@ -197,6 +201,7 @@ class DemoBackend {
     return { mil: this.codesList.length > 0, count: this.codesList.length, diesel: false, monitors: ['Misfire', 'Fuel system', 'Components', 'Catalyst', 'EVAP system', 'O2 sensor', 'O2 heater', 'EGR / VVT'].map((n) => ({ name: n, ready: n !== 'EVAP system' })) };
   }
   async misfire() { await sleep(700); return this.misCur.map((c, i) => ({ cyl: i + 1, cur: c, avg: this.misAvg[i] })); }
+  async pendingCodes() { await sleep(300); return []; }
   async monitorTests() {
     await sleep(900);
     const T = [[0x01, 0x05, 0x10, 70, 0, 150], [0x01, 0x06, 0x10, 82, 0, 150], [0x02, 0x08, 0x0A, 6557, 4918, 0xFFFF],
@@ -237,7 +242,7 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', fuel: 'Fuel Trim', extra: 'Extra' };
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', tests: 'Tests', health: 'Health', fuel: 'Fuel Trim', extra: 'Extra' };
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
 function push(n) {
@@ -263,6 +268,7 @@ function onShow(n) {
   if (n === 'systems') renderSystems();
   if (n === 'module') renderModule();
   if (n === 'misfire') { renderMis(); if (!S.mis && !S.misLoading) loadMis(); }
+  if (n === 'health') renderHealth();
   if (n === 'tests') { renderTests(); if (!S.tests && !S.testsLoading) loadTests(); }
   if (n === 'live') { buildLive(); updateLive(); }
   if (n === 'extra') initExtra();
@@ -349,7 +355,9 @@ async function connect(demo) {
     if (v) VEH = v;
     else look.then((x) => { if (x && B && x.vin === B.vin) { VEH = x; setTimeout(() => { if (top() === 'home') renderHome(); }, Math.max(0, S.arriveUntil - Date.now())); } });
   } else { VEH = null; loadFuel('none'); }
+  hlLoad(B.vin);
   S.mode = demo ? 'demo' : 'live';
+  hlStart();
   S.arrive = true; S.arriveUntil = Date.now() + 2600;
   renderHome();
   S.arrive = false;
@@ -365,12 +373,14 @@ function resetData() {
 function disconnect() {
   lgEnd();
   if (F.trip) saveFuel();
+  hlFinish(false, true);
   if (B) B.disconnect();
   B = null; S.mode = 'off'; S.rec = false; resetData(); goHome(); renderHome(); closeSheet();
 }
 function onDisconnected() {
   if (S.mode !== 'live') return;
   lgEnd();
+  hlFinish(false, true);
   B = null; S.mode = 'off'; resetData(); goHome(); renderHome();
   alertBox({ title: 'Adapter disconnected', msg: 'The Bluetooth connection dropped. Check the adapter is plugged in, then connect again.', cancel: false });
 }
@@ -380,9 +390,13 @@ function needConnection() {
 }
 
 // Long operations pause live polling so they have the adapter to themselves.
+// Jobs also take turns with each other: a background check must never land in the middle of a module scan.
+let jobQ = Promise.resolve();
 async function job(fn) {
   S.busy++;
-  try { while (S.inRead) await sleep(20); return await fn(); }
+  const run = jobQ.then(async () => { while (S.inRead) await sleep(20); return fn(); });
+  jobQ = run.catch(() => {});
+  try { return await run; }
   finally { S.busy--; }
 }
 
@@ -398,6 +412,7 @@ function pollKeys() {
   if (k === 'extra') return k;
   const out = k.concat(fuelKeys().filter((x) => !k.includes(x)));
   lgPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
+  hlPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
   return out;
 }
 function basePollKeys() {
@@ -437,7 +452,7 @@ async function pollLoop() {
         S.inRead = true;
         let v = null;
         try { v = await B.readPid(k); } catch (e) { v = null; } finally { S.inRead = false; }
-        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); }
+        if (S.mode === 'live' && v !== null && v !== undefined) { D[k] = v; pushH(k, v); hlFeed(k, v); }
         did++;
       }
       if (S.mode === 'live') updateAll();
@@ -899,6 +914,7 @@ function renderHome() {
   }
   $$('.tile').forEach((t) => { t.style.opacity = on ? '' : '.55'; });
   renderTiles();
+  renderHealthCard();
   updateHome();
 }
 function renderTiles() {
@@ -927,6 +943,7 @@ function updateHome() {
   $('#t-live').textContent = D.rpm === undefined ? 'Tap to view' : fmt('rpm', D.rpm) + ' rpm · ' + fmt('speed', D.speed) + ' ' + unit('speed');
   $('#t-fuel').textContent = D.stft1 !== undefined && D.ltft1 !== undefined ? 'B1 ' + pct(D.stft1 + D.ltft1) : 'Tap to view';
   updateFuelCard();
+  if (Date.now() - (HL.cardAt || 0) > 2000) { HL.cardAt = Date.now(); renderHealthCard(); }
 }
 function updateFuelCard() {
   const t = F.trip, m = tripMPG(t), s = spendStats();
@@ -1473,6 +1490,8 @@ function lgAlert() {
   if (D.cool !== undefined && D.cool >= 110) return 'Engine hot: ' + tempStr(D.cool);
   if (D.volt !== undefined && D.volt < 11.8) return 'Battery low: ' + D.volt.toFixed(1) + ' V';
   if (D.volt !== undefined && D.rpm > 500 && D.volt < 12.6) return 'Not charging: ' + D.volt.toFixed(1) + ' V';
+  const w = HL.d && HL.d.worst();
+  if (w && w.level !== 'watch') return w.title;
   return null;
 }
 function lgCfg() {
@@ -1516,11 +1535,149 @@ function lgSettingsHtml() {
     (LG.on ? rows : '') + '</div><p class="foot" style="text-align:left;margin:0 4px">While connected, these show on your CarPlay Dashboard and Lock Screen, and keep updating with the phone locked. Turn on Live Activities in Settings › Scanner if they don’t appear.</p>';
 }
 
+// ---------------------------------------------------------------- drive health
+// health.js does the thinking; this feeds it live readings, runs the slower checks every few minutes,
+// shows what it finds, and keeps a short history of drives per vehicle (for trends later).
+const HL = { d: null, rot: 0, loop: 0, deepAt: 0, deepBusy: false, offSince: 0, drives: [], vin: null, demo0: 0, lastDraw: 0 };
+const hlNow = () => (S.mode === 'demo' ? HL.demo0 + (Date.now() - HL.demo0) * 8 : Date.now());   // the demo runs 8x so findings show up quickly
+const hlKey = () => 'health.drives.' + (HL.vin || 'none');
+const HL_LEVEL = { urgent: ['red', 'Urgent'], warn: ['orange', 'Worth a look'], watch: ['gray', 'Keep an eye on'] };
+function hlLoad(vin) {
+  HL.vin = vin || 'none';
+  try { HL.drives = JSON.parse(store.get(hlKey(), '[]')) || []; } catch (e) { HL.drives = []; }
+}
+function hlStart() {
+  HL.demo0 = Date.now(); HL.offSince = 0; HL.deepAt = 0;
+  HL.d = new DriveHealth({ disp: (VEH && VEH.disp) || 0, temp: tempStr, describe: (c) => dtcText(c, S.makeKey),
+    has: (k) => !!B && (k === 'misfire' ? !!B.isCAN : B.supported(k)) });
+}
+function hlPollKeys() {
+  if (!HL.d || !B) return [];
+  HL.loop++;
+  if (top() === 'live' && S.liveMode === 'graph' && HL.loop % 4) return [];   // keep the graph fast
+  const ks = HEALTH_KEYS.filter((k) => B.supported(k)), out = ['rpm', 'speed'];
+  for (let i = 0; i < 2 && ks.length; i++) out.push(ks[HL.rot++ % ks.length]);
+  return out;
+}
+function hlFeed(k, v) {
+  if (!HL.d) return;
+  const t = hlNow();
+  HL.d.feed(t, k, v);
+  if (k === 'rpm') {   // engine off for 15 s after running = the drive is over
+    if (v < 50 && HL.d.runMs > 0) { if (!HL.offSince) HL.offSince = t; else if (t - HL.offSince > 15000) { hlFinish(true); return; } }
+    else HL.offSince = 0;
+  }
+  hlEvents();
+}
+function hlEvents() {
+  if (!HL.d) return;
+  const ev = HL.d.drain();
+  if (!ev.length) return;
+  const u = ev.find((f) => f.level === 'urgent');
+  if (u) { hud(u.title, 'i-warn'); lgTick(true); }
+  else if (ev.some((f) => f.level === 'warn')) hud('Drive Health: worth a look', 'i-pulse');
+  renderHealthCard();
+  if (top() === 'health') renderHealth();
+}
+// Pending codes and misfire counts need their own requests, so they run every 3 minutes, not every poll.
+function hlDeep() {
+  if (!HL.d || HL.deepBusy || !B || LG.paused || document.hidden || !HL.d.running()) return;
+  const now = Date.now();
+  if (!HL.deepAt) { HL.deepAt = now + 20000; return; }
+  if (now < HL.deepAt) return;
+  HL.deepAt = now + 180000; HL.deepBusy = true;
+  const d = HL.d;
+  job(async () => ({ p: await B.pendingCodes(), m: B.isCAN ? await B.misfire() : null }))
+    .then((r) => { if (HL.d === d) { d.setPending(r.p); if (r.m) d.setMisfire(r.m); hlEvents(); } })
+    .catch(() => {}).finally(() => { HL.deepBusy = false; });
+}
+// Save the drive (if it was a real one) and start watching the next. show = open the summary.
+function hlFinish(show, end) {
+  const d = HL.d;
+  HL.d = null; HL.offSince = 0;
+  if (d && d.runMs >= 2 * 60000) {
+    const s = d.summary();
+    s.vehicle = vehicleName();
+    if (S.mode === 'live') { HL.drives.push(s); HL.drives = HL.drives.slice(-30); store.set(hlKey(), JSON.stringify(HL.drives)); }
+    if (show) openDriveSheet(s, true);
+  }
+  if (!end && (S.mode === 'live' || S.mode === 'demo')) hlStart();
+  renderHealthCard();
+  if (top() === 'health') renderHealth();
+}
+function renderHealthCard() {
+  const sub = $('#hc-sub'), chip = $('#hc-chip');
+  if (!sub) return;
+  const on = (S.mode === 'live' || S.mode === 'demo') && HL.d;
+  const w = on ? HL.d.worst() : null, n = on ? HL.d.list().filter((f) => f.level !== 'watch').length : 0;
+  if (!on) { sub.textContent = HL.drives.length ? 'Last drive: ' + driveVerdict(HL.drives[HL.drives.length - 1]) : 'Watches your drive for problems'; chip.style.display = 'none'; return; }
+  if (w && w.level === 'urgent') { sub.textContent = w.title; chip.className = 'chip red'; chip.textContent = 'Urgent'; }
+  else if (n) { sub.textContent = w.title; chip.className = 'chip orange'; chip.textContent = n === 1 ? '1 to look at' : n + ' to look at'; }
+  else { const okN = HL.d.checks().filter((c) => c.state === 'ok').length; sub.textContent = okN ? 'Watching · ' + okN + ' checks OK so far' : 'Watching this drive'; chip.className = 'chip green'; chip.textContent = w ? '1 to watch' : 'OK'; if (w) chip.className = 'chip gray'; }
+  chip.style.display = '';
+}
+function driveVerdict(s) {
+  const n = s.findings.filter((f) => f.level !== 'watch').length;
+  return s.findings.some((f) => f.level === 'urgent') ? 'something urgent' : n ? n + ' thing' + (n > 1 ? 's' : '') + ' to look at' : 'nothing looked off';
+}
+function findingCards(list) {
+  return list.map((f) => '<div class="hfind"><div class="hft"><span class="chip ' + HL_LEVEL[f.level][0] + '">' + HL_LEVEL[f.level][1] + '</span><b>' + esc(f.title) + '</b></div><p>' + esc(f.detail) + '</p></div>').join('');
+}
+function checkRows(checks) {
+  return '<div class="group">' + checks.map((c) => {
+    const right = c.state === 'ok' ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg>'
+      : c.state === 'wait' ? '<svg class="ic" style="color:var(--sec)"><use href="#i-clock"/></svg>'
+        : '<span class="chip ' + HL_LEVEL[c.state][0] + '">' + HL_LEVEL[c.state][1] + '</span>';
+    return '<div class="row"><span class="grow">' + esc(c.name) + (c.note ? '<span class="sub">' + esc(c.note) + '</span>' : '') + '</span>' + right + '</div>';
+  }).join('') + '</div>';
+}
+const driveWhen = (s) => new Date(s.start).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const driveLen = (s) => Math.max(1, Math.round(s.secs / 60)) + ' min';
+function openDriveSheet(s, justEnded) {
+  let h = '<div style="font-size:19px;font-weight:600;line-height:24px">' + (justEnded ? 'Drive finished' : esc(driveWhen(s))) + ' · ' + driveLen(s) + '</div>';
+  h += s.findings.length ? findingCards(s.findings) : '<div class="tip"><svg class="ic"><use href="#i-check"/></svg><span>Nothing looked off on this drive.</span></div>';
+  const ran = s.checks.filter((c) => c.state !== 'wait');
+  if (ran.length) h += '<div class="cap in">Checked</div>' + checkRows(ran.map((c) => Object.assign({}, c, { note: '' })));
+  h += '<p class="foot" style="text-align:left">Hints from patterns in the live data, not a diagnosis.</p>';
+  openSheet(justEnded ? 'Drive Health' : 'Past drive', h);
+}
+function renderHealth() {
+  HL.lastDraw = Date.now();
+  const el = $('#healthbody');
+  const on = (S.mode === 'live' || S.mode === 'demo') && HL.d;
+  let h = '';
+  if (!on) {
+    h += '<div class="ringcard"><span class="hsq" style="background:var(--fill);color:var(--sec)"><svg class="ic"><use href="#i-pulse"/></svg></span><p><b>Not connected</b>Connect and drive with the app open. It watches the live data and tells you if something looks off.</p></div>';
+  } else {
+    const list = HL.d.list(), w = list[0], checks = HL.d.checks(), okN = checks.filter((c) => c.state === 'ok').length;
+    const col = !w ? 'var(--green)' : w.level === 'urgent' ? 'var(--red)' : w.level === 'warn' ? 'var(--orange)' : 'var(--gray, #8E8E93)';
+    const n = list.filter((f) => f.level !== 'watch').length;
+    const head = !w ? (okN ? 'Looking good' : 'Watching') : w.level === 'urgent' ? w.title : n ? n + ' thing' + (n > 1 ? 's' : '') + ' worth a look' : 'Something to keep an eye on';
+    const sub = !w ? (okN ? okN + ' checks passed so far. More fill in as you drive.' : 'Keep the app open while you drive. Checks fill in as the engine warms up and you idle and cruise.')
+      : 'Tap a check below for details. These are hints, not a diagnosis.';
+    h += '<div class="ringcard"><span class="hsq" style="background:' + col + '"><svg class="ic"><use href="#' + (w ? 'i-warn' : 'i-pulse') + '"/></svg></span><p><b>' + esc(head) + '</b>' + sub + '</p></div>';
+    if (list.length) h += '<div class="cap">This drive</div>' + findingCards(list);
+    h += '<div class="cap">Checks</div>' + checkRows(checks);
+    h += '<button class="btn tap" data-act="finishDrive" style="flex-shrink:0">Finish drive &amp; save summary</button>';
+  }
+  if (HL.drives.length) {
+    h += '<div class="cap">Past drives</div><div class="group">' + HL.drives.slice().reverse().slice(0, 10).map((s, i) => {
+      const u = s.findings.some((f) => f.level === 'urgent'), n = s.findings.filter((f) => f.level !== 'watch').length;
+      return '<button class="row tap" data-act="openDrive" data-i="' + (HL.drives.length - 1 - i) + '"><span class="grow">' + esc(driveWhen(s)) + '<span class="sub">' + driveLen(s) + ' · ' + esc(driveVerdict(s)) + '</span></span>' +
+        '<span class="chip ' + (u ? 'red">Urgent' : n ? 'orange">' + n : 'green">OK') + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
+    }).join('') + '</div>';
+  }
+  h += '<p class="foot">Drive Health looks for patterns in the live data, like fuel trims, warm-up, charging voltage and misfires. It only flags things that last, but it can’t see everything, so it isn’t a diagnosis. Keep the app open while you drive.</p>';
+  el.innerHTML = h;
+}
+
 // ---------------------------------------------------------------- refresh
 function updateAll() {
   fuelTick();
   lgTick();
+  hlDeep();
   const t = top();
+  if (t === 'health' && Date.now() - HL.lastDraw > 2000) renderHealth();
   if (t === 'mpg') updateMpg();
   if (t === 'home') updateHome();
   if (t === 'live') updateLive();
@@ -1580,6 +1737,8 @@ const ACT = {
   openMon: (el) => { const l = monLink(el.dataset.mon); if (l === 'misfire') push('misfire'); else if (l) openTests(MON_GROUP[el.dataset.mon]); },
   openMisfire: () => { closeSheet(); push('misfire'); },
   openCode: (el) => openCode(el.dataset.code),
+  finishDrive: () => { if (HL.d && HL.d.runMs < 2 * 60000) { hud('Drive too short to save', 'i-info'); return; } hlFinish(true); },
+  openDrive: (el) => openDriveSheet(HL.drives[+el.dataset.i], false),
   clearEngine: () => {
     if (!B) return needConnection();
     alertBox({ title: 'Clear engine codes?', msg: 'This also erases freeze frame data and resets readiness monitors, so the vehicle won’t pass an emissions test until they re-run. Key on, engine off.',
@@ -1607,7 +1766,7 @@ document.addEventListener('click', (e) => {
   const segBtn = e.target.closest('.seg button');
   if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg' || g.dataset.go === 'health') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
   if (e.target.closest('[data-pop]')) { pop(); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
@@ -1621,5 +1780,5 @@ renderHome();
 if (!navigator.bluetooth && !NativeTransport.available()) {
   $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
 }
-window.__scanner = { S, D, H, F, connect, push, pop, ACT, getVEH: () => VEH };
+window.__scanner = { S, D, H, F, HL, connect, push, pop, ACT, getVEH: () => VEH };
 })();
