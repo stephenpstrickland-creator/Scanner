@@ -376,7 +376,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
 
   <!-- MONITOR TESTS (mode 06) -->
   <section class="view" id="v-tests" aria-label="Monitor test results">
-    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Readiness</span></button><h2>Monitor Tests</h2>
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Readiness</span></button><h2 id="tr-title">Test Results</h2>
       <div class="navR"><button class="textbtn" data-act="loadTests">Refresh</button></div></div>
     <div class="content" id="testsbody"></div>
   </section>
@@ -1278,7 +1278,7 @@ class RealBackend {
     const rd = await this.e.readiness();
     const st = await this.e.readDTCs(3), pe = await this.e.readDTCs(7), pm = this.e.isCAN() ? await this.e.readDTCs(0x0A) : [];
     const ff = st && st.length ? await this.e.freezeFrame() : null;
-    return { ok: st !== null, mil: rd ? rd.mil : false, stored: st || [], pending: pe || [], permanent: pm || [], ff };
+    return { ok: st !== null, mil: rd ? rd.mil : false, stored: st || [], pending: pe || [], permanent: pm || [], ff, ready: rd };
   }
   async clearCodes() { await this._func(); return (await this.e.lines('04', 6000)).some((s) => s.startsWith('44')); }
   async readiness() { await this._func(); return this.e.readiness(); }
@@ -1506,7 +1506,7 @@ async function connect(demo) {
   S.arrive = false;
   hud(demo ? 'Demo running' : 'Connected', demo ? 'i-gauge' : 'i-check');
   pollLoop();
-  loadCodes();
+  loadEngine();
 }
 function resetData() {
   S.codes = null; S.ff = null; S.ready = null; S.mis = null; S.tests = null; S.scan = { state: 'intro', results: [], i: 0, n: 0, name: '' }; S.selMod = null; S.extra = [];
@@ -2059,7 +2059,9 @@ function renderTiles() {
   const tc = $('#t-codes');
   tc.textContent = !on ? '—' : S.codesLoading && !S.codes ? 'Reading...' : n === null ? 'Tap to read' : n ? n + ' found' : 'No codes';
   tc.className = 'tv' + (n ? ' red' : '');
-  $('#t-ready').textContent = !on ? '—' : S.ready ? S.ready.monitors.filter((m) => m.ready).length + ' of ' + S.ready.monitors.length + ' ready' : 'Tap to check';
+  const tf = on && S.tests ? S.tests.filter((t) => !t.notRun && !t.pass).length : 0, rd = S.ready;
+  $('#t-ready').innerHTML = !on ? '—' : (rd ? rd.monitors.filter((m) => m.ready).length + (tf ? '/' : ' of ') + rd.monitors.length + ' ready' : tf ? '' : 'Tap to check') +
+    (tf ? (rd ? ' · ' : '') + '<span style="color:var(--redT);font-weight:600">' + tf + ' test' + (tf > 1 ? 's' : '') + ' failed</span>' : '');
   const sc = S.scan;
   $('#t-sys').textContent = !on ? '—' : sc.state === 'done' ? sc.results.length + ' found · ' + sc.results.filter((r) => r.dtcs.length).length + ' w/ codes' : sc.state === 'scanning' ? 'Scanning...' : 'Tap to scan';
   if (S.mis && S.mis.length) { const w = S.mis.reduce((a, x) => (x.cur > a.cur ? x : a), S.mis[0]); $('#t-mis').textContent = w.cur ? 'Cyl ' + w.cyl + ' · ' + w.cur : 'All clear'; }
@@ -2089,7 +2091,7 @@ async function loadCodes() {
   S.codesLoading = true; renderCodes(); renderTiles();
   try {
     const r = await job(() => B.codes());
-    S.codes = r; S.ff = r.ff;
+    S.codes = r; S.ff = r.ff; if (r.ready) S.ready = r.ready;
   } catch (e) { S.codes = { ok: false, mil: false, stored: [], pending: [], permanent: [] }; }
   S.codesLoading = false; renderCodes(); renderTiles();
 }
@@ -2126,7 +2128,9 @@ function openCode(code) {
   } else if (ff) h += '<p class="foot" style="text-align:left">The freeze frame was saved for ' + ff.code + ', not this code.</p>';
   const cz = CAUSES[code.split('-')[0]];
   if (cz) h += '<div class="cap in">Common causes</div><ul class="causes">' + cz.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  h += relatedTests(code);
   h += '<p class="foot" style="text-align:left">Look the code up for your exact model before buying parts.</p>';
+  S.sheetCode = code;
   openSheet(code, h);
 }
 
@@ -2151,11 +2155,30 @@ function renderReady() {
   const notReady = mons.filter((m) => !m.ready);
   el.innerHTML = '<div class="ringcard"><div class="big"><svg viewBox="0 0 110 110" width="110" height="110" role="img" aria-label="' + done + ' of ' + mons.length + ' monitors ready">' + ring + '</svg><b>' + done + '/' + mons.length + '</b></div>' +
     '<p><b>' + (notReady.length ? notReady.length + ' not ready' : 'All ready') + '</b>' + (notReady.length ? 'Many states allow one incomplete monitor on 2001+ vehicles. Monitors complete after normal driving.' : 'Ready for an emissions inspection.') + '</p></div>' +
-    '<div class="group">' + mons.map((m) => '<div class="row"><span class="grow">' + m.name + '</span>' +
-      (m.ready ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg><span class="val" style="width:84px">Ready</span>'
-        : '<svg class="ic" style="color:var(--orangeT)"><use href="#i-clock"/></svg><span class="val" style="width:84px;color:var(--orangeT);font-weight:600">Not ready</span>') + '</div>').join('') + '</div>' +
-    (B && B.isCAN ? '<div class="group"><button class="row tap" data-go="tests"><span class="grow">Monitor test results<span class="sub">The pass/fail numbers behind each monitor</span></span>' +
-      (S.tests ? testsChip() : '') + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>' : '');
+    '<div class="group">' + mons.map((m) => {
+      const link = monLink(m.name), bad = link === 'tests' ? groupFails(MON_GROUP[m.name]) : 0;
+      const inner = '<span class="grow">' + m.name + '</span>' + (bad ? '<span class="chip red">' + bad + ' failed</span>' : '') +
+        (m.ready ? '<svg class="ic" style="color:var(--greenT)"><use href="#i-check"/></svg><span class="val" style="width:84px">Ready</span>'
+          : '<svg class="ic" style="color:var(--orangeT)"><use href="#i-clock"/></svg><span class="val" style="width:84px;color:var(--orangeT);font-weight:600">Not ready</span>');
+      return link ? '<button class="row tap" data-act="openMon" data-mon="' + esc(m.name) + '">' + inner + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button>' : '<div class="row">' + inner + '<span style="width:15px"></span></div>';
+    }).join('') + '</div>' +
+    (B && B.isCAN ? '<div class="group"><button class="row tap" data-act="openTests"><span class="grow">All test results<span class="sub">The pass/fail numbers behind each monitor</span></span>' +
+      (S.tests ? testsChip() : '') + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>' : '') +
+    (B && B.isCAN ? '<p class="foot">Tap a monitor to see its test results.</p>' : '');
+}
+// Readiness monitor -> test-result group (or the Misfire screen)
+const MON_GROUP = { 'Catalyst': 'Catalytic converter', 'Heated catalyst': 'Catalytic converter', 'EVAP system': 'EVAP system', 'Secondary air': 'Secondary air',
+  'O2 sensor': 'Oxygen sensors', 'O2 heater': 'Oxygen sensor heaters', 'EGR / VVT': 'EGR / VVT', 'Fuel system': 'Fuel system' };
+function monLink(name) {
+  if (name === 'Misfire') return 'misfire';
+  if (!B || !B.isCAN || !MON_GROUP[name]) return null;
+  if (S.tests && !S.tests.some((t) => t.group === MON_GROUP[name])) return null;   // nothing reported for it
+  return 'tests';
+}
+const groupFails = (g) => (S.tests ? S.tests.filter((t) => t.group === g && !t.notRun && !t.pass).length : 0);
+function openTests(group) {
+  S.testsFilter = group || null;
+  if (top() === 'tests') renderTests(); else push('tests');
 }
 
 // ---------------------------------------------------------------- monitor tests (mode 06)
@@ -2163,8 +2186,53 @@ async function loadTests() {
   if (!B || S.testsLoading) return;
   S.testsLoading = true; renderTests();
   try { S.tests = await job(() => B.monitorTests()); } catch (e) { S.tests = null; }
-  S.testsLoading = false; renderTests();
+  S.testsLoading = false; S.testsTried = true; renderTests(); renderTiles();
+  if (top() === 'ready') renderReady();
+  if (S.sheetCode && $('#sheet').classList.contains('on')) openCode(S.sheetCode);   // fill in "related tests"
 }
+// Codes first, then test results in the background so the badges and links are ready.
+async function loadEngine() {
+  S.tests = null; S.testsTried = false;
+  await loadCodes();
+  if (B && B.isCAN) loadTests();
+}
+
+// Which test results go with a trouble code: { group, mids } (mids empty = whole group), or 'misfire'.
+function codeTests(code) {
+  const m = /^P0(\d{3})$/.exec(code.split('-')[0]);
+  if (!m) return null;
+  const n = +m[1], at = (a, b) => n >= a && n <= b;
+  if (at(300, 312)) return 'misfire';
+  if (at(420, 424)) return { group: 'Catalytic converter', mids: [0x21] };
+  if (at(430, 434)) return { group: 'Catalytic converter', mids: [0x22] };
+  if (n === 441 || n === 496) return { group: 'EVAP system', mids: [0x3D] };
+  if (n === 442) return { group: 'EVAP system', mids: [0x3B] };
+  if (n === 455) return { group: 'EVAP system', mids: [0x39, 0x3A] };
+  if (n === 456) return { group: 'EVAP system', mids: [0x3C] };
+  if (n === 457) return { group: 'EVAP system', mids: [0x39] };
+  if (at(440, 459)) return { group: 'EVAP system', mids: [] };
+  const heater = { 30: 0x41, 31: 0x41, 32: 0x41, 36: 0x42, 37: 0x42, 38: 0x42, 50: 0x45, 51: 0x45, 52: 0x45, 56: 0x46, 57: 0x46, 58: 0x46, 135: 0x41, 141: 0x42, 155: 0x45, 161: 0x46 };
+  if (heater[n]) return { group: 'Oxygen sensor heaters', mids: [heater[n]] };
+  if (at(130, 167)) return { group: 'Oxygen sensors', mids: [[0x01, 0x02, 0x05, 0x06][Math.floor(n / 10) - 13]] };
+  if (n === 171 || n === 172) return { group: 'Fuel system', mids: [0x81] };
+  if (n === 174 || n === 175) return { group: 'Fuel system', mids: [0x82] };
+  if (at(10, 19)) return { group: 'EGR / VVT', mids: [0x35] };
+  if (at(20, 25)) return { group: 'EGR / VVT', mids: [0x36] };
+  if (at(400, 409)) return { group: 'EGR / VVT', mids: [0x31] };
+  return null;
+}
+function relatedTests(code) {
+  const ct = codeTests(code);
+  if (ct === 'misfire') return '<div class="cap in">Related data</div><div class="group"><button class="row tap" data-act="openMisfire"><span class="grow">Misfire counts<span class="sub">Which cylinder is misfiring</span></span><svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>';
+  if (!ct || !B || !B.isCAN) return '';
+  if (!S.tests) return S.testsLoading ? '<div class="cap in">Related test results</div><div class="loading" style="padding:10px 0"><div class="spin" style="width:18px;height:18px"></div>Reading test results...</div>' : '';
+  let list = S.tests.filter((t) => t.group === ct.group && (!ct.mids.length || ct.mids.includes(t.mid)));
+  if (!list.length) list = S.tests.filter((t) => t.group === ct.group);
+  if (!list.length) return '';
+  return '<div class="cap in">Related test results</div><div class="group">' + list.map((t) => '<button class="row tap" data-act="openTests" data-group="' + esc(t.group) + '"><span class="grow"><b style="font-weight:600">' + esc(t.name) + '</b><span class="sub">' + esc(testLimits(t)) + '</span></span>' +
+    '<span class="val num"' + (!t.notRun && !t.pass ? ' style="color:var(--redT);font-weight:600"' : '') + '>' + (t.notRun ? '—' : esc(testVal(t, t.value))) + '</span>' + testChip(t) + '<svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('') + '</div>';
+}
+const testChip = (t) => (t.notRun ? '<span class="chip gray">Not run</span>' : t.pass ? '<span class="chip green">Pass</span>' : '<span class="chip red">Fail</span>');
 function testsChip() {
   const bad = S.tests.filter((t) => !t.notRun && !t.pass).length;
   return '<span class="chip ' + (bad ? 'red">' + bad + ' failed' : 'green">All passed') + '</span>';
@@ -2188,8 +2256,13 @@ const TEST_TIPS = {
 function renderTests() {
   const el = $('#testsbody');
   if (S.testsLoading && !S.tests) { el.innerHTML = '<div class="loading"><div class="spin"></div>Reading test results...</div>'; return; }
+  const f = S.testsFilter;
+  $('#tr-title').textContent = f || 'Test Results';
   if (!S.tests) { el.innerHTML = B ? '<div class="empty"><svg class="ic" style="color:var(--orangeT)"><use href="#i-info"/></svg><b>No test results</b>' + (B.isCAN ? 'This engine computer didn’t report any monitor tests. Try again with the key on.' : 'Test results need a CAN vehicle (most 2008 and newer).') + '</div>' : ''; return; }
-  const all = S.tests, bad = all.filter((t) => !t.notRun && !t.pass), run = all.filter((t) => !t.notRun);
+  const showAll = '<button class="btn tap" data-act="openTests" style="flex-shrink:0">Show all test results</button>';
+  const all = f ? S.tests.filter((t) => t.group === f) : S.tests;
+  if (!all.length) { el.innerHTML = '<div class="empty"><svg class="ic" style="color:var(--sec)"><use href="#i-info"/></svg><b>Nothing reported</b>The engine computer has no test results for this monitor.</div>' + showAll; return; }
+  const bad = all.filter((t) => !t.notRun && !t.pass), run = all.filter((t) => !t.notRun);
   const groups = [];
   all.forEach((t) => { let g = groups.find((x) => x.name === t.group); if (!g) groups.push(g = { name: t.group, tests: [] }); g.tests.push(t); });
   const hasBad = (g) => g.tests.some((t) => !t.notRun && !t.pass);
@@ -2199,12 +2272,13 @@ function renderTests() {
     (all.length > run.length ? '. The rest run during normal driving.' : '.') + '</p></div>';
   groups.forEach((g) => {
     h += '<div class="cap">' + esc(g.name) + '</div><div class="group">' + g.tests.map((t) => {
-      const chip = t.notRun ? '<span class="chip gray">Not run</span>' : t.pass ? '<span class="chip green">Pass</span>' : '<span class="chip red">Fail</span>';
+      const chip = testChip(t);
       return '<div class="row"><span class="grow"><b style="font-weight:600">' + esc(t.name) + '</b><span class="sub">' + esc(t.test) + ' · ' + esc(testLimits(t)) + '</span></span>' +
         '<span class="val num"' + (!t.notRun && !t.pass ? ' style="color:var(--redT);font-weight:600"' : '') + '>' + (t.notRun ? '—' : esc(testVal(t, t.value))) + '</span>' + chip + '</div>';
     }).join('') + '</div>';
     if (hasBad(g) && TEST_TIPS[g.name]) h += '<div class="tip"><svg class="ic"><use href="#i-info"/></svg><span>' + TEST_TIPS[g.name] + '</span></div>';
   });
+  if (f) h += showAll;
   h += '<p class="foot">Results from the engine computer’s last run of each test (Mode 06). Clearing codes erases them until the tests run again. Test numbers 80 and up are defined by the manufacturer. Misfire counts are on the Misfire screen.</p>';
   el.innerHTML = h;
 }
@@ -2296,7 +2370,7 @@ function clearModule() {
     r.loading = true; renderModule();
     let x;
     try { x = await job(() => B.clearModule(r)); } catch (e) { x = { ok: false, msg: e.message }; }
-    if (x.ok) { await job(() => B.reread(r)); hud('Codes cleared'); if (/Engine/.test(r.mod.name)) { S.codes = null; loadCodes(); } }
+    if (x.ok) { await job(() => B.reread(r)); hud('Codes cleared'); if (/Engine/.test(r.mod.name)) { S.codes = null; loadEngine(); } }
     else alertBox({ title: 'Clear failed', msg: x.msg, cancel: false });
     r.loading = false; renderModule(); renderTiles();
   } });
@@ -2653,6 +2727,9 @@ const ACT = {
   loadReady: () => loadReady(),
   loadMis: () => loadMis(),
   loadTests: () => loadTests(),
+  openTests: (el) => { closeSheet(); openTests(el.dataset.group); },
+  openMon: (el) => { const l = monLink(el.dataset.mon); if (l === 'misfire') push('misfire'); else if (l) openTests(MON_GROUP[el.dataset.mon]); },
+  openMisfire: () => { closeSheet(); push('misfire'); },
   openCode: (el) => openCode(el.dataset.code),
   clearEngine: () => {
     if (!B) return needConnection();
@@ -2660,7 +2737,7 @@ const ACT = {
       ok: 'Clear', dest: true, onOk: async () => {
         let ok = false;
         try { ok = await job(() => B.clearCodes()); } catch (e) { ok = false; }
-        if (ok) { hud('Codes cleared'); S.codes = null; S.ready = null; loadCodes(); }
+        if (ok) { hud('Codes cleared'); S.codes = null; S.ready = null; loadEngine(); }
         else alertBox({ title: 'Clear failed', msg: 'The engine computer didn’t confirm. Try with the key on and the engine off.', cancel: false });
       } });
   },

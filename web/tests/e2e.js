@@ -28,11 +28,23 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) pass++; else { fail++; con
   ok(txt('#t-codes') === '3 found', 'tile codes ' + txt('#t-codes'));
   await until(() => txt('#h-rpm') !== '—', 8000, 'home rpm');
   ok(txt('#h-rpm') === '700', 'rpm ' + txt('#h-rpm'));
+  // test results load in the background after codes and show on the Readiness tile
+  await until(() => w.__scanner.S.tests && !w.__scanner.S.testsLoading, 20000, 'background tests');
+  ok(/7\/8 ready · 2 tests failed/.test(txt('#t-ready')), 'ready tile ' + txt('#t-ready'));
   // codes screen + sheet
   click('[data-go="codes"]'); await sleep(200);
   ok(d.querySelectorAll('#codesbody [data-act="openCode"]').length === 3, 'codes rows');
   click('[data-code="P0441"]'); await sleep(100);
   ok(/1,840/.test(txt('#sh-b')) && /Purge valve/.test(txt('#sh-b')), 'freeze frame sheet');
+  ok(/Related test results/.test(txt('#sh-b')) && /Purge flow/.test(txt('#sh-b')) && /Fail/.test(txt('#sh-b')) && !/Leak test/.test(txt('#sh-b')), 'P0441 related test');
+  click('#sh-b [data-act="openTests"]'); await sleep(400);
+  ok(!d.querySelector('#sheet').classList.contains('on') && w.__scanner.S.stack.join() === 'home,codes,tests', 'related test opens tests ' + w.__scanner.S.stack);
+  ok(txt('#tr-title') === 'EVAP system' && d.querySelectorAll('#testsbody .cap').length === 1 && /Show all/.test(txt('#testsbody')), 'filtered to EVAP');
+  click('#testsbody [data-act="openTests"]'); await sleep(100);
+  ok(txt('#tr-title') === 'Test Results' && d.querySelectorAll('#testsbody .cap').length > 4, 'show all');
+  click('#v-tests [data-pop]'); await sleep(200);
+  click('[data-code="P0455"]'); await sleep(100);
+  ok(/Leak test \(0\.090"\)/.test(txt('#sh-b')) && !/Purge flow/.test(txt('#sh-b')), 'P0455 related test');
   click('#sheet [data-act="closeSheet"]'); click('#v-codes [data-pop]'); await sleep(100);
   // live gauges / list / graph
   click('[data-go="live"]'); await until(() => txt('#gv-rpm') === '700', 8000, 'gauge');
@@ -43,12 +55,20 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) pass++; else { fail++; con
   // readiness
   click('[data-go="ready"]'); await until(() => /not ready/.test(txt('#readybody')), 10000, 'ready');
   ok(/EVAP system/.test(txt('#readybody')) && /7\/8/.test(txt('#readybody')), 'readiness ' + txt('.ringcard b'));
-  // monitor tests (mode 06), opened from readiness
-  click('#readybody [data-go="tests"]'); await until(() => /failed/.test(txt('#testsbody')), 15000, 'monitor tests');
+  // tap a monitor: EVAP -> its tests, Misfire -> misfire screen, Components -> not tappable
+  ok(/2 failed/.test(txt('#readybody [data-mon="EVAP system"]')) && !d.querySelector('#readybody [data-mon="Components"]'), 'monitor rows');
+  click('#readybody [data-mon="EVAP system"]'); await sleep(300);
+  ok(txt('#tr-title') === 'EVAP system' && /Purge flow/.test(txt('#testsbody')) && !/O2 sensor/.test(txt('#testsbody')), 'EVAP monitor -> tests');
+  click('#v-tests [data-pop]'); await sleep(200);
+  click('#readybody [data-mon="Misfire"]'); await sleep(300);
+  ok(w.__scanner.S.stack.join() === 'home,ready,misfire', 'misfire monitor -> misfire');
+  click('#v-misfire [data-pop]'); await sleep(200);
+  // all test results
+  click('#readybody [data-act="openTests"]'); await until(() => /failed/.test(txt('#testsbody')), 15000, 'monitor tests');
   ok(/2 failed/.test(txt('#testsbody .ringcard')) && /Purge flow/.test(txt('#testsbody')) && /Not run/.test(txt('#testsbody')), 'tests summary');
   ok(d.querySelector('#testsbody .cap').textContent === 'EVAP system' && /gas cap/.test(txt('#testsbody .tip')), 'failed group first + tip');
   click('#v-tests [data-pop]'); await sleep(200);
-  ok(/2 failed/.test(txt('#readybody [data-go="tests"]')), 'readiness row chip');
+  ok(/2 failed/.test(txt('#readybody [data-act="openTests"]')), 'readiness row chip');
   click('#v-ready [data-pop]'); await sleep(100);
   // misfire
   click('[data-go="misfire"]'); await until(() => d.querySelectorAll('#misbody .bar').length === 6, 10000, 'misfire');
