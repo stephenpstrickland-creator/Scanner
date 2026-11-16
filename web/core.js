@@ -147,6 +147,7 @@ class NativeTransport extends SerialBase {
       },
       onData: (s) => this._onText(s),
       onDisconnect: () => { if (this.onDisconnect) this.onDisconnect(); },
+      onResume: (j) => { this.buf = ''; if (typeof window.__gaugesResume === 'function') window.__gaugesResume(j); },
     };
   }
   _post(m) { nativePost(m); }

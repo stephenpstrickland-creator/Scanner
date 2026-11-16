@@ -3,7 +3,7 @@ name: Scanner
 options:
   bundleIdPrefix: com.diyscanner
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "16.2"
 settings:
   base:
     MARKETING_VERSION: "1.0"
@@ -14,7 +14,10 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: Shared
       - path: Resources
+    dependencies:
+      - target: ScannerGauges
     info:
       path: Sources/Info.plist
       properties:
@@ -31,6 +34,8 @@ targets:
         NSCameraUsageDescription: Take a photo of your vehicle for the home screen.
         NSPhotoLibraryUsageDescription: Choose a photo of your vehicle for the home screen.
         ITSAppUsesNonExemptEncryption: false
+        NSSupportsLiveActivities: true
+        UIBackgroundModes: [bluetooth-central]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.diyscanner.scanner
@@ -41,3 +46,29 @@ targets:
         CODE_SIGNING_REQUIRED: "NO"
         CODE_SIGN_IDENTITY: ""
     scheme: {}
+
+  # Live Activity (CarPlay Dashboard + Lock Screen gauges)
+  ScannerGauges:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: Gauges
+      - path: Shared
+    info:
+      path: Gauges/Info.plist
+      properties:
+        CFBundleDisplayName: Scanner Gauges
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.diyscanner.scanner.gauges
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        APPLICATION_EXTENSION_API_ONLY: "YES"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""

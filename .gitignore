@@ -4,3 +4,4 @@ ios/*.xcodeproj/
 ios/Sources/Info.plist
 ios/Payload/
 *.ipa
+ios/Gauges/Info.plist

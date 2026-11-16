@@ -18,6 +18,11 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
     private var pendingServices = 0
     private var connectName = ""
 
+    /// While true the app (not the page) is talking to the adapter: phone locked, gauges on CarPlay.
+    private(set) var nativeMode = false
+    let poller = GaugePoller()
+    var isConnected: Bool { tx != nil && peripheral?.state == .connected }
+
     // Serial services used by ELM327-style adapters (OBDLink CX and most clones use FFF0).
     private let preferred: [CBUUID] = ["FFF0", "FFE0", "18F0", "E7810A71-73AE-499D-8C15-FAA9AEF0C3F2", "BEEF"].map { CBUUID(string: $0) }
 
@@ -25,6 +30,24 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
         self.webView = webView
         self.presenter = presenter
         super.init()
+        poller.send = { [weak self] text in self?.rawWrite(text) }
+    }
+
+    // MARK: - Background gauges
+
+    func startNative(cfg: [String: Any]) {
+        guard isConnected else { return }
+        nativeMode = true
+        poller.start(cfg: cfg)
+    }
+
+    /// Hands the adapter back to the page; reports the miles/gallons driven meanwhile.
+    func stopNative(_ done: @escaping ([String: Double]) -> Void) {
+        guard nativeMode else { done(["miles": 0, "gal": 0, "secs": 0]); return }
+        poller.stop { [weak self] result in
+            self?.nativeMode = false
+            done(result)
+        }
     }
 
     // MARK: - Commands from the page
@@ -40,6 +63,11 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
     }
 
     func write(_ text: String) {
+        if nativeMode { return }   // the page is paused; ignore anything it sent late
+        rawWrite(text)
+    }
+
+    func rawWrite(_ text: String) {
         guard let p = peripheral, let t = tx else { return }
         let bytes = Array(text.utf8)
         let type: CBCharacteristicWriteType = t.properties.contains(.write) ? .withResponse : .withoutResponse
@@ -53,6 +81,7 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
 
     func disconnect() {
         wantConnect = false
+        endNative()
         if scanning { central?.stopScan(); scanning = false }
         if let p = peripheral { central?.cancelPeripheralConnection(p) }
         peripheral = nil; rx = nil; tx = nil
@@ -150,7 +179,7 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         let wasReady = tx != nil
-        if self.peripheral === peripheral { self.peripheral = nil; rx = nil; tx = nil }
+        if self.peripheral === peripheral { self.peripheral = nil; rx = nil; tx = nil; endNative() }
         if wasReady { js("onDisconnect", "") }
     }
 
@@ -204,10 +233,21 @@ final class BLEBridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard characteristic == rx, let data = characteristic.value, !data.isEmpty else { return }
         let text = String(data: data, encoding: .isoLatin1) ?? String(decoding: data, as: UTF8.self)
-        js("onData", text)
+        if nativeMode { poller.feed(text) } else { js("onData", text) }
     }
 
     // MARK: - Helpers
+
+    private func endNative() {
+        if nativeMode { poller.cancel(); nativeMode = false }
+        LiveGauges.shared.end()
+    }
+
+    /// Calls window.__nativeBle.onResume(<json>) so the page adds the background trip to its own totals.
+    func resumePage(_ result: [String: Double]) {
+        guard let data = try? JSONSerialization.data(withJSONObject: result), let json = String(data: data, encoding: .utf8) else { return }
+        js("onResume", json)
+    }
 
     private func fail(_ message: String) {
         wantConnect = false

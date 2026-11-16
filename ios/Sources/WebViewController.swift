@@ -37,6 +37,9 @@ final class WebViewController: UIViewController, WKScriptMessageHandler, WKNavig
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        LiveGauges.shared.endLeftovers()
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
             webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
@@ -63,6 +66,8 @@ final class WebViewController: UIViewController, WKScriptMessageHandler, WKNavig
                 let text = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
                 DispatchQueue.main.async { self?.callJS("__nativeFetch", [id, text]) }
             }.resume()
+        case "gauges":
+            handleGauges(body)
         case "share":
             share(name: body["name"] as? String ?? "scan.csv", text: body["data"] as? String ?? "")
         case "theme":
@@ -74,6 +79,60 @@ final class WebViewController: UIViewController, WKScriptMessageHandler, WKNavig
             setNeedsStatusBarAppearanceUpdate()
         default:
             break
+        }
+    }
+
+    // MARK: - CarPlay / Lock Screen gauges
+
+    private var gaugeCfg: [String: Any] = [:]
+    private var gaugesOn = false
+    private var pageHandedOff = false
+
+    private func handleGauges(_ body: [String: Any]) {
+        if var cfg = body["cfg"] as? [String: Any] {
+            if let v = body["vehicle"] as? String { cfg["vehicle"] = v } else if let v = gaugeCfg["vehicle"] { cfg["vehicle"] = v }
+            gaugeCfg = cfg
+        }
+        switch body["action"] as? String ?? "" {
+        case "update":
+            gaugesOn = true
+            guard !ble.nativeMode, let raw = body["items"] as? [[String: Any]] else { return }
+            let items = raw.map { d in
+                GaugeAttributes.Item(label: d["label"] as? String ?? "", value: d["value"] as? String ?? "—",
+                                     unit: d["unit"] as? String ?? "", level: (d["level"] as? NSNumber)?.intValue ?? 0)
+            }
+            LiveGauges.shared.update(vehicle: gaugeCfg["vehicle"] as? String ?? "Your vehicle",
+                                     state: GaugeAttributes.ContentState(items: items, alert: body["alert"] as? String ?? ""))
+        case "handoff":
+            pageHandedOff = true
+            gaugesOn = (body["enabled"] as? Bool) ?? gaugesOn
+            if UIApplication.shared.applicationState != .active { goNative() }
+        case "end":
+            gaugesOn = false
+            LiveGauges.shared.end()
+        default:
+            break
+        }
+    }
+
+    @objc private func appDidEnterBackground() {
+        // The page normally hands off right away; if it was suspended first, take over anyway.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            guard let self = self, UIApplication.shared.applicationState != .active else { return }
+            self.goNative()
+        }
+    }
+
+    private func goNative() {
+        guard gaugesOn, !ble.nativeMode, ble.isConnected, !gaugeCfg.isEmpty else { return }
+        ble.startNative(cfg: gaugeCfg)
+    }
+
+    @objc private func appWillEnterForeground() {
+        let handedOff = pageHandedOff
+        pageHandedOff = false
+        ble.stopNative { [weak self] result in
+            if handedOff || result["miles"] ?? 0 > 0 { self?.ble.resumePage(result) }
         }
     }
 

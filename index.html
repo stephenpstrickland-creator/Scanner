@@ -570,6 +570,7 @@ class NativeTransport extends SerialBase {
       },
       onData: (s) => this._onText(s),
       onDisconnect: () => { if (this.onDisconnect) this.onDisconnect(); },
+      onResume: (j) => { this.buf = ''; if (typeof window.__gaugesResume === 'function') window.__gaugesResume(j); },
     };
   }
   _post(m) { nativePost(m); }
@@ -1413,12 +1414,14 @@ function resetData() {
   if (S.mode === 'live') Object.keys(H).forEach((k) => { delete H[k]; });
 }
 function disconnect() {
+  lgEnd();
   if (F.trip) saveFuel();
   if (B) B.disconnect();
   B = null; S.mode = 'off'; S.rec = false; resetData(); goHome(); renderHome(); closeSheet();
 }
 function onDisconnected() {
   if (S.mode !== 'live') return;
+  lgEnd();
   B = null; S.mode = 'off'; resetData(); goHome(); renderHome();
   alertBox({ title: 'Adapter disconnected', msg: 'The Bluetooth connection dropped. Check the adapter is plugged in, then connect again.', cancel: false });
 }
@@ -1444,7 +1447,9 @@ function fuelKeys() {
 function pollKeys() {
   const k = basePollKeys();
   if (k === 'extra') return k;
-  return k.concat(fuelKeys().filter((x) => !k.includes(x)));
+  const out = k.concat(fuelKeys().filter((x) => !k.includes(x)));
+  lgPollKeys().forEach((x) => { if (!out.includes(x)) out.push(x); });
+  return out;
 }
 function basePollKeys() {
   const t = top();
@@ -2324,6 +2329,7 @@ function settings() {
   } else {
     h += '<div class="group"><button class="row tap" data-act="connect"><span class="grow" style="color:var(--blueT)">Connect Adapter</span></button><button class="row tap" data-act="demo"><span class="grow" style="color:var(--blueT)">Try Demo</span></button></div>';
   }
+  h += lgSettingsHtml();
   h += '<p class="foot">Works with Bluetooth LE OBD adapters (ELM327-compatible or OBDLink CX)' + (NativeTransport.available() ? '.' : ' in the Bluefy browser.') + '</p>';
   openSheet('Settings', h);
   segSet('theme', S.theme); segSet('temp', S.tempU); segSet('speedu', S.speedU);
@@ -2343,9 +2349,101 @@ async function runCheck() {
     res.map((r) => '<div class="row ic-row">' + icon(r.ok) + '<span class="grow"><span>' + esc(r.name) + '</span><span class="sub" style="white-space:normal">' + esc(r.detail) + '</span></span></div>').join('') + '</div>';
 }
 
+
+// ---------------------------------------------------------------- CarPlay / Lock Screen gauges (iPhone app only)
+// The page sends the chosen values to the iPhone app about once a second; the app shows them as a Live Activity,
+// which iOS 26 puts on the CarPlay Dashboard and the Lock Screen. When the phone locks, the app keeps reading
+// these gauges itself (BLEBridge.swift) and hands the trip totals back when you return.
+const LG_ITEMS = {
+  cool: { n: 'Coolant', pids: ['cool'] },
+  tmpg: { n: 'Trip MPG', pids: 'fuel' },
+  impg: { n: 'Instant MPG', pids: 'fuel' },
+  cost: { n: 'Trip cost', pids: 'fuel' },
+  volt: { n: 'Battery', pids: ['volt'] },
+  rpm: { n: 'RPM', pids: ['rpm'] },
+  speed: { n: 'Speed', pids: ['speed'] },
+  fuel: { n: 'Fuel level', pids: ['fuel'] },
+  oil: { n: 'Oil temp', pids: ['oil'] },
+  iat: { n: 'Intake temp', pids: ['iat'] },
+  load: { n: 'Engine load', pids: ['load'] },
+  tps: { n: 'Throttle', pids: ['tps'] },
+};
+const LG = { on: store.get('lg.on', '1') === '1', keys: (store.get('lg.keys', 'cool,tmpg,volt,rpm') || '').split(',').filter((k) => LG_ITEMS[k]).slice(0, 4), last: 0, started: false, paused: false };
+while (LG.keys.length < 4) LG.keys.push(['cool', 'tmpg', 'volt', 'rpm'].find((k) => !LG.keys.includes(k)) || 'speed');
+const lgActive = () => LG.on && NativeTransport.available() && S.mode === 'live' && !!B;
+function lgPollKeys() {
+  if (!lgActive()) return [];
+  const out = [];
+  LG.keys.forEach((k) => { const p = LG_ITEMS[k].pids; (p === 'fuel' ? fuelKeys() : p).forEach((x) => { if (!out.includes(x)) out.push(x); }); });
+  return out;
+}
+function lgItem(k) {
+  const it = { label: LG_ITEMS[k].n, value: '—', unit: '', level: 0 };
+  const has = (x) => D[x] !== undefined && D[x] !== null && !isNaN(D[x]);
+  switch (k) {
+    case 'cool': case 'oil': case 'iat':
+      if (has(k)) { it.value = String(Math.round(conv(k, D[k]))); it.unit = unit(k); if (k !== 'iat' && D[k] >= (k === 'oil' ? 130 : 110)) it.level = 2; else if (k !== 'iat' && D[k] >= (k === 'oil' ? 120 : 104)) it.level = 1; }
+      break;
+    case 'tmpg': { const m = tripMPG(F.trip); it.unit = 'mpg'; if (m !== null) it.value = m.toFixed(1); break; }
+    case 'impg': it.unit = 'mpg'; if (F.inst !== null && F.inst !== undefined) it.value = F.inst.toFixed(1); break;
+    case 'cost': it.label = 'Trip cost'; if (F.trip) it.value = money(F.trip.gal * F.price); break;
+    case 'volt': if (has('volt')) { it.value = D.volt.toFixed(1); it.unit = 'V'; it.level = D.volt < 11.8 ? 2 : D.volt < 12.2 ? 1 : 0; } break;
+    case 'speed': if (has('speed')) { it.value = fmt('speed', D.speed); it.unit = unit('speed'); } break;
+    default: if (has(k)) { it.value = fmt(k, D[k]); it.unit = unit(k) === 'rpm' ? '' : unit(k); }
+  }
+  return it;
+}
+function lgAlert() {
+  if (D.cool !== undefined && D.cool >= 110) return 'Engine hot: ' + tempStr(D.cool);
+  if (D.volt !== undefined && D.volt < 11.8) return 'Battery low: ' + D.volt.toFixed(1) + ' V';
+  if (D.volt !== undefined && D.rpm > 500 && D.volt < 12.6) return 'Not charging: ' + D.volt.toFixed(1) + ' V';
+  return null;
+}
+function lgCfg() {
+  return { vehicle: vehicleName(), keys: LG.keys, tempF: S.tempU === 'F', mph: S.speedU === 'mph', fuel: B && B.supported('maf') ? 'maf' : (B && ['map', 'rpm', 'iat'].every((k) => B.supported(k)) ? 'sd' : ''),
+    disp: (VEH && VEH.disp) || 2.5, price: F.price, miles: F.trip ? F.trip.miles : 0, gal: F.trip ? F.trip.gal : 0, voltPid: !!(B && B.e && B.e.sup && B.e.sup[0x42]),
+    labels: LG.keys.map((k) => LG_ITEMS[k].n) };
+}
+function lgTick(force) {
+  if (!lgActive() || LG.paused) return;
+  const now = Date.now();
+  if (!force && now - LG.last < 1000) return;
+  LG.last = now; LG.started = true;
+  try { nativePost({ op: 'gauges', action: 'update', vehicle: vehicleName(), items: LG.keys.map(lgItem), alert: lgAlert() || '', cfg: lgCfg() }); } catch (e) { /* ignore */ }
+}
+function lgEnd() { if (LG.started) { LG.started = false; try { nativePost({ op: 'gauges', action: 'end' }); } catch (e) { /* ignore */ } } }
+// Phone locked / app in the background: stop polling here and let the app take over.
+document.addEventListener('visibilitychange', async () => {
+  if (!NativeTransport.available() || S.mode !== 'live' || !B) return;
+  if (document.hidden) {
+    LG.paused = true; S.busy++;
+    const t0 = Date.now(); while (S.inRead && Date.now() - t0 < 2500) await sleep(20);
+    if (F.trip) saveFuel();
+    try { nativePost({ op: 'gauges', action: 'handoff', cfg: lgCfg(), enabled: LG.on }); } catch (e) { /* ignore */ }
+  } else if (LG.paused) {
+    // the app normally calls __gaugesResume with the trip totals; don't stay paused if it doesn't
+    setTimeout(() => { if (LG.paused && !document.hidden) window.__gaugesResume('{}'); }, 3000);
+  }
+});
+window.__gaugesResume = (j) => {
+  let d = {}; try { d = typeof j === 'string' ? JSON.parse(j || '{}') : (j || {}); } catch (e) { d = {}; }
+  if (F.trip && d.miles > 0) { F.trip.miles += d.miles; F.trip.gal += d.gal || 0; F.trip.secs += d.secs || 0; F.trip.last = Date.now(); saveFuel(); }
+  F.lastT = 0;
+  if (LG.paused) { LG.paused = false; S.busy = Math.max(0, S.busy - 1); }
+  lgTick(true);
+};
+function lgSettingsHtml() {
+  if (!NativeTransport.available()) return '<div class="cap">CarPlay & Lock Screen</div><div class="group"><div class="row"><span class="grow">Live gauges</span><span class="val">iPhone app only</span></div></div>' +
+    '<p class="foot" style="text-align:left;margin:0 4px">In the installed iPhone app, four gauges you pick show on your CarPlay Dashboard and Lock Screen while you drive.</p>';
+  const rows = LG.keys.map((k, i) => '<button class="row tap" data-act="lgSlot" data-i="' + i + '"><span class="grow">Gauge ' + (i + 1) + '</span><span class="val">' + LG_ITEMS[k].n + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>').join('');
+  return '<div class="cap">CarPlay & Lock Screen</div><div class="group"><div class="row"><span class="grow">Live gauges</span><button class="switch tap' + (LG.on ? ' on' : '') + '" data-act="lgToggle" aria-label="Live gauges"><i></i></button></div>' +
+    (LG.on ? rows : '') + '</div><p class="foot" style="text-align:left;margin:0 4px">While connected, these show on your CarPlay Dashboard and Lock Screen, and keep updating with the phone locked. Turn on Live Activities in Settings › Scanner if they don’t appear.</p>';
+}
+
 // ---------------------------------------------------------------- refresh
 function updateAll() {
   fuelTick();
+  lgTick();
   const t = top();
   if (t === 'mpg') updateMpg();
   if (t === 'home') updateHome();
@@ -2377,6 +2475,17 @@ const ACT = {
   saveFill: (el) => saveFill(el),
   deleteFill: (el) => alertBox({ title: 'Delete this fill-up?', ok: 'Delete', dest: true, onOk: () => { F.fills = F.fills.filter((f) => f.id !== el.dataset.id); saveFuel(); closeSheet(); renderMpg(); updateFuelCard(); } }),
   toggleSwitch: (el) => el.classList.toggle('on'),
+  lgToggle: () => { LG.on = !LG.on; store.set('lg.on', LG.on ? '1' : '0'); if (!LG.on) lgEnd(); else lgTick(true); settings(); },
+  lgSlot: (el) => {
+    const i = +el.dataset.i;
+    openSheet('Gauge ' + (i + 1), '<div class="group">' + Object.keys(LG_ITEMS).map((k) => '<button class="row tap" data-act="lgPick" data-i="' + i + '" data-k="' + k + '"><span class="grow">' + LG_ITEMS[k].n + '</span>' +
+      (LG.keys[i] === k ? '<svg class="ic" style="color:var(--blueT)"><use href="#i-check"/></svg>' : '') + '</button>').join('') + '</div>');
+  },
+  lgPick: (el) => {
+    const i = +el.dataset.i, k = el.dataset.k, j = LG.keys.indexOf(k);
+    if (j >= 0 && j !== i) LG.keys[j] = LG.keys[i];   // swap if it's already in another slot
+    LG.keys[i] = k; store.set('lg.keys', LG.keys.join(',')); lgTick(true); settings();
+  },
   connect: () => { closeSheet(); connect(false); },
   demo: () => { closeSheet(); connect(true); },
   cancelConnect: () => {
