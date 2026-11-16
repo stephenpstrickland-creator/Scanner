@@ -10,8 +10,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unpack scanner-app.zip
-        run: unzip -o -q scanner-app.zip
+      - name: Unpack scanner-app.zip (only if one was uploaded)
+        run: if [ -f scanner-app.zip ]; then unzip -o -q scanner-app.zip; fi
       - name: Put the scanner interface inside the app
         run: cp index.html ios/Resources/index.html
       - name: Create the Xcode project

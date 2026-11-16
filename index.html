@@ -176,6 +176,65 @@ button { color: inherit; }
 .bigcard .bv span { font-size: 20px; font-weight: 500; color: var(--sec); }
 .bigcard svg { width: 100%; height: 28px; }
 
+
+/* vehicle hero */
+.hero { display: flex; flex-direction: column; gap: 12px; width: 100%; border: 0; padding: 0; background: none; text-align: left; color: inherit; cursor: pointer; }
+.stage { position: relative; display: flex; justify-content: center; align-items: flex-end; margin: -6px -6px 0; min-height: 120px;
+  background: radial-gradient(60% 38% at 50% 94%, rgba(255,255,255,.09), transparent 72%); }
+html[data-theme="light"] .stage { background: radial-gradient(60% 38% at 50% 94%, rgba(0,0,0,.06), transparent 72%); }
+.stage.photo { margin: -16px -16px 0; min-height: 0; background: none; }
+.carsvg { width: 100%; max-width: 400px; height: auto; display: block; }
+.carsvg.dim { filter: grayscale(1); opacity: .35; }
+.carsvg.on .glow { opacity: .55; }
+.carphoto { display: block; width: 100%; height: 200px; object-fit: cover; border-radius: 16px 16px 0 0; }
+.carphoto.dim { filter: grayscale(.8) brightness(.55); }
+.stage:not(.photo) .carphoto { border-radius: 12px; }
+.arrive { animation: arrive 1.05s cubic-bezier(.16,.84,.3,1) both; }
+.carsvg.arrive .glow { animation: flash 1.5s .85s both; }
+.carphoto.arrive { animation: photoin .9s cubic-bezier(.16,.84,.3,1) both; }
+@keyframes arrive { from { transform: translateX(110px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes flash { 0% { opacity: 0; } 12% { opacity: 1; } 26% { opacity: .15; } 40% { opacity: 1; } 100% { opacity: .55; } }
+@keyframes photoin { from { transform: scale(1.08); opacity: 0; } to { transform: none; opacity: 1; } }
+.vprev { background: var(--cell); border-radius: 14px; padding: 12px 10px 4px; overflow: hidden; }
+.vprev .carphoto { margin: -12px -10px -4px; width: calc(100% + 20px); height: 210px; border-radius: 0; }
+.swatches { display: flex; gap: 12px; flex-wrap: wrap; padding: 2px 4px; }
+.swatch { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(128,128,128,.4); cursor: pointer; padding: 0; }
+.swatch.on { outline: 3px solid var(--blue); outline-offset: 3px; }
+.credit { position: absolute; right: 8px; bottom: 6px; max-width: 80%; font-size: 9px; line-height: 12px; color: rgba(255,255,255,.85); background: rgba(0,0,0,.45); padding: 1px 6px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.vprev { position: relative; }
+.vprev.photo { padding: 0; }
+.vprev.photo .carphoto { margin: 0; width: 100%; }
+.ptiles { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 4px; }
+.ptiles::-webkit-scrollbar { display: none; }
+.ptile { flex: 0 0 auto; width: 108px; height: 72px; border-radius: 10px; overflow: hidden; border: 0; padding: 0; background: var(--cell); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.ptile img { width: 100%; height: 100%; object-fit: cover; }
+.ptile .carsvg { width: 96%; }
+.ptile.on { outline: 3px solid var(--blue); outline-offset: 2px; }
+/* fuel */
+.fuelcard { display: flex; align-items: center; gap: 12px; background: var(--card); border: 0; border-radius: 18px; padding: 14px 16px; width: 100%; text-align: left; cursor: pointer; flex-shrink: 0; }
+.fuelcard .grow { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.fuelcard .grow b { font-size: 17px; font-weight: 600; }
+.fuelcard .s { font-size: 14px; color: var(--sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fcv { display: flex; flex-direction: column; align-items: flex-end; }
+.fcv b { font-size: 28px; font-weight: 600; letter-spacing: -.7px; line-height: 30px; }
+.fcv span { font-size: 11px; font-weight: 700; color: var(--sec); letter-spacing: .3px; }
+.mpggauge { position: relative; background: var(--card); border-radius: 18px; padding: 18px 16px 8px; display: flex; justify-content: center; flex-shrink: 0; }
+.mpggauge svg { width: 250px; height: 145px; }
+.mg { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; flex-direction: column; align-items: center; }
+.mg b { font-size: 48px; font-weight: 600; letter-spacing: -1.6px; line-height: 52px; }
+.mg span { font-size: 13px; color: var(--sec); font-weight: 600; }
+.stats4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0; }
+@media (min-width: 560px) { .stats4 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.stats4 .stat b { font-size: 24px; }
+.ffsum { text-align: center; font-size: 30px; font-weight: 600; letter-spacing: -.6px; }
+.switch { width: 51px; height: 31px; border-radius: 16px; border: 0; background: var(--fill2); position: relative; padding: 0; flex-shrink: 0; transition: background .2s; cursor: pointer; }
+.switch i { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.25); transition: transform .25s cubic-bezier(.32,.72,0,1); }
+.switch.on { background: var(--green); }
+.switch.on i { transform: translateX(20px); }
+.sheet input[type=number], .sheet input[type=date] { flex: 1; min-width: 0; text-align: right; border: 0; background: none; color: var(--label); font-size: 17px; outline: none; -webkit-appearance: none; appearance: none; font-family: inherit; -webkit-user-select: text; user-select: text; }
+.sheet input[type=date] { min-height: 30px; }
+.sheet input::placeholder { color: var(--sec); }
+
 /* overlays */
 .scrim { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.42); opacity: 0; pointer-events: none; transition: opacity .3s; }
 .scrim.on { opacity: 1; pointer-events: auto; }
@@ -242,6 +301,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
   <symbol id="i-gears" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M16.3 16.3l2.1 2.1"/><path d="M5.6 18.4l2.1-2.1"/><path d="M16.3 7.7l2.1-2.1"/></symbol>
   <symbol id="i-steer" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2"/><path d="M4 11h6"/><path d="M14 11h6"/><path d="M12 14v6.5"/></symbol>
   <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></symbol>
+  <symbol id="i-pump" viewBox="0 0 24 24"><path d="M5 20.5V5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 5v15.5"/><path d="M3.5 20.5h12"/><path d="M7 8h5"/><path d="M14 9.5h1.5l2 2v5.5a1.5 1.5 0 0 0 3 0V8.5l-3-3"/></symbol>
 </svg>
 
 <div id="app">
@@ -251,6 +311,7 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
     <div class="content">
       <div class="homehead"><h1>Scanner</h1><button class="iconbtn tap" data-act="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button></div>
       <div class="carcard" id="carcard"></div>
+      <button class="fuelcard tap" data-go="mpg"><span class="sq" style="background:#30C452"><svg class="ic"><use href="#i-pump"/></svg></span><span class="grow"><b>Fuel &amp; MPG</b><span class="s" id="fc-sub">Live MPG, trips &amp; fill-ups</span></span><span class="fcv"><b class="num" id="fc-mpg">—</b><span>TRIP MPG</span></span></button>
       <div class="tiles">
         <button class="tile tap" data-go="codes"><span class="sq" style="background:#FF3B30"><svg class="ic"><use href="#i-warn"/></svg></span><span class="badge" id="h-badge"></span><span class="tl">Codes</span><span class="tv" id="t-codes">—</span></button>
         <button class="tile tap" data-go="live"><span class="sq" style="background:#0A84FF"><svg class="ic"><use href="#i-gauge"/></svg></span><span class="tl">Live Data</span><span class="tv num" id="t-live">—</span></button>
@@ -325,6 +386,12 @@ html[data-theme="dark"] .sheet { --sec: #AEAEB2; }
     </div>
   </section>
 
+  <!-- FUEL & MPG -->
+  <section class="view" id="v-mpg" aria-label="Fuel and MPG">
+    <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Fuel &amp; MPG</h2><span></span></div>
+    <div class="content" id="mpgbody"></div>
+  </section>
+
   <!-- EXTRA -->
   <section class="view" id="v-extra" aria-label="Extra data">
     <div class="nav"><button class="back" data-pop><svg class="ic"><use href="#i-chev-l"/></svg><span>Home</span></button><h2>Extra Data</h2>
@@ -372,14 +439,41 @@ const BLE_SERVICES = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-class BleTransport {
-  constructor() { this.buf = ''; this.waiter = null; this.dev = null; this.rx = null; this.tx = null; this.onDisconnect = null; }
+// Shared prompt-based serial logic: collect bytes until the ELM ">" prompt.
+class SerialBase {
+  constructor() { this.buf = ''; this.waiter = null; this.onDisconnect = null; this.onStatus = null; }
+  _onText(s) { this.buf += s; this._check(); }
+  _check() {
+    const i = this.buf.indexOf('>');
+    if (this.waiter && i >= 0) {
+      const w = this.waiter; this.waiter = null;
+      const out = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1);
+      w(out);
+    }
+  }
+  request(cmd, timeoutMs) {
+    this.buf = '';
+    return new Promise((resolve) => {
+      const w = (s) => { clearTimeout(timer); resolve(s); };
+      const timer = setTimeout(() => {
+        if (this.waiter === w) { this.waiter = null; const b = this.buf; this.buf = ''; resolve(b + '\rTIMEOUT'); }
+      }, timeoutMs);
+      this.waiter = w;
+      Promise.resolve().then(() => this._write(cmd + '\r')).catch((e) => { if (this.waiter === w) { this.waiter = null; clearTimeout(timer); resolve('\rERROR ' + e.message); } });
+    });
+  }
+}
+
+// Web Bluetooth (Bluefy / Chrome).
+class BleTransport extends SerialBase {
+  constructor() { super(); this.dev = null; this.rx = null; this.tx = null; }
 
   async connect() {
     if (!navigator.bluetooth) throw new Error('This browser has no Bluetooth. Open the page in Bluefy.');
     const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES });
     this.dev = dev;
     dev.addEventListener('gattserverdisconnected', () => { if (this.onDisconnect) this.onDisconnect(); });
+    if (this.onStatus) this.onStatus('Connecting to ' + (dev.name || 'adapter') + '...');
     const server = await dev.gatt.connect();
     const services = await server.getPrimaryServices();
     for (const svc of services) {
@@ -395,27 +489,15 @@ class BleTransport {
     }
     if (!this.rx) throw new Error('This adapter has no serial service I recognise.');
     await this.rx.startNotifications();
-    this.rx.addEventListener('characteristicvaluechanged', (e) => this._onData(e.target.value));
+    this.rx.addEventListener('characteristicvaluechanged', (e) => {
+      const dv = e.target.value; let s = '';
+      for (let i = 0; i < dv.byteLength; i++) s += String.fromCharCode(dv.getUint8(i));
+      this._onText(s);
+    });
     return dev.name || 'OBD adapter';
   }
 
   disconnect() { try { if (this.dev && this.dev.gatt.connected) this.dev.gatt.disconnect(); } catch (e) { /* ignore */ } }
-
-  _onData(dv) {
-    let s = '';
-    for (let i = 0; i < dv.byteLength; i++) s += String.fromCharCode(dv.getUint8(i));
-    this.buf += s;
-    this._check();
-  }
-
-  _check() {
-    const i = this.buf.indexOf('>');
-    if (this.waiter && i >= 0) {
-      const w = this.waiter; this.waiter = null;
-      const out = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1);
-      w(out);
-    }
-  }
 
   async _write(str) {
     const bytes = new TextEncoder().encode(str);
@@ -427,18 +509,28 @@ class BleTransport {
       else await this.tx.writeValue(part);
     }
   }
+}
 
-  request(cmd, timeoutMs) {
-    this.buf = '';
-    return new Promise((resolve) => {
-      const w = (s) => { clearTimeout(timer); resolve(s); };
-      const timer = setTimeout(() => {
-        if (this.waiter === w) { this.waiter = null; const b = this.buf; this.buf = ''; resolve(b + '\rTIMEOUT'); }
-      }, timeoutMs);
-      this.waiter = w;
-      this._write(cmd + '\r').catch((e) => { if (this.waiter === w) { this.waiter = null; clearTimeout(timer); resolve('\rERROR ' + e.message); } });
-    });
+// Native iPhone app: CoreBluetooth lives in Swift (BLEBridge.swift); this talks to it.
+class NativeTransport extends SerialBase {
+  static available() { return !!(typeof window !== 'undefined' && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.ble); }
+  constructor() {
+    super(); this.pending = null;
+    window.__nativeBle = {
+      onStatus: (s) => { if (this.onStatus) this.onStatus(s); },
+      onConnected: (n) => { const p = this.pending; this.pending = null; if (p) p.res(n || 'OBD adapter'); },
+      onError: (m) => {
+        const p = this.pending; this.pending = null;
+        if (p) { const e = new Error(m === 'cancel' ? 'Cancelled' : m); if (m === 'cancel') e.name = 'NotFoundError'; p.rej(e); }
+      },
+      onData: (s) => this._onText(s),
+      onDisconnect: () => { if (this.onDisconnect) this.onDisconnect(); },
+    };
   }
+  _post(m) { window.webkit.messageHandlers.ble.postMessage(m); }
+  connect() { return new Promise((res, rej) => { this.pending = { res, rej }; this._post({ op: 'connect' }); }); }
+  disconnect() { try { this._post({ op: 'disconnect' }); } catch (e) { /* ignore */ } }
+  _write(str) { this._post({ op: 'write', data: str }); }
 }
 
 // ---------------------------------------------------------------- helpers
@@ -1014,9 +1106,11 @@ const pct = (v) => (v > 0 ? '+' : '') + v.toFixed(1) + '%';
 
 // ---------------------------------------------------------------- real backend
 class RealBackend {
-  constructor() { this.t = new BleTransport(); this.e = new Elm(this.t); this.a = new AllSystems(this.e); this.adapterName = ''; }
+  constructor() { this.t = NativeTransport.available() ? new NativeTransport() : new BleTransport(); this.e = new Elm(this.t); this.a = new AllSystems(this.e); this.adapterName = ''; }
   async connect(status) {
+    this.t.onStatus = status;
     this.adapterName = await this.t.connect();
+    this.t.onStatus = null;
     this.t.onDisconnect = () => onDisconnected();
     await this.e.connect(status);
   }
@@ -1080,12 +1174,12 @@ class DemoBackend {
     let rpm;
     if (!moving) rpm = 700 + 14 * Math.sin(t * 2 * Math.PI * 1.6) + rnd(6);
     else { const g = mph < 12 ? 1 : mph < 24 ? 2 : mph < 36 ? 3 : 4; rpm = Math.max(820, mph * [0, 118, 66, 44, 33][g] + (accel ? 260 : 0)) + rnd(10); }
-    const load = !moving ? 21 + rnd(1) : accel ? 62 + rnd(3) : decel ? 12 + rnd(1) : 34 + rnd(2);
+    const load = !moving ? 21 + rnd(1) : accel ? 62 + rnd(3) : decel ? 12 + rnd(1) : 52 + rnd(2);
     const f2c = (f) => (f - 32) * 5 / 9;
     this.D = {
       rpm, speed: mph * 1.609, load, tps: !moving ? 14.5 + rnd(.2) : accel ? 38 + rnd(2) : decel ? 13.7 : 18 + rnd(1),
       cool: f2c(150 + 46 * (1 - Math.exp(-t / 40)) + rnd(.3)), iat: f2c(88 + rnd(.4) - (moving ? 3 : 0)),
-      maf: rpm * load / 100 * 0.024 + rnd(.1), map: 30 + load * 0.6 + rnd(1), timing: !moving ? 10 + rnd(1) : accel ? 18 + rnd(1) : 32 + rnd(1),
+      maf: rpm * load / 100 * 0.0306 + rnd(.1), map: 30 + load * 0.6 + rnd(1), timing: !moving ? 10 + rnd(1) : accel ? 18 + rnd(1) : 32 + rnd(1),
       stft1: 1.4 * Math.sin(t * 1.3) + rnd(.8), stft2: 1.1 * Math.sin(t * 1.1 + 1) + rnd(.8), ltft1: 4.7, ltft2: 3.1,
       o2: (Math.sin(t * 5) > 0 ? 0.78 : 0.12) + rnd(.03), volt: 14.1 + rnd(.03), fuel: 62, baro: 101, runtime: t,
       atfA: f2c(140 + 35 * (1 - Math.exp(-t / 90)) + (moving ? 1.5 * Math.sin(t / 3) : 0) + rnd(.15)), atfB: f2c(130 + 30 * (1 - Math.exp(-t / 120)) + rnd(.1)),
@@ -1138,7 +1232,7 @@ class DemoBackend {
 }
 
 // ---------------------------------------------------------------- navigation
-const TITLES = { home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', fuel: 'Fuel Trim', extra: 'Extra' };
+const TITLES = { mpg: 'Fuel', home: 'Home', live: 'Live', codes: 'Codes', ready: 'Readiness', systems: 'Systems', module: 'Module', misfire: 'Misfire', fuel: 'Fuel Trim', extra: 'Extra' };
 const view = (n) => $('#v-' + n);
 const top = () => S.stack[S.stack.length - 1];
 function push(n) {
@@ -1167,6 +1261,7 @@ function onShow(n) {
   if (n === 'live') { buildLive(); updateLive(); }
   if (n === 'extra') initExtra();
   if (n === 'fuel') drawFuel();
+  if (n === 'mpg') renderMpg();
 }
 
 // ---------------------------------------------------------------- overlays
@@ -1202,27 +1297,24 @@ function onSeg(seg, val) {
   segSet(seg, val);
   if (seg === 'live') { S.liveMode = val; ['gauges', 'list', 'graph'].forEach((m) => $('#p-' + m).classList.toggle('on', m === val)); updateLive(); }
   if (seg === 'mis') { S.misMode = val; renderMis(); }
+  if (seg === 'mpg') { S.mpgMode = val; renderMpg(); }
+  if (seg === 'body' && VEH) { VEH.body = val; VEH.bodyUser = val; saveVeh(VEH); const pv = $('.vprev'); if (pv) pv.innerHTML = heroArt(''); renderHome(); }
   if (seg === 'theme') { S.theme = val; store.set('theme', val); applyTheme(); }
   if (seg === 'temp') { S.tempU = val; store.set('tempU', val); liveBuilt = ''; buildLive(); refreshAll(); }
   if (seg === 'speedu') { S.speedU = val; store.set('speedU', val); liveBuilt = ''; buildLive(); refreshAll(); }
 }
 function applyTheme() {
   document.documentElement.dataset.theme = S.theme;
+  if (NativeTransport.available()) { try { window.webkit.messageHandlers.ble.postMessage({ op: 'theme', value: S.theme }); } catch (e) { /* ignore */ } }
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = S.theme === 'dark' ? '#000000' : '#F2F2F7';
 }
 
 // ---------------------------------------------------------------- connection
-function vehicleName() {
-  if (!B) return 'No vehicle';
-  const saved = store.get('vname.' + B.vin, '');
-  if (saved) return saved;
-  const y = modelYear(B.vin), mk = S.makeKey && VEHICLE_DB[S.makeKey] ? VEHICLE_DB[S.makeKey].name.split(' /')[0] : '';
-  return [y, mk].filter(Boolean).join(' ') || 'Vehicle';
-}
+function vehicleName() { return VEH ? vehTitle(VEH) : (B ? 'Vehicle' : 'No vehicle'); }
 async function connect(demo) {
   if (S.mode !== 'off') return;
   const b = demo ? new DemoBackend() : new RealBackend();
-  S.mode = 'connecting'; S.status = demo ? 'Starting demo...' : 'Choose your adapter...'; renderHome();
+  S.mode = 'connecting'; S.status = demo ? 'Starting demo...' : NativeTransport.available() ? 'Looking for adapters...' : 'Choose your adapter...'; renderHome();
   try {
     await b.connect((s) => { S.status = s; renderHome(); });
   } catch (err) {
@@ -1233,10 +1325,23 @@ async function connect(demo) {
     alertBox({ title: 'Couldn’t connect', msg: (err && err.message) || String(err), cancel: false });
     return;
   }
-  B = b; S.mode = demo ? 'demo' : 'live';
+  B = b; S.status = 'Identifying your vehicle...';
   S.makeKey = makeFromVIN(B.vin) || store.get('make', null);
   resetData();
+  if (B.vin) {
+    store.set('lastVin', B.vin);
+    VEH = loadVeh(B.vin) || basicVeh(B.vin); saveVeh(VEH);
+    loadFuel(B.vin);
+    // Wait briefly for the exact model (cached after the first time) so the right vehicle drives in.
+    const look = lookupVehicle(B.vin).then(ensurePhotos);
+    const v = await Promise.race([look, sleep(2500).then(() => null)]);
+    if (v) VEH = v;
+    else look.then((x) => { if (x && B && x.vin === B.vin) { VEH = x; setTimeout(() => { if (top() === 'home') renderHome(); }, Math.max(0, S.arriveUntil - Date.now())); } });
+  } else { VEH = null; loadFuel('none'); }
+  S.mode = demo ? 'demo' : 'live';
+  S.arrive = true; S.arriveUntil = Date.now() + 2600;
   renderHome();
+  S.arrive = false;
   hud(demo ? 'Demo running' : 'Connected', demo ? 'i-gauge' : 'i-check');
   pollLoop();
   loadCodes();
@@ -1247,6 +1352,7 @@ function resetData() {
   if (S.mode === 'live') Object.keys(H).forEach((k) => { delete H[k]; });
 }
 function disconnect() {
+  if (F.trip) saveFuel();
   if (B) B.disconnect();
   B = null; S.mode = 'off'; S.rec = false; resetData(); goHome(); renderHome(); closeSheet();
 }
@@ -1269,7 +1375,17 @@ async function job(fn) {
 
 // ---------------------------------------------------------------- polling
 let polling = false;
+function fuelKeys() {
+  if (!B) return [];
+  if (B.supported('maf')) return ['maf', 'speed'];
+  return ['map', 'rpm', 'iat', 'speed'].filter((k) => B.supported(k));
+}
 function pollKeys() {
+  const k = basePollKeys();
+  if (k === 'extra') return k;
+  return k.concat(fuelKeys().filter((x) => !k.includes(x)));
+}
+function basePollKeys() {
   const t = top();
   if (t === 'live') {
     if (S.liveMode === 'gauges') return GAUGES;
@@ -1316,19 +1432,453 @@ async function pollLoop() {
   polling = false;
 }
 
+// ---------------------------------------------------------------- vehicle identity & artwork
+// (inserted into app.js; shares its scope: S, D, H, B, store, esc, $, $$, etc.)
+const PAINTS = [['Silver', '#B8BCC2'], ['White', '#EDEDED'], ['Black', '#2A2B30'], ['Gray', '#6E7178'], ['Red', '#C21F32'],
+  ['Blue', '#2457B5'], ['Green', '#2F6B45'], ['Tan', '#B69C74'], ['Orange', '#E8731C']];
+const BODY_STYLES = [['truck', 'Pickup'], ['suv', 'SUV'], ['sedan', 'Car'], ['van', 'Van']];
+let VEH = null;            // current vehicle {vin, make, model, year, body, disp, paint, ...}
+let fetchSeq = 0;
+const fetchWait = {};
+window.__nativeFetch = (id, text) => { const w = fetchWait[id]; if (w) { delete fetchWait[id]; w(text); } };
+
+// JSON GET. Inside the iPhone app the request goes through Swift (no browser CORS limits).
+function getJSON(url, ms) {
+  ms = ms || 8000;
+  if (NativeTransport.available()) {
+    return new Promise((res, rej) => {
+      const id = 'f' + (++fetchSeq);
+      const t = setTimeout(() => { delete fetchWait[id]; rej(new Error('timeout')); }, ms);
+      fetchWait[id] = (text) => { clearTimeout(t); try { res(JSON.parse(text)); } catch (e) { rej(e); } };
+      window.webkit.messageHandlers.ble.postMessage({ op: 'fetch', id, url });
+    });
+  }
+  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const t = setTimeout(() => { if (ctl) ctl.abort(); }, ms);
+  return fetch(url, ctl ? { signal: ctl.signal } : {}).then((r) => r.json()).finally(() => clearTimeout(t));
+}
+
+const vehKey = (vin) => 'veh.' + (vin || 'none');
+function loadVeh(vin) { try { return JSON.parse(store.get(vehKey(vin), 'null')); } catch (e) { return null; } }
+function saveVeh(v) { if (v) store.set(vehKey(v.vin), JSON.stringify(v)); }
+const titleCase = (s) => String(s || '').toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase()).replace(/\b(Bmw|Gmc|Ram|Mg|Byd)\b/g, (m) => m.toUpperCase());
+function bodyFromClass(c) {
+  c = (c || '').toLowerCase();
+  if (/pickup/.test(c)) return 'truck';
+  if (/sport utility|suv|multi-purpose|crossover/.test(c)) return 'suv';
+  if (/van/.test(c)) return 'van';
+  return 'sedan';
+}
+function basicVeh(vin) {
+  const mk = makeFromVIN(vin);
+  return { vin, make: mk ? VEHICLE_DB[mk].name.split(' /')[0] : '', model: '', year: modelYear(vin) || '', body: 'sedan', disp: null, paint: '#B8BCC2', src: 'vin' };
+}
+// Exact year/make/model/body from the free NHTSA VIN decoder; cached per VIN.
+async function lookupVehicle(vin) {
+  if (!vin) return null;
+  let v = loadVeh(vin) || basicVeh(vin);
+  if (v.src !== 'nhtsa') {
+    try {
+      const j = await getJSON('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + encodeURIComponent(vin) + '?format=json');
+      const x = j && j.Results && j.Results[0];
+      if (x && x.Make) {
+        Object.assign(v, {
+          make: titleCase(x.Make), model: x.Model || v.model, year: +x.ModelYear || v.year, bodyClass: x.BodyClass || '',
+          body: v.bodyUser || bodyFromClass(x.BodyClass), disp: parseFloat(x.DisplacementL) || v.disp, cyl: +x.EngineCylinders || null,
+          fuelType: x.FuelTypePrimary || '', drive: x.DriveType || '', trim: x.Trim || '', src: 'nhtsa',
+        });
+      }
+    } catch (e) { /* offline - keep the VIN-based basics */ }
+  }
+  saveVeh(v);
+  return v;
+}
+
+// Real photos of the exact model: NHTSA studio shots (public domain, mostly 2011+),
+// then freely licensed photos from Wikimedia Commons (credited on screen).
+function scorePhoto(title, ii, v) {
+  const t = title.toLowerCase().replace(/^file:/, ''), model = String(v.model || '').toLowerCase().split(/\s+/)[0];
+  if (!ii || !ii.thumburl || !model || !t.includes(model)) return 0;
+  if (/\.(svg|gif|pdf|tiff?|webm|ogv|png)$/.test(t)) return 0;
+  if (/\b(interior|engine|dashboard|badge|logo|emblem|wheels?|rims?|seats?|cockpit|tail ?lights?|headlights?|lamps?|grilles?|steering|trunk|cargo|toys?|model car|diecast|die-cast|lego|crash(ed)?|wreck(ed)?|damaged?|accident|burn(ed|t)?|rust(y)?|police|ambulance|fire|taxi|racing|race|rally|drift|parts|brochure)\b/.test(t)) return 0;
+  let s = 1;
+  const y = +v.year;
+  if (y && t.includes(String(y))) s += 5;
+  const r = t.match(/((?:19|20)\d{2})\s*[–-]\s*((?:19|20)?\d{2})/);
+  if (r && y) { const a = +r[1], b = +(r[2].length === 2 ? r[1].slice(0, 2) + r[2] : r[2]); if (y >= a && y <= b) s += 4; }
+  const years = (t.match(/\b(?:19|20)\d{2}\b/g) || []).map(Number);
+  if (y && years.length && !r && years.every((x) => Math.abs(x - y) > 3)) s -= 4;
+  if (/front|3\/4|three.quarter/.test(t)) s += 2;
+  if (/\brear\b|\bback\b/.test(t)) s -= 1;
+  if (ii.width && ii.height) s += ii.width > ii.height * 1.2 ? 2 : -3;
+  if (/nhtsa/.test(t)) s += 1;
+  return s;
+}
+const stripTags = (h) => String(h || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+async function findStockPhotos(v) {
+  const out = [];
+  if (!v || !v.make || !v.model || !v.year) return out;
+  try {
+    const list = await getJSON('https://api.nhtsa.gov/SafetyRatings/modelyear/' + v.year + '/make/' + encodeURIComponent(v.make) + '/model/' + encodeURIComponent(v.model));
+    const rows = (list && (list.Results || list)) || [];
+    const ids = (Array.isArray(rows) ? rows : []).slice(0, 4).map((r) => r.VehicleId).filter(Boolean);
+    for (const id of ids) {
+      const d = await getJSON('https://api.nhtsa.gov/SafetyRatings/VehicleId/' + id);
+      const r = d && d.Results && d.Results[0];
+      if (r && r.VehiclePicture && !out.some((o) => o.url === r.VehiclePicture)) out.push({ url: r.VehiclePicture, credit: 'Photo: NHTSA (public domain)', title: r.VehicleDescription || '' });
+    }
+  } catch (e) { /* none */ }
+  try {
+    const q = v.year + ' ' + v.make + ' ' + v.model;
+    const j = await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=40&gsrsearch=' +
+      encodeURIComponent(q) + '&prop=imageinfo&iiprop=url%7Cextmetadata%7Csize&iiurlwidth=1000');
+    const pages = Object.values((j && j.query && j.query.pages) || {});
+    pages.map((p) => ({ p, ii: p.imageinfo && p.imageinfo[0] })).map((x) => Object.assign(x, { s: scorePhoto(x.p.title, x.ii, v) }))
+      .filter((x) => x.s > 1).sort((a, b) => b.s - a.s).slice(0, 8).forEach((x) => {
+        const m = x.ii.extmetadata || {}, artist = stripTags(m.Artist && m.Artist.value).slice(0, 48), lic = stripTags(m.LicenseShortName && m.LicenseShortName.value);
+        out.push({ url: x.ii.thumburl, credit: 'Photo: ' + (artist || 'Wikimedia Commons') + (lic ? ' · ' + lic : '') + ' · Wikimedia Commons', title: x.p.title.replace(/^File:/, '').replace(/\.[a-z]+$/i, '') });
+      });
+  } catch (e) { /* offline */ }
+  return out;
+}
+async function ensurePhotos(v) {
+  if (!v || v.photos || v.src !== 'nhtsa') return v;
+  const ph = await findStockPhotos(v);
+  v.photos = ph; v.photoIdx = ph.length ? 0 : -1; saveVeh(v);
+  return v;
+}
+window.__heroImgFail = (img) => {
+  if (VEH && VEH.photos && VEH.photoIdx >= 0) { VEH.photos.splice(VEH.photoIdx, 1); VEH.photoIdx = VEH.photos.length ? 0 : -1; saveVeh(VEH); }
+  const wrap = img.closest('.stage, .vprev');
+  if (wrap) { wrap.classList.remove('photo'); wrap.innerHTML = carSVG(VEH ? VEH.body : 'sedan', VEH ? VEH.paint : '#8E8E93', 'on'); }
+};
+function vehTitle(v) {
+  if (!v) return 'Vehicle';
+  const saved = store.get('vname.' + v.vin, '');
+  if (saved) return saved;
+  return [v.year, v.make, v.model].filter(Boolean).join(' ') || 'Vehicle';
+}
+function vehSub(v) {
+  if (!v) return '';
+  return [v.disp ? v.disp.toFixed(1) + 'L' + (v.cyl ? ' V' + v.cyl : '') : '', v.drive, v.bodyClass].filter(Boolean).join(' · ');
+}
+const photoKey = (vin) => 'photo.' + (vin || 'none');
+
+function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255];
+  const t = f < 0 ? 0 : 255, p = Math.abs(f);
+  return '#' + c.map((x) => Math.round((t - x) * p + x).toString(16).padStart(2, '0')).join('');
+}
+
+// Original side-view illustrations by body style (not any brand's design).
+const CAR_SHAPES = {
+  truck: { body: 'M18,128 L18,80 Q18,76 22,76 L188,76 L196,40 Q198,32 208,32 L268,32 Q280,32 288,42 L308,72 L370,78 Q388,80 391,96 L392,120 Q392,128 384,128 Z',
+    glass: ['M204,40 L264,40 Q272,40 277,47 L294,70 L200,70 Z'], pillars: [[238, 38, 7, 34]], seams: [[188, 78, 188, 124], [196, 74, 196, 124], [298, 74, 298, 124]],
+    wheels: [92, 316], wy: 128, head: [380, 90], headPath: 'M376,84 L391,86 L391,95 L374,92 Z', tail: [18, 82, 6, 16], handles: [[264, 82]], line: 96 },
+  suv: { body: 'M20,128 L20,40 Q20,22 40,22 L268,22 Q281,22 290,31 L322,64 L372,71 Q390,75 392,92 L392,120 Q392,128 384,128 Z',
+    glass: ['M34,32 L100,32 L100,60 L34,60 Z', 'M108,32 L266,32 Q276,32 283,39 L304,60 L108,60 Z'], pillars: [[196, 30, 7, 32], [250, 30, 7, 32]],
+    seams: [[200, 64, 200, 122], [306, 66, 306, 122], [104, 62, 104, 122]], wheels: [96, 306], wy: 128, head: [384, 87], headPath: 'M378,81 L392,85 L392,94 L376,91 Z',
+    tail: [20, 50, 6, 20], handles: [[170, 72], [270, 72]], line: 88 },
+  sedan: { body: 'M16,126 L18,96 Q20,84 40,82 L108,74 L148,46 Q156,40 170,40 L252,40 Q266,40 276,50 L306,74 L366,80 Q388,84 390,100 L390,120 Q390,126 382,126 Z',
+    glass: ['M158,48 L250,48 Q260,48 268,56 L290,74 L124,76 L150,54 Q154,48 158,48 Z'], pillars: [[208, 46, 7, 32]],
+    seams: [[212, 78, 212, 120], [296, 78, 296, 120], [128, 80, 128, 120]], wheels: [96, 306], wy: 126, head: [382, 93], headPath: 'M374,88 L390,90 L390,98 L372,96 Z',
+    tail: [16, 92, 6, 12], handles: [[176, 86], [256, 86]], line: 100 },
+  van: { body: 'M18,128 L18,40 Q18,24 34,24 L250,24 Q266,24 278,36 L330,76 L374,82 Q390,86 392,100 L392,120 Q392,128 384,128 Z',
+    glass: ['M30,34 L120,34 L120,64 L30,64 Z', 'M128,34 L210,34 L210,64 L128,64 Z', 'M218,34 L256,34 Q264,34 270,40 L300,64 L218,64 Z'], pillars: [],
+    seams: [[214, 68, 214, 124], [310, 72, 310, 124]], wheels: [92, 312], wy: 128, head: [384, 96], headPath: 'M376,90 L392,92 L392,101 L374,98 Z',
+    tail: [18, 70, 6, 20], handles: [[234, 82]], line: 104 },
+};
+function carSVG(body, paint, cls) {
+  const s = CAR_SHAPES[body] || CAR_SHAPES.sedan, id = 'c' + Math.random().toString(36).slice(2, 8), wy = s.wy;
+  paint = paint || '#B8BCC2';
+  const hi = shade(paint, 0.3), lo = shade(paint, -0.35), well = shade(paint, -0.72);
+  let g = '<svg class="carsvg ' + (cls || '') + '" viewBox="0 0 400 170" role="img" aria-label="Vehicle illustration"><defs>' +
+    '<linearGradient id="' + id + 'b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + hi + '"/><stop offset=".5" stop-color="' + paint + '"/><stop offset="1" stop-color="' + lo + '"/></linearGradient>' +
+    '<linearGradient id="' + id + 'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a6878"/><stop offset="1" stop-color="#11161c"/></linearGradient>' +
+    '<linearGradient id="' + id + 'r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9dbde"/><stop offset="1" stop-color="#7b7f86"/></linearGradient>' +
+    '<radialGradient id="' + id + 's"><stop offset="0" stop-color="#000" stop-opacity=".6"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="' + id + 'h"><stop offset="0" stop-color="#FFF7D6" stop-opacity="1"/><stop offset="1" stop-color="#FFF7D6" stop-opacity="0"/></radialGradient>' +
+    '<clipPath id="' + id + 'c"><path d="' + s.body + '"/></clipPath></defs>' +
+    '<ellipse cx="205" cy="' + (wy + 28) + '" rx="195" ry="13" fill="url(#' + id + 's)"/>' +
+    '<path d="' + s.body + '" fill="url(#' + id + 'b)"/>';
+  s.glass.forEach((p) => { g += '<path d="' + p + '" fill="url(#' + id + 'g)"/>'; });
+  s.pillars.forEach((p) => { g += '<rect x="' + p[0] + '" y="' + p[1] + '" width="' + p[2] + '" height="' + p[3] + '" fill="' + paint + '"/>'; });
+  g += '<line x1="30" x2="378" y1="' + s.line + '" y2="' + s.line + '" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>';
+  s.seams.forEach((p) => { g += '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + p[2] + '" y2="' + p[3] + '" stroke="#000" stroke-opacity=".22" stroke-width="1.5"/>'; });
+  s.handles.forEach((p) => { g += '<rect x="' + p[0] + '" y="' + p[1] + '" width="14" height="4" rx="2" fill="#000" fill-opacity=".3"/>'; });
+  g += '<path d="' + s.headPath + '" fill="#FFF3C4"/><rect x="' + s.tail[0] + '" y="' + s.tail[1] + '" width="' + s.tail[2] + '" height="' + s.tail[3] + '" rx="2" fill="#E0302A"/>';
+  g += '<g clip-path="url(#' + id + 'c)">' + s.wheels.map((x) => '<circle cx="' + x + '" cy="' + wy + '" r="35" fill="' + well + '"/>').join('') + '</g>';
+  s.wheels.forEach((x) => {
+    g += '<circle cx="' + x + '" cy="' + wy + '" r="30" fill="#17171a"/>' +
+      '<circle cx="' + x + '" cy="' + wy + '" r="19" fill="url(#' + id + 'r)"/><circle cx="' + x + '" cy="' + wy + '" r="19" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2"/>';
+    for (let k = 0; k < 5; k++) { const a = (k * 72 - 90) * Math.PI / 180; g += '<line x1="' + x + '" y1="' + wy + '" x2="' + (x + 16 * Math.cos(a)).toFixed(1) + '" y2="' + (wy + 16 * Math.sin(a)).toFixed(1) + '" stroke="#5d6168" stroke-width="3" stroke-linecap="round"/>'; }
+    g += '<circle cx="' + x + '" cy="' + wy + '" r="5.5" fill="#3a3a3c"/>';
+  });
+  g += '<ellipse class="glow" cx="' + s.head[0] + '" cy="' + s.head[1] + '" rx="34" ry="20" fill="url(#' + id + 'h)" opacity="0"/></svg>';
+  return g;
+}
+
+function heroPhoto() {
+  const vin = VEH ? VEH.vin : store.get('lastVin', '');
+  const own = vin ? store.get(photoKey(vin), '') : '';
+  if (own && !(VEH && VEH.useOwn === false)) return { url: own, credit: '' };
+  if (VEH && VEH.photos && VEH.photoIdx >= 0 && VEH.photos[VEH.photoIdx]) return VEH.photos[VEH.photoIdx];
+  return null;
+}
+function heroArt(cls) {
+  const ph = heroPhoto();
+  if (ph) return '<img class="carphoto ' + (cls || '') + '" src="' + esc(ph.url) + '" alt="' + esc(VEH ? vehTitle(VEH) : 'Your vehicle') + '" onerror="__heroImgFail(this)">' +
+    (ph.credit ? '<span class="credit">' + esc(ph.credit) + '</span>' : '');
+  return carSVG(VEH ? VEH.body : 'sedan', VEH ? VEH.paint : '#8E8E93', cls);
+}
+
+function vehicleSheet() {
+  if (!VEH) { hud('Connect first', 'i-info'); return; }
+  const v = VEH, own = store.get(photoKey(v.vin), ''), photos = v.photos || [];
+  const sel = own && v.useOwn !== false ? 'own' : v.photoIdx >= 0 && photos[v.photoIdx] ? v.photoIdx : 'art';
+  const tile = (key, inner, label) => '<button class="ptile tap' + (String(sel) === String(key) ? ' on' : '') + '" data-act="choosePic" data-k="' + key + '" aria-label="' + esc(label) + '">' + inner + '</button>';
+  let tiles = '';
+  if (own) tiles += tile('own', '<img src="' + own + '" alt="">', 'Your photo');
+  photos.forEach((p, i) => { tiles += tile(i, '<img src="' + esc(p.url) + '" alt="" loading="lazy">', p.title || 'Photo ' + (i + 1)); });
+  tiles += tile('art', carSVG(v.body, v.paint, ''), 'Illustration');
+  const sw = PAINTS.map((p) => '<button class="swatch tap' + (p[1] === v.paint ? ' on' : '') + '" data-act="setPaint" data-c="' + p[1] + '" aria-label="' + p[0] + '" style="background:' + p[1] + '"></button>').join('');
+  const searching = v.photos === undefined && v.src === 'nhtsa';
+  openSheet('Your Vehicle',
+    '<div class="vprev' + (sel === 'art' ? '' : ' photo') + '">' + heroArt('') + '</div>' +
+    '<div class="cap">Picture</div><div class="ptiles">' + tiles + '</div>' +
+    (searching ? '<p class="foot" style="text-align:left;margin:0 4px">Looking for photos of your model...</p>'
+      : (!photos.length ? '<p class="foot" style="text-align:left;margin:0 4px">No photos of this model found online right now. Use your own photo below.</p>' : '')) +
+    '<div class="group"><button class="row tap" data-act="pickPhoto"><span class="grow" style="color:var(--blueT)">' + (own ? 'Replace My Photo' : 'Use My Own Photo') + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>' +
+    (own ? '<button class="row tap" data-act="removePhoto"><span class="grow" style="color:var(--redT)">Remove My Photo</span></button>' : '') + '</div>' +
+    '<p class="foot" style="text-align:left;margin:0 4px">Tip: in the Photos app, touch and hold your truck in a picture, tap <b>Share</b> to lift it off the background, save it, then choose it here for a clean cut-out look.</p>' +
+    (sel === 'art' ? '<div class="cap">Illustration color</div><div class="swatches">' + sw + '</div>' +
+      '<div class="cap">Body style</div><div class="seg" data-seg="body"><span class="ind"></span>' + BODY_STYLES.map((b) => '<button data-val="' + b[0] + '">' + b[1] + '</button>').join('') + '</div>' : '') +
+    '<div class="cap">Details</div><div class="group">' +
+    '<div class="row"><span class="grow">Name</span><input type="text" id="vname" value="' + esc(vehTitle(v)) + '" aria-label="Vehicle name"></div>' +
+    '<div class="row"><span class="grow">Engine size (L)</span><input type="number" inputmode="decimal" step="0.1" id="vdisp" value="' + (v.disp || '') + '" placeholder="e.g. 4.0" aria-label="Engine size in liters"></div>' +
+    '<div class="row"><span class="grow">VIN</span><span class="val num">' + esc(v.vin) + '</span></div></div>' +
+    '<p class="foot">Year, make and model come from the NHTSA VIN decoder. Photos come from NHTSA (public domain) or Wikimedia Commons (free licenses, credited on the picture) and may not match your exact trim or color.</p>');
+  if (sel === 'art') segSet('body', v.body);
+  const vn = $('#vname'), vd = $('#vdisp');
+  vn.addEventListener('change', () => { store.set('vname.' + v.vin, vn.value.trim()); renderHome(); });
+  vd.addEventListener('change', () => { const x = parseFloat(vd.value); v.disp = x > 0 && x < 10 ? x : v.disp; saveVeh(v); });
+  if (searching) ensurePhotos(v).then(() => { if ($('#sh-t').textContent === 'Your Vehicle') vehicleSheet(); renderHome(); });
+}
+function pickPhoto() {
+  let inp = $('#photoin');
+  if (!inp) {
+    inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.id = 'photoin'; inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', () => {
+      const f = inp.files && inp.files[0]; if (!f || !VEH) return;
+      const img = new Image(), url = URL.createObjectURL(f);
+      img.onload = () => {
+        const max = 1100, k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        let data = c.toDataURL('image/jpeg', 0.82);
+        if (data.length > 1500000) data = c.toDataURL('image/jpeg', 0.6);
+        store.set(photoKey(VEH.vin), data); VEH.useOwn = true; saveVeh(VEH);
+        URL.revokeObjectURL(url); inp.value = '';
+        vehicleSheet(); renderHome(); hud('Photo saved');
+      };
+      img.onerror = () => { hud('Couldn’t read that photo', 'i-info'); };
+      img.src = url;
+    });
+  }
+  inp.click();
+}
+
+// ---------------------------------------------------------------- fuel & MPG tracker
+const GAL_PER_GRAM_HR = 3600 / (14.7 * 2798.7);   // MAF (g/s) -> gal/h at 14.7:1, 6.17 lb/gal gasoline
+const F = { vin: null, price: 3.25, fills: [], trips: [], trip: null, lastT: 0, inst: null, gph: null, lastSave: 0 };
+const fk = (n) => 'fuel.' + n + '.' + (F.vin || 'none');
+const newTrip = () => ({ start: Date.now(), last: Date.now(), miles: 0, gal: 0, secs: 0, idle: 0 });
+function loadFuel(vin) {
+  F.vin = vin || 'none';
+  const j = (k, d) => { try { return JSON.parse(store.get(fk(k), 'null')) || d; } catch (e) { return d; } };
+  F.fills = j('fills', []); F.trips = j('trips', []); F.trip = j('trip', null);
+  F.price = parseFloat(store.get('fuel.price', '')) || (F.fills.length ? F.fills[F.fills.length - 1].ppg : 3.25);
+  if (!F.trip || Date.now() - F.trip.last > 2 * 3600 * 1000) archiveTrip(true);
+  F.lastT = 0;
+}
+function saveFuel() {
+  store.set(fk('fills'), JSON.stringify(F.fills)); store.set(fk('trips'), JSON.stringify(F.trips.slice(-100)));
+  store.set(fk('trip'), JSON.stringify(F.trip)); F.lastSave = Date.now();
+}
+function archiveTrip(quiet) {
+  if (F.trip && F.trip.miles >= 0.2) F.trips.push(Object.assign({}, F.trip, { ppg: F.price }));
+  F.trip = newTrip(); F.lastT = 0;
+  saveFuel();
+  if (!quiet) hud('New trip started', 'i-pump');
+}
+function fuelRate() {
+  if (D.maf !== undefined && D.maf !== null && !isNaN(D.maf)) return D.maf * GAL_PER_GRAM_HR;
+  if (D.map !== undefined && D.rpm !== undefined && D.iat !== undefined) {
+    const disp = (VEH && VEH.disp) || 2.5;
+    const maf = (D.map * 1000) / (287.05 * (D.iat + 273.15)) * (disp / 1000) * (D.rpm / 120) * 0.85 * 1000;   // speed-density
+    return maf * GAL_PER_GRAM_HR;
+  }
+  return null;
+}
+function fuelTick() {
+  if (!F.trip || !(S.mode === 'live' || S.mode === 'demo')) return;
+  const now = performance.now();
+  if (!F.lastT) { F.lastT = now; return; }
+  let dt = (now - F.lastT) / 1000; F.lastT = now;
+  if (dt <= 0) return; if (dt > 5) dt = 5;
+  const gph = fuelRate(), mph = D.speed !== undefined ? D.speed / 1.609 : null;
+  if (gph === null || mph === null) return;
+  const t = F.trip;
+  t.gal += gph * dt / 3600; t.miles += mph * dt / 3600; t.secs += dt; if (mph < 1) t.idle += dt; t.last = Date.now();
+  F.gph = gph; F.inst = mph >= 2 ? Math.min(99, mph / Math.max(gph, 0.05)) : null;
+  pushH('mpg', F.inst === null ? 0 : F.inst);
+  if (Date.now() - F.lastSave > 10000) saveFuel();
+}
+const tripMPG = (t) => (t && t.gal > 0.02 && t.miles > 0.1 ? t.miles / t.gal : null);
+const money = (x) => '$' + (x || 0).toFixed(2);
+function fillMPGs() {
+  const f = F.fills.slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : (a.odo || 0) - (b.odo || 0)));
+  const out = {};
+  let prev = null, galSince = 0;
+  f.forEach((x) => {
+    if (prev) galSince += x.gal;
+    if (x.full && x.odo) {
+      if (prev && x.odo > prev.odo && galSince > 0) out[x.id] = (x.odo - prev.odo) / galSince;
+      prev = x; galSince = 0;
+    }
+  });
+  return { sorted: f, mpg: out };
+}
+function monthKey(d) { return d.slice(0, 7); }
+function spendStats() {
+  const now = new Date(), cur = now.toISOString().slice(0, 7), lastD = new Date(now.getFullYear(), now.getMonth() - 1, 15), last = lastD.toISOString().slice(0, 7);
+  const by = {};
+  F.fills.forEach((x) => { const k = monthKey(x.date); by[k] = (by[k] || 0) + x.gal * x.ppg; });
+  const months = [];
+  for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 15); const k = d.toISOString().slice(0, 7); months.push({ k, label: d.toLocaleString('en-US', { month: 'short' }), v: by[k] || 0 }); }
+  const keys = Object.keys(by), total = keys.reduce((a, k) => a + by[k], 0);
+  const odos = F.fills.filter((x) => x.odo).map((x) => x.odo), miles = odos.length > 1 ? Math.max.apply(null, odos) - Math.min.apply(null, odos) : 0;
+  const firstGal = F.fills.length ? F.fills.slice().sort((a, b) => (a.odo || 0) - (b.odo || 0))[0] : null;
+  const costForMiles = firstGal ? total - firstGal.gal * firstGal.ppg : total;
+  return { cur: by[cur] || 0, last: by[last] || 0, avg: keys.length ? total / keys.length : 0, perMile: miles > 0 ? costForMiles / miles : null, months, total };
+}
+
+function renderMpg() {
+  const el = $('#mpgbody'); if (!el) return;
+  const mode = S.mpgMode || 'trip';
+  let h = '<div class="seg" data-seg="mpg"><span class="ind"></span><button data-val="trip">Live Trip</button><button data-val="fills">Fill-Ups</button><button data-val="spend">Spending</button></div>';
+  if (mode === 'trip') {
+    const live = S.mode === 'live' || S.mode === 'demo';
+    h += '<div class="mpggauge"><svg viewBox="0 0 220 128" aria-hidden="true"><path d="M20,118 A90,90 0 0 1 200,118" fill="none" stroke="var(--fill)" stroke-width="16" stroke-linecap="round"/>' +
+      '<path id="mpgarc" d="M20,118 A90,90 0 0 1 200,118" fill="none" stroke="var(--green)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" style="transition:stroke-dasharray .4s"/></svg>' +
+      '<div class="mg"><b class="num" id="mpg-inst">—</b><span id="mpg-instl">' + (live ? 'Instant MPG' : 'Connect to track') + '</span></div></div>' +
+      '<div class="stats4">' + ['Trip MPG|mpg-trip', 'Distance|mpg-mi', 'Fuel used|mpg-gal', 'Trip cost|mpg-cost', 'Idle time|mpg-idle', 'Cost / mile|mpg-cpm']
+        .map((x) => { const p = x.split('|'); return '<div class="stat"><span class="cap in">' + p[0] + '</span><b class="num" id="' + p[1] + '">—</b></div>'; }).join('') + '</div>' +
+      '<div class="chart" style="height:120px"><svg id="mpgsvg" viewBox="0 0 360 120" preserveAspectRatio="none"></svg></div>' +
+      '<div class="btns"><button class="btn tap" data-act="newTrip">Start New Trip</button><button class="btn tap" data-act="setPrice">Gas $' + F.price.toFixed(2) + '/gal</button></div>';
+    const recent = F.trips.slice(-6).reverse();
+    if (recent.length) {
+      h += '<div class="cap">Recent trips</div><div class="group">' + recent.map((t) => {
+        const m = tripMPG(t), d = new Date(t.start);
+        return '<div class="row"><span class="grow"><span>' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) +
+          '</span><span class="sub num">' + t.miles.toFixed(1) + ' mi · ' + t.gal.toFixed(2) + ' gal</span></span><span class="val num"><b style="color:var(--label)">' + (m ? m.toFixed(1) + ' mpg' : '—') +
+          '</b><br><span style="font-size:13px">' + money(t.gal * (t.ppg || F.price)) + '</span></span></div>';
+      }).join('') + '</div>';
+    }
+    h += '<p class="foot">Live MPG is estimated from the engine’s airflow sensor (usually within about 10%). Trips only record while the app is open and connected. Log fill-ups for exact numbers.</p>';
+  } else if (mode === 'fills') {
+    const r = fillMPGs(), vals = Object.values(r.mpg);
+    const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    const lastId = r.sorted.length ? r.sorted[r.sorted.length - 1].id : null;
+    h += '<button class="btn primary tap" data-act="addFill"><svg class="ic"><use href="#i-pump"/></svg>Add Fill-Up</button>' +
+      '<div class="stats"><div class="stat"><span class="cap in">Average MPG</span><b class="num">' + (avg ? avg.toFixed(1) : '—') + '</b></div>' +
+      '<div class="stat"><span class="cap in">Last tank</span><b class="num">' + (lastId && r.mpg[lastId] ? r.mpg[lastId].toFixed(1) : '—') + '</b></div></div>';
+    if (!r.sorted.length) h += '<div class="empty"><svg class="ic" style="color:var(--sec)"><use href="#i-pump"/></svg><b>No fill-ups yet</b>Each time you get gas, add the gallons, price and odometer. Two full tanks in a row give your real MPG.</div>';
+    else h += '<div class="group">' + r.sorted.slice().reverse().map((x) => {
+      const m = r.mpg[x.id], d = new Date(x.date + 'T12:00:00');
+      return '<button class="row tap" data-act="editFill" data-id="' + x.id + '"><span class="grow"><span>' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+        '</span><span class="sub num">' + x.gal.toFixed(2) + ' gal @ $' + x.ppg.toFixed(2) + (x.odo ? ' · ' + x.odo.toLocaleString('en-US') + ' mi' : '') + (x.full ? '' : ' · partial') + '</span></span>' +
+        (m ? '<span class="chip green num">' + m.toFixed(1) + ' mpg</span>' : '') + '<span class="val num" style="min-width:64px">' + money(x.gal * x.ppg) + '</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>';
+    }).join('') + '</div>';
+  } else {
+    const s = spendStats(), mx = Math.max(1, Math.max.apply(null, s.months.map((m) => m.v)));
+    h += '<div class="stats4">' + [['This month', money(s.cur)], ['Last month', money(s.last)], ['Avg / month', money(s.avg)], ['Cost / mile', s.perMile ? '$' + s.perMile.toFixed(3) : '—']]
+      .map((x) => '<div class="stat"><span class="cap in">' + x[0] + '</span><b class="num">' + x[1] + '</b></div>').join('') + '</div>' +
+      '<div class="bars" style="height:220px">' + s.months.map((m) => '<div class="bar"><b class="num" style="font-size:13px">' + (m.v ? '$' + Math.round(m.v) : '') + '</b><div class="track"><div class="fillb" style="height:' + Math.max(2, m.v / mx * 100) + '%;background:var(--green)"></div></div><span>' + m.label.toUpperCase() + '</span></div>').join('') + '</div>' +
+      (F.fills.length ? '' : '<p class="foot">Spending comes from your fill-ups. Add one on the Fill-Ups tab.</p>') +
+      '<div class="group"><button class="row tap" data-act="setPrice"><span class="grow">Gas price for trip costs</span><span class="val num">$' + F.price.toFixed(2) + '/gal</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button></div>';
+  }
+  el.innerHTML = h;
+  segSet('mpg', mode);
+  updateMpg();
+}
+function updateMpg() {
+  if (top() !== 'mpg' || (S.mpgMode || 'trip') !== 'trip') return;
+  const t = F.trip || newTrip(), m = tripMPG(t), set = (id, v) => { const e = $('#' + id); if (e) e.textContent = v; };
+  const live = S.mode === 'live' || S.mode === 'demo';
+  set('mpg-inst', !live ? '—' : F.inst !== null ? F.inst.toFixed(1) : F.gph !== null ? F.gph.toFixed(2) : '—');
+  set('mpg-instl', !live ? 'Connect to track' : F.inst !== null ? 'Instant MPG' : F.gph !== null ? 'Idling · gal/hour' : 'Waiting for data');
+  const a = $('#mpgarc'); if (a) a.setAttribute('stroke-dasharray', (live && F.inst !== null ? Math.min(100, F.inst / 40 * 100) : 0).toFixed(1) + ' 100');
+  set('mpg-trip', m ? m.toFixed(1) : '—'); set('mpg-mi', t.miles.toFixed(1) + ' mi'); set('mpg-gal', t.gal.toFixed(2) + ' gal');
+  set('mpg-cost', money(t.gal * F.price)); set('mpg-idle', Math.floor(t.idle / 60) + ' min'); set('mpg-cpm', t.miles > 0.5 ? '$' + (t.gal * F.price / t.miles).toFixed(2) : '—');
+  const svg = $('#mpgsvg'), arr = (H.mpg || []).slice(-120);
+  if (svg) svg.innerHTML = arr.length > 1 ? '<path d="' + spath(arr, 360, 120, 0, 40, 6) + '" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+    '<text x="352" y="16" text-anchor="end" font-size="11" fill="var(--sec)">40 mpg</text><text x="352" y="114" text-anchor="end" font-size="11" fill="var(--sec)">0</text>' : '';
+}
+function fillSheet(id) {
+  const x = id ? F.fills.find((f) => f.id === id) : null;
+  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const lastOdo = F.fills.reduce((a, f) => Math.max(a, f.odo || 0), 0);
+  openSheet(x ? 'Edit Fill-Up' : 'Add Fill-Up',
+    '<div class="group">' +
+    '<div class="row"><span class="grow">Date</span><input type="date" id="ff-date" value="' + (x ? x.date : today) + '"></div>' +
+    '<div class="row"><span class="grow">Gallons</span><input type="number" inputmode="decimal" step="0.001" id="ff-gal" placeholder="12.500" value="' + (x ? x.gal : '') + '"></div>' +
+    '<div class="row"><span class="grow">Price per gallon</span><input type="number" inputmode="decimal" step="0.001" id="ff-ppg" placeholder="' + F.price.toFixed(2) + '" value="' + (x ? x.ppg : '') + '"></div>' +
+    '<div class="row"><span class="grow">Odometer (mi)</span><input type="number" inputmode="numeric" id="ff-odo" placeholder="' + (lastOdo ? 'last ' + lastOdo : 'optional') + '" value="' + (x && x.odo ? x.odo : '') + '"></div>' +
+    '<div class="row"><span class="grow">Filled the tank</span><button class="switch tap' + (!x || x.full ? ' on' : '') + '" id="ff-full" data-act="toggleSwitch" aria-label="Filled the tank"><i></i></button></div>' +
+    '</div><div class="ffsum num" id="ff-total">Total $0.00</div>' +
+    '<button class="btn primary tap" data-act="saveFill" data-id="' + (x ? x.id : '') + '">Save</button>' +
+    (x ? '<button class="btn danger tap" data-act="deleteFill" data-id="' + x.id + '">Delete Fill-Up</button>' : '') +
+    '<p class="foot">MPG = miles between two full tanks ÷ gallons added. Partial fills are counted toward the next full tank.</p>');
+  const upd = () => { const g = parseFloat($('#ff-gal').value) || 0, p = parseFloat($('#ff-ppg').value) || F.price; $('#ff-total').textContent = 'Total ' + money(g * p); };
+  ['#ff-gal', '#ff-ppg'].forEach((s) => $(s).addEventListener('input', upd)); upd();
+}
+function saveFill(el) {
+  const gal = parseFloat($('#ff-gal').value), ppg = parseFloat($('#ff-ppg').value) || F.price, odo = parseInt($('#ff-odo').value, 10) || null, date = $('#ff-date').value;
+  if (!(gal > 0) || !(ppg > 0) || !date) { hud('Enter gallons and price', 'i-info'); return; }
+  const full = $('#ff-full').classList.contains('on');
+  const id = el.dataset.id || ('f' + Date.now());
+  const rec = { id, date, gal, ppg, odo, full };
+  const i = F.fills.findIndex((f) => f.id === id);
+  if (i >= 0) F.fills[i] = rec; else F.fills.push(rec);
+  F.price = ppg; store.set('fuel.price', String(ppg));
+  saveFuel(); closeSheet(); renderMpg(); renderTiles(); hud('Fill-up saved', 'i-pump');
+}
+function priceSheet() {
+  openSheet('Gas Price', '<div class="group"><div class="row"><span class="grow">Price per gallon</span><input type="number" inputmode="decimal" step="0.001" id="gp" value="' + F.price.toFixed(2) + '"></div></div>' +
+    '<button class="btn primary tap" data-act="savePrice">Save</button><p class="foot">Used for trip cost estimates. Adding a fill-up updates it automatically.</p>');
+}
+
 // ---------------------------------------------------------------- home
 function renderHome() {
   const c = $('#carcard'), on = S.mode === 'live' || S.mode === 'demo';
+  const known = VEH || store.get('lastVin', '');
   if (S.mode === 'off') {
-    c.innerHTML = '<div class="carrow"><span class="sq" style="background:var(--fill2);color:var(--sec)"><svg class="ic"><use href="#i-bt"/></svg></span>' +
-      '<div class="grow"><b>Not connected</b><span class="s">Plug in the adapter and turn the key on</span></div></div>' +
+    c.innerHTML = (known ? '<div class="stage' + (heroPhoto() ? ' photo' : '') + '">' + heroArt('dim') + '</div>' : '') +
+      '<div class="carrow">' + (known ? '' : '<span class="sq" style="background:var(--fill2);color:var(--sec)"><svg class="ic"><use href="#i-bt"/></svg></span>') +
+      '<div class="grow"><b>' + (VEH ? esc(vehTitle(VEH)) : 'Not connected') + '</b><span class="s">' + (VEH ? 'Not connected · ' : '') + 'Plug in the adapter and turn the key on</span></div></div>' +
       '<button class="btn primary tap" data-act="connect">Connect Adapter</button><button class="btn tap" data-act="demo" style="height:44px">Try Demo</button>';
   } else if (S.mode === 'connecting') {
-    c.innerHTML = '<div class="carrow"><div class="spin"></div><div class="grow"><b>Connecting</b><span class="s">' + esc(S.status) + '</span></div></div>';
+    c.innerHTML = (known ? '<div class="stage' + (heroPhoto() ? ' photo' : '') + '">' + heroArt('dim') + '</div>' : '') +
+      '<div class="carrow"><div class="spin"></div><div class="grow"><b>Connecting</b><span class="s">' + esc(S.status) + '</span></div></div>';
   } else {
-    c.innerHTML = '<div class="carrow"><span class="sq" style="background:#5E5CE6"><svg class="ic"><use href="#i-car"/></svg></span>' +
-      '<div class="grow"><b>' + esc(vehicleName()) + (S.mode === 'demo' ? ' <span class="demo">DEMO</span>' : '') + '</b><span class="s">' + esc(B.protoDesc || 'Connected') + '</span></div>' +
-      '<div class="vpill num"><span class="dot"></span><span id="h-volt">' + (D.volt ? D.volt.toFixed(1) + ' V' : '—') + '</span></div></div>' +
+    const photo = heroPhoto();
+    c.innerHTML = '<button class="hero tap" data-act="vehicle" aria-label="Vehicle details">' +
+      '<div class="stage' + (photo ? ' photo' : '') + '">' + heroArt(S.arrive ? 'on arrive' : 'on') + '</div>' +
+      '<div class="carrow"><div class="grow"><b>' + esc(vehicleName()) + (S.mode === 'demo' ? ' <span class="demo">DEMO</span>' : '') + '</b><span class="s">' +
+      esc((VEH && vehSub(VEH)) || B.protoDesc || 'Connected') + '</span></div>' +
+      '<div class="vpill num"><span class="dot"></span><span id="h-volt">' + (D.volt ? D.volt.toFixed(1) + ' V' : '—') + '</span></div></div></button>' +
       '<div class="mini num"><div><b id="h-rpm">—</b><span>RPM</span></div><div><b id="h-spd">—</b><span id="h-spdu">' + unit('speed').toUpperCase() + '</span></div><div><b id="h-cool">—</b><span>COOLANT</span></div></div>';
   }
   $$('.tile').forEach((t) => { t.style.opacity = on ? '' : '.55'; });
@@ -1352,12 +1902,18 @@ function renderTiles() {
 }
 function updateHome() {
   const on = S.mode === 'live' || S.mode === 'demo';
-  if (!on) { ['#t-live', '#t-fuel'].forEach((s) => { $(s).textContent = '—'; }); return; }
+  if (!on) { ['#t-live', '#t-fuel'].forEach((s) => { $(s).textContent = '—'; }); updateFuelCard(); return; }
   const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
   set('#h-rpm', fmt('rpm', D.rpm)); set('#h-spd', fmt('speed', D.speed)); set('#h-cool', D.cool === undefined ? '—' : tempStr(D.cool).replace(/°[FC]/, '°'));
   set('#h-volt', D.volt ? D.volt.toFixed(1) + ' V' : '—');
   $('#t-live').textContent = D.rpm === undefined ? 'Tap to view' : fmt('rpm', D.rpm) + ' rpm · ' + fmt('speed', D.speed) + ' ' + unit('speed');
   $('#t-fuel').textContent = D.stft1 !== undefined && D.ltft1 !== undefined ? 'B1 ' + pct(D.stft1 + D.ltft1) : 'Tap to view';
+  updateFuelCard();
+}
+function updateFuelCard() {
+  const t = F.trip, m = tripMPG(t), s = spendStats();
+  $('#fc-mpg').textContent = m ? m.toFixed(1) : '—';
+  $('#fc-sub').textContent = t && t.miles >= 0.1 ? t.miles.toFixed(1) + ' mi · ' + money(t.gal * F.price) + ' this trip' : s.cur ? money(s.cur) + ' on gas this month' : 'Live MPG, trips & fill-ups';
 }
 
 // ---------------------------------------------------------------- codes
@@ -1678,6 +2234,7 @@ async function saveRecording() {
   const header = ['time_s'].concat(PIDS.map((p) => p.k + '_' + unit(p.k).replace('°', 'deg').replace('/', 'per')));
   const csv = [header.join(',')].concat(S.recRows.map((r) => r.join(','))).join('\n');
   const d = new Date(), name = 'scan_' + d.toISOString().slice(0, 16).replace(/[-:T]/g, '') + '.csv';
+  if (NativeTransport.available()) { window.webkit.messageHandlers.ble.postMessage({ op: 'share', name, data: csv }); return; }
   try {
     const file = new File([csv], name, { type: 'text/csv' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; }
@@ -1697,7 +2254,7 @@ function settings() {
   const info = (l, v) => '<div class="row"><span class="grow">' + l + '</span><span class="val num" style="max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(v) + '</span></div>';
   let h = '<div class="group">' + row('Appearance', seg('theme', [['dark', 'Dark'], ['light', 'Light']])) + row('Temperature', seg('temp', [['F', '°F'], ['C', '°C']])) + row('Speed', seg('speedu', [['mph', 'mph'], ['kmh', 'km/h']])) + '</div>';
   if (B) {
-    h += '<div class="cap">Vehicle</div><div class="group">' + row('Name', '<input type="text" id="vname" value="' + esc(vehicleName()) + '" aria-label="Vehicle name">') +
+    h += '<div class="cap">Vehicle</div><div class="group"><button class="row tap" data-act="vehicle"><span class="grow">' + esc(vehicleName()) + '</span><span class="val">Photo, color, details</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>' +
       info('VIN', B.vin || 'Not reported') + info('Make', S.makeKey ? VEHICLE_DB[S.makeKey].name : 'Unknown') + info('Protocol', B.protoDesc || '—') + '</div>';
     h += '<div class="cap">Adapter</div><div class="group">' + info('Device', B.adapterName) + info('Chip', B.chip || '—') +
       '<button class="row tap" data-act="check"><span class="grow" style="color:var(--blueT)">Run Adapter Check</span><svg class="ic chev"><use href="#i-chev-r"/></svg></button>' +
@@ -1705,11 +2262,9 @@ function settings() {
   } else {
     h += '<div class="group"><button class="row tap" data-act="connect"><span class="grow" style="color:var(--blueT)">Connect Adapter</span></button><button class="row tap" data-act="demo"><span class="grow" style="color:var(--blueT)">Try Demo</span></button></div>';
   }
-  h += '<p class="foot">Works with Bluetooth LE OBD adapters (ELM327-compatible or OBDLink CX) in the Bluefy browser.</p>';
+  h += '<p class="foot">Works with Bluetooth LE OBD adapters (ELM327-compatible or OBDLink CX)' + (NativeTransport.available() ? '.' : ' in the Bluefy browser.') + '</p>';
   openSheet('Settings', h);
   segSet('theme', S.theme); segSet('temp', S.tempU); segSet('speedu', S.speedU);
-  const vn = $('#vname');
-  if (vn) vn.addEventListener('change', () => { store.set('vname.' + B.vin, vn.value.trim()); renderHome(); });
 }
 async function runCheck() {
   if (!B) return;
@@ -1728,7 +2283,9 @@ async function runCheck() {
 
 // ---------------------------------------------------------------- refresh
 function updateAll() {
+  fuelTick();
   const t = top();
+  if (t === 'mpg') updateMpg();
   if (t === 'home') updateHome();
   if (t === 'live') updateLive();
   if (t === 'fuel') drawFuel();
@@ -1738,6 +2295,26 @@ function refreshAll() { renderHome(); const t = top(); if (t !== 'home') onShow(
 
 // ---------------------------------------------------------------- actions
 const ACT = {
+  vehicle: () => vehicleSheet(),
+  pickPhoto: () => pickPhoto(),
+  choosePic: (el) => {
+    if (!VEH) return;
+    const k = el.dataset.k;
+    if (k === 'own') VEH.useOwn = true;
+    else { VEH.useOwn = false; VEH.photoIdx = k === 'art' ? -1 : +k; }
+    saveVeh(VEH);
+    vehicleSheet(); renderHome();
+  },
+  removePhoto: () => { if (VEH) { store.set(photoKey(VEH.vin), ''); VEH.useOwn = true; saveVeh(VEH); vehicleSheet(); renderHome(); } },
+  setPaint: (el) => { if (!VEH) return; VEH.paint = el.dataset.c; saveVeh(VEH); vehicleSheet(); renderHome(); },
+  newTrip: () => { archiveTrip(false); renderMpg(); updateFuelCard(); },
+  setPrice: () => priceSheet(),
+  savePrice: () => { const x = parseFloat($('#gp').value); if (x > 0) { F.price = x; store.set('fuel.price', String(x)); } closeSheet(); renderMpg(); updateFuelCard(); },
+  addFill: () => fillSheet(null),
+  editFill: (el) => fillSheet(el.dataset.id),
+  saveFill: (el) => saveFill(el),
+  deleteFill: (el) => alertBox({ title: 'Delete this fill-up?', ok: 'Delete', dest: true, onOk: () => { F.fills = F.fills.filter((f) => f.id !== el.dataset.id); saveFuel(); closeSheet(); renderMpg(); updateFuelCard(); } }),
+  toggleSwitch: (el) => el.classList.toggle('on'),
   connect: () => { closeSheet(); connect(false); },
   demo: () => { closeSheet(); connect(true); },
   disconnect,
@@ -1774,7 +2351,7 @@ document.addEventListener('click', (e) => {
   const segBtn = e.target.closest('.seg button');
   if (segBtn) { onSeg(segBtn.parentElement.dataset.seg, segBtn.dataset.val); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (S.mode === 'live' || S.mode === 'demo') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
+  if (g) { if (S.mode === 'live' || S.mode === 'demo' || g.dataset.go === 'mpg') push(g.dataset.go); else if (S.mode === 'off') needConnection(); return; }
   if (e.target.closest('[data-pop]')) { pop(); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a);
@@ -1783,11 +2360,12 @@ document.addEventListener('click', (e) => {
 // ---------------------------------------------------------------- start
 applyTheme();
 segSet('live', 'gauges');
+(function () { const lv = store.get('lastVin', ''); if (lv) VEH = loadVeh(lv); loadFuel(lv || 'none'); })();
 renderHome();
-if (!navigator.bluetooth) {
+if (!navigator.bluetooth && !NativeTransport.available()) {
   $('.foot').innerHTML = 'Bluetooth isn’t available in this browser. Open this page in <b>Bluefy</b> to connect an adapter. The demo works anywhere.';
 }
-window.__scanner = { S, D, H, connect, push, pop, ACT };
+window.__scanner = { S, D, H, F, connect, push, pop, ACT, getVEH: () => VEH };
 })();
 
 </script>

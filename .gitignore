@@ -1,0 +1,6 @@
+ios/Resources/index.html
+ios/build/
+ios/*.xcodeproj/
+ios/Sources/Info.plist
+ios/Payload/
+*.ipa
